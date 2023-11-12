@@ -13,8 +13,6 @@ using Jotunn.Managers;
 using BepInEx.Configuration;
 using TerrainTools.Helpers;
 
-using TerrainTools.Configs;
-
 namespace TerrainTools
 {
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
@@ -77,26 +75,6 @@ namespace TerrainTools
 
         #endregion Radius Configs
 
-        // Roadmap
-
-        // Make pathen versions of:
-        // - Cobblestone
-        // - Cultivate
-
-        // Make Square versions of:
-        // - Cultivate
-        // - Cultivate (Pathen)
-        // - Grass
-        // - Level
-        // - Pathen
-        // - Cobblestone
-        // - Cobblestone (Pathen)
-        // - Raise ground
-
-        // Add tools:
-        // - Remove Terrain modifications
-        // - Precision raise ground
-
         // Add feature:
         // - Hotkey to let scroll wheel change size of any of the above
         // - Add better descriptions to all the hoe pieces (if they smooth terrain or not)
@@ -122,7 +100,6 @@ namespace TerrainTools
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), harmonyInstanceId: PluginGUID);
             Game.isModded = true;
 
-            //PrefabManager.OnPrefabsRegistered += InitManager.InitToolPieces;
             PieceManager.OnPiecesRegistered += InitManager.InitToolPieces;
 
             ConfigManager.SetupWatcher();
@@ -140,6 +117,17 @@ namespace TerrainTools
 
             // Update tools if in-game config manager window is closed
             ConfigManager.OnConfigWindowClosed += () =>
+            {
+                if (UpdateTools)
+                {
+                    InitManager.UpdatePlugin();
+                    ConfigManager.Save();
+                    UpdateTools = false;
+                }
+            };
+
+            // Update tools if in-game config manager window is closed
+            SynchronizationManager.OnConfigurationSynchronized += (obj, args) =>
             {
                 if (UpdateTools)
                 {
