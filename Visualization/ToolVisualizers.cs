@@ -72,6 +72,13 @@ namespace TerrainTools.Visualization
 
     public class CultivateOverlayVisualizer : HoverInfoEnabled
     {
+        protected override void Initialize()
+        {
+            base.Initialize();
+            SpeedUp(secondary);
+            VisualizeRecoloringBounds(secondary);
+        }
+
         protected override void OnRefresh()
         {
             base.OnRefresh();
@@ -89,13 +96,14 @@ namespace TerrainTools.Visualization
             Freeze(secondary);
             VisualizeRecoloringBounds(secondary);
             primary.StartSize = 4.0f;
-            primary.LocalPosition = new Vector3(0.5f, 2.5f, 0.5f);
+            primary.LocalPosition = new Vector3(0.0f, 2.5f, 0.0f);
+            //primary.LocalPosition = new Vector3(0.0f, 2.5f, 0.0f);
         }
 
         protected override void OnRefresh()
         {
             base.OnRefresh();
-            primary.Enabled = false;
+            primary.Enabled = true;
             secondary.Enabled = true;
         }
     }

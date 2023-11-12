@@ -55,11 +55,16 @@ namespace TerrainTools
 
         // Add feature:
         // - Hotkey to let scroll wheel change size of any of the above
+        // - Add better descriptions to all the hoe pieces (if they smooth terrain or not)
 
         // Configuration:
         // - Option to enable/disable each of the above tools
         // - Options to set max and min size for when changing tool size
         // - Configure hotkey for changing size with scroll wheel
+        // - Configure whether the hover info shows or not (terrain height info)
+
+        // Stretch Goal:
+        // - Add a shovel tool that lets you lower terrain
 
         public void Awake()
         {
@@ -94,8 +99,8 @@ namespace TerrainTools
                 IconCache.MudRoadSquare
             );
 
-            AddToolPiece<LevelGroundOverlayVisualizer>(
-                "Raise Terrain (Square)",
+            AddToolPiece<RaiseGroundOverlayVisualizer>(
+                "Raise Terrain (Precision)",
                 "raise_v2",
                 PieceTables.Hoe,
                 IconCache.RaiseSquare
@@ -115,6 +120,14 @@ namespace TerrainTools
                 IconCache.PavedRoadSquare
             );
 
+            AddToolPiece(
+                "Cobblestone Path",
+                "paved_road_v2",
+                PieceTables.Hoe,
+                IconCache.PavedRoadPath,
+                smooth: false
+            );
+
             AddToolPiece<PaveRoadOverlayVisualizer>(
                 "Cobblestone Path (Square)",
                 "paved_road_v2",
@@ -128,6 +141,14 @@ namespace TerrainTools
                 "cultivate_v2",
                 PieceTables.Cultivator,
                 IconCache.CultivateSquare
+            );
+
+            AddToolPiece(
+                "Cultivate Path",
+                "cultivate_v2",
+                PieceTables.Cultivator,
+                IconCache.CultivatePath,
+                smooth: false
             );
 
             AddToolPiece<CultivateOverlayVisualizer>(
@@ -170,7 +191,40 @@ namespace TerrainTools
             bool? clearPaint = null
         ) where TOverlayVisualizer : OverlayVisualizer
         {
-            if (PieceManager.Instance.GetPiece(pieceName) != null) { return; }
+            var piece = MakeToolPiece(pieceName, basePieceName, pieceTable, iconTexture, level, raise, smooth, clearPaint);
+            if (piece == null) { return; }
+            piece.PiecePrefab.AddComponent<TOverlayVisualizer>();
+            PieceManager.Instance.AddPiece(piece);
+        }
+
+        private void AddToolPiece(
+            string pieceName,
+            string basePieceName,
+            string pieceTable,
+            Texture2D iconTexture,
+            bool? level = null,
+            bool? raise = null,
+            bool? smooth = null,
+            bool? clearPaint = null
+        )
+        {
+            var piece = MakeToolPiece(pieceName, basePieceName, pieceTable, iconTexture, level, raise, smooth, clearPaint);
+            if (piece == null) { return; }
+            PieceManager.Instance.AddPiece(piece);
+        }
+
+        private static CustomPiece MakeToolPiece(
+            string pieceName,
+            string basePieceName,
+            string pieceTable,
+            Texture2D iconTexture,
+            bool? level = null,
+            bool? raise = null,
+            bool? smooth = null,
+            bool? clearPaint = null
+        )
+        {
+            if (PieceManager.Instance.GetPiece(pieceName) != null) { return null; }
 
             var pieceIcon = Sprite.Create(iconTexture, new Rect(0, 0, iconTexture.width, iconTexture.height), Vector2.zero);
             var piece = new CustomPiece(
@@ -189,9 +243,7 @@ namespace TerrainTools
             settings.m_raise = raise != null ? raise.Value : settings.m_raise;
             settings.m_smooth = smooth != null ? smooth.Value : settings.m_smooth;
             settings.m_paintCleared = clearPaint != null ? clearPaint.Value : settings.m_paintCleared;
-            piece.PiecePrefab.AddComponent<TOverlayVisualizer>();
-
-            PieceManager.Instance.AddPiece(piece);
+            return piece;
         }
     }
 

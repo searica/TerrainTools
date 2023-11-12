@@ -40,179 +40,6 @@ namespace TerrainTools
             return true;
         }
 
-        public static void SmoothenTerrain(
-            TerrainComp compiler,
-            Vector3 worldPos,
-            Heightmap hMap,
-            int worldWidth,
-            ref float[] smoothDelta,
-            ref bool[] modifiedHeight
-        )
-        {
-            Debug.Log("[INIT] Smooth Terrain Modification");
-
-            var worldSize = worldWidth + 1;
-            hMap.WorldToVertex(worldPos, out var xPos, out var yPos);
-            var referenceH = worldPos.y - compiler.transform.position.y;
-            Debug.Log($"worldPos: {worldPos}, xPos: {xPos}, yPos: {yPos}, referenceH: {referenceH}");
-
-            FindExtremums(xPos, worldSize, out var xMin, out var xMax);
-            FindExtremums(yPos, worldSize, out var yMin, out var yMax);
-            for (var x = xMin; x <= xMax; x++)
-            {
-                for (var y = yMin; y <= yMax; y++)
-                {
-                    var tileIndex = y * worldSize + x;
-                    var tileH = hMap.GetHeight(x, y);
-                    var deltaH = referenceH - tileH;
-                    var oldDeltaH = smoothDelta[tileIndex];
-                    var newDeltaH = oldDeltaH + deltaH;
-                    var roundedNewDeltaH = RoundToTwoDecimals(tileH, oldDeltaH, newDeltaH);
-                    var limDeltaH = Mathf.Clamp(roundedNewDeltaH, -1.0f, 1.0f);
-                    smoothDelta[tileIndex] = limDeltaH;
-                    modifiedHeight[tileIndex] = true;
-                    Debug.Log($"tilePos: ({x}, {y}), tileH: {tileH}, deltaH: {deltaH}, oldDeltaH: {oldDeltaH}, newDeltaH: {newDeltaH}, roundedNewDeltaH: {roundedNewDeltaH}, limDeltaH: {limDeltaH}");
-                }
-            }
-            Debug.Log("[SUCCESS] Smooth Terrain Modification");
-        }
-
-        public static void RaiseTerrain(
-            TerrainComp compiler,
-            Vector3 worldPos,
-            Heightmap hMap,
-            int worldWidth,
-            float power,
-            ref float[] levelDelta,
-            ref float[] smoothDelta,
-            ref bool[] modifiedHeight
-        )
-        {
-            Debug.Log("[INIT] Raise Terrain Modification");
-
-            var worldSize = worldWidth + 1;
-            hMap.WorldToVertex(worldPos, out var xPos, out var yPos);
-            var referenceH = worldPos.y - compiler.transform.position.y + power;
-            Debug.Log($"worldPos: {worldPos}, xPos: {xPos}, yPos: {yPos}, power: {power}, referenceH: {referenceH}");
-
-            FindExtremums(xPos, worldSize, out var xMin, out var xMax);
-            FindExtremums(yPos, worldSize, out var yMin, out var yMax);
-            for (var x = xMin; x <= xMax; x++)
-            {
-                for (var y = yMin; y <= yMax; y++)
-                {
-                    var tileIndex = y * worldSize + x;
-                    var tileH = hMap.GetHeight(x, y);
-                    var deltaH = referenceH - tileH;
-                    if (deltaH >= 0)
-                    {
-                        var oldLevelDelta = levelDelta[tileIndex];
-                        var oldSmoothDelta = smoothDelta[tileIndex];
-                        var newLevelDelta = oldLevelDelta + oldSmoothDelta + deltaH;
-                        var newSmoothDelta = 0f;
-                        var roundedNewLevelDelta = RoundToTwoDecimals(tileH, oldLevelDelta + oldSmoothDelta, newLevelDelta + newSmoothDelta);
-                        var limitedNewLevelDelta = Mathf.Clamp(roundedNewLevelDelta, -16.0f, 16.0f);
-                        levelDelta[tileIndex] = limitedNewLevelDelta;
-                        smoothDelta[tileIndex] = newSmoothDelta;
-                        modifiedHeight[tileIndex] = true;
-                        Debug.Log($"tilePos: ({x}, {y}), tileH: {tileH}, deltaH: {deltaH}, oldLevelDelta: {oldLevelDelta}, oldSmoothDelta: {oldSmoothDelta}, newLevelDelta: {newLevelDelta}, newSmoothDelta: {newSmoothDelta}, roundedNewLevelDelta: {roundedNewLevelDelta}, limitedNewLevelDelta: {limitedNewLevelDelta}");
-                    }
-                    else
-                    {
-                        Debug.Log("Declined to process tile: deltaH < 0!");
-                        Debug.Log($"tilePos: ({x}, {y}), tileH: {tileH}, deltaH: {deltaH}");
-                    }
-                }
-            }
-
-            Debug.Log("[SUCCESS] Raise Terrain Modification");
-        }
-
-        public static void RecolorTerrain(
-            Vector3 worldPos,
-            TerrainModifier.PaintType paintType,
-            Heightmap hMap,
-            int worldWidth,
-            ref Color[] paintMask,
-            ref bool[] modifiedPaint
-        )
-        {
-            Debug.Log("[INIT] Color Terrain Modification");
-            worldPos -= new Vector3(0.5f, 0, 0.5f);
-            hMap.WorldToVertex(worldPos, out var xPos, out var yPos);
-            Debug.Log($"worldPos: {worldPos}, vertexPos: ({xPos}, {yPos})");
-
-            var tileColor = ResolveColor(paintType);
-            var removeColor = tileColor == Color.black;
-            FindExtremums(xPos, worldWidth, out var xMin, out var xMax);
-            FindExtremums(yPos, worldWidth, out var yMin, out var yMax);
-            for (var x = xMin; x <= xMax; x++)
-            {
-                for (var y = yMin; y <= yMax; y++)
-                {
-                    var tileIndex = y * worldWidth + x;
-                    paintMask[tileIndex] = tileColor;
-                    modifiedPaint[tileIndex] = !removeColor;
-                    Debug.Log($"tilePos: ({x}, {y}), tileIndex: {tileIndex}, tileColor: {tileColor}");
-                }
-            }
-            Debug.Log("[SUCCESS] Color Terrain Modification");
-        }
-
-        public static void RemoveTerrainModifications(
-            Vector3 worldPos,
-            Heightmap hMap,
-            int worldWidth,
-            ref float[] levelDelta,
-            ref float[] smoothDelta,
-            ref bool[] modifiedHeight
-        )
-        {
-            Debug.Log("[INIT] Remove Terrain Modifications");
-
-            var worldSize = worldWidth + 1;
-            hMap.WorldToVertex(worldPos, out var xPos, out var yPos);
-            Debug.Log($"worldPos: {worldPos}, vertexPos: ({xPos}, {yPos})");
-
-            FindExtremums(xPos, worldSize, out var xMin, out var xMax);
-            FindExtremums(yPos, worldSize, out var yMin, out var yMax);
-            for (var x = xMin; x <= xMax; x++)
-            {
-                for (var y = yMin; y <= yMax; y++)
-                {
-                    var tileIndex = y * worldSize + x;
-                    levelDelta[tileIndex] = 0;
-                    smoothDelta[tileIndex] = 0;
-                    modifiedHeight[tileIndex] = false;
-                    Debug.Log($"tilePos: ({x}, {y}), tileIndex: {tileIndex}");
-                }
-            }
-            Debug.Log("[SUCCESS] Remove Terrain Modifications");
-        }
-
-        public static Color ResolveColor(TerrainModifier.PaintType paintType)
-        {
-            if (paintType == TerrainModifier.PaintType.Dirt) { return Color.red; }
-            if (paintType == TerrainModifier.PaintType.Paved) { return Color.blue; }
-            if (paintType == TerrainModifier.PaintType.Cultivate) { return Color.green; }
-            return Color.black;
-        }
-
-        public static void FindExtremums(int x, int worldSize, out int xMin, out int xMax)
-        {
-            xMin = Mathf.Max(0, x - SizeInTiles);
-            xMax = Mathf.Min(x + SizeInTiles, worldSize - 1);
-        }
-
-        public static float RoundToTwoDecimals(float oldH, float oldDeltaH, float newDeltaH)
-        {
-            var newH = oldH - oldDeltaH + newDeltaH;
-            var roundedNewH = Mathf.Round(newH * 100) / 100;
-            var roundedNewDeltaH = roundedNewH - oldH + oldDeltaH;
-            Debug.Log($"oldH: {oldH}, oldDeltaH: {oldDeltaH}, newDeltaH: {newDeltaH}, newH: {newH}, roundedNewH: {roundedNewH}, roundedNewDeltaH: {roundedNewDeltaH}");
-            return roundedNewDeltaH;
-        }
-
         [HarmonyPrefix]
         [HarmonyPatch(nameof(TerrainComp.SmoothTerrain))]
         private static bool SmoothTerrianPrefix(
@@ -242,11 +69,11 @@ namespace TerrainTools
         [HarmonyPrefix]
         [HarmonyPatch(nameof(TerrainComp.RaiseTerrain))]
         private static bool RaiseTerrainPrefix(
-            TerrainComp __instance,
-            Vector3 worldPos,
-            float radius,
-            float delta
-        )
+           TerrainComp __instance,
+           Vector3 worldPos,
+           float radius,
+           float delta
+       )
         {
             if (IsGridModeEnabled(radius))
             {
@@ -324,6 +151,183 @@ namespace TerrainTools
         public static bool IsGridModeEnabled(float radius)
         {
             return radius == float.NegativeInfinity;
+        }
+
+        public static void SmoothenTerrain(
+            TerrainComp compiler,
+            Vector3 worldPos,
+            Heightmap hMap,
+            int worldWidth,
+            ref float[] smoothDelta,
+            ref bool[] modifiedHeight
+        )
+        {
+            Debug.Log("[INIT] Smooth Terrain Modification");
+
+            var worldSize = worldWidth + 1;
+            hMap.WorldToVertex(worldPos, out var xPos, out var yPos);
+            var referenceH = worldPos.y - compiler.transform.position.y;
+            Debug.Log($"worldPos: {worldPos}, xPos: {xPos}, yPos: {yPos}, referenceH: {referenceH}");
+
+            FindExtrema(xPos, worldSize, out var xMin, out var xMax);
+            FindExtrema(yPos, worldSize, out var yMin, out var yMax);
+            for (var x = xMin; x <= xMax; x++)
+            {
+                for (var y = yMin; y <= yMax; y++)
+                {
+                    var tileIndex = y * worldSize + x;
+                    var tileH = hMap.GetHeight(x, y);
+                    var deltaH = referenceH - tileH;
+                    var oldDeltaH = smoothDelta[tileIndex];
+                    var newDeltaH = oldDeltaH + deltaH;
+                    var roundedNewDeltaH = RoundToTwoDecimals(tileH, oldDeltaH, newDeltaH);
+                    var limDeltaH = Mathf.Clamp(roundedNewDeltaH, -1.0f, 1.0f);
+                    smoothDelta[tileIndex] = limDeltaH;
+                    modifiedHeight[tileIndex] = true;
+                    Debug.Log($"tilePos: ({x}, {y}), tileH: {tileH}, deltaH: {deltaH}, oldDeltaH: {oldDeltaH}, newDeltaH: {newDeltaH}, roundedNewDeltaH: {roundedNewDeltaH}, limDeltaH: {limDeltaH}");
+                }
+            }
+            Debug.Log("[SUCCESS] Smooth Terrain Modification");
+        }
+
+        public static void RaiseTerrain(
+            TerrainComp compiler,
+            Vector3 worldPos,
+            Heightmap hMap,
+            int worldWidth,
+            float power,
+            ref float[] levelDelta,
+            ref float[] smoothDelta,
+            ref bool[] modifiedHeight
+        )
+        {
+            Debug.Log("[INIT] Raise Terrain Modification");
+
+            var worldSize = worldWidth + 1;
+            hMap.WorldToVertex(worldPos, out var xPos, out var yPos);
+            var referenceH = worldPos.y - compiler.transform.position.y + power;
+            Debug.Log($"worldPos: {worldPos}, xPos: {xPos}, yPos: {yPos}, power: {power}, referenceH: {referenceH}");
+
+            FindExtrema(xPos, worldSize, out var xMin, out var xMax);
+            FindExtrema(yPos, worldSize, out var yMin, out var yMax);
+            for (var x = xMin; x <= xMax; x++)
+            {
+                for (var y = yMin; y <= yMax; y++)
+                {
+                    var tileIndex = y * worldSize + x;
+                    var tileH = hMap.GetHeight(x, y);
+                    var deltaH = referenceH - tileH;
+                    if (deltaH >= 0)
+                    {
+                        var oldLevelDelta = levelDelta[tileIndex];
+                        var oldSmoothDelta = smoothDelta[tileIndex];
+                        var newLevelDelta = oldLevelDelta + oldSmoothDelta + deltaH;
+                        var newSmoothDelta = 0f;
+                        var roundedNewLevelDelta = RoundToTwoDecimals(
+                            tileH,
+                            oldLevelDelta + oldSmoothDelta,
+                            newLevelDelta + newSmoothDelta
+                        );
+                        var limitedNewLevelDelta = Mathf.Clamp(roundedNewLevelDelta, -16.0f, 16.0f);
+                        levelDelta[tileIndex] = limitedNewLevelDelta;
+                        smoothDelta[tileIndex] = newSmoothDelta;
+                        modifiedHeight[tileIndex] = true;
+
+                        Debug.Log($"tilePos: ({x}, {y}), tileH: {tileH}, deltaH: {deltaH}, oldLevelDelta: {oldLevelDelta}, oldSmoothDelta: {oldSmoothDelta}, newLevelDelta: {newLevelDelta}, newSmoothDelta: {newSmoothDelta}, roundedNewLevelDelta: {roundedNewLevelDelta}, limitedNewLevelDelta: {limitedNewLevelDelta}");
+                    }
+                    else
+                    {
+                        Debug.Log("Declined to process tile: deltaH < 0!");
+                        Debug.Log($"tilePos: ({x}, {y}), tileH: {tileH}, deltaH: {deltaH}");
+                    }
+                }
+            }
+
+            Debug.Log("[SUCCESS] Raise Terrain Modification");
+        }
+
+        public static void RecolorTerrain(
+            Vector3 worldPos,
+            TerrainModifier.PaintType paintType,
+            Heightmap hMap,
+            int worldWidth,
+            ref Color[] paintMask,
+            ref bool[] modifiedPaint
+        )
+        {
+            Debug.Log("[INIT] Color Terrain Modification");
+            hMap.WorldToVertex(worldPos, out var xPos, out var yPos);
+            Debug.Log($"worldPos: {worldPos}, vertexPos: ({xPos}, {yPos})");
+
+            var tileColor = ResolveColor(paintType);
+            var removeColor = tileColor == Color.black;
+            FindExtrema(xPos, worldWidth, out var xMin, out var xMax);
+            FindExtrema(yPos, worldWidth, out var yMin, out var yMax);
+            for (var x = xMin; x <= xMax; x++)
+            {
+                for (var y = yMin; y <= yMax; y++)
+                {
+                    var tileIndex = y * worldWidth + x;
+                    paintMask[tileIndex] = tileColor;
+                    modifiedPaint[tileIndex] = !removeColor;
+                    Debug.Log($"tilePos: ({x}, {y}), tileIndex: {tileIndex}, tileColor: {tileColor}");
+                }
+            }
+            Debug.Log("[SUCCESS] Color Terrain Modification");
+        }
+
+        public static void RemoveTerrainModifications(
+            Vector3 worldPos,
+            Heightmap hMap,
+            int worldWidth,
+            ref float[] levelDelta,
+            ref float[] smoothDelta,
+            ref bool[] modifiedHeight
+        )
+        {
+            Debug.Log("[INIT] Remove Terrain Modifications");
+
+            var worldSize = worldWidth + 1;
+            hMap.WorldToVertex(worldPos, out var xPos, out var yPos);
+            Debug.Log($"worldPos: {worldPos}, vertexPos: ({xPos}, {yPos})");
+
+            FindExtrema(xPos, worldSize, out var xMin, out var xMax);
+            FindExtrema(yPos, worldSize, out var yMin, out var yMax);
+            for (var x = xMin; x <= xMax; x++)
+            {
+                for (var y = yMin; y <= yMax; y++)
+                {
+                    var tileIndex = y * worldSize + x;
+                    levelDelta[tileIndex] = 0;
+                    smoothDelta[tileIndex] = 0;
+                    modifiedHeight[tileIndex] = false;
+                    Debug.Log($"tilePos: ({x}, {y}), tileIndex: {tileIndex}");
+                }
+            }
+            Debug.Log("[SUCCESS] Remove Terrain Modifications");
+        }
+
+        public static Color ResolveColor(TerrainModifier.PaintType paintType)
+        {
+            if (paintType == TerrainModifier.PaintType.Dirt) { return Color.red; }
+            if (paintType == TerrainModifier.PaintType.Paved) { return Color.blue; }
+            if (paintType == TerrainModifier.PaintType.Cultivate) { return Color.green; }
+            return Color.black;
+        }
+
+        public static void FindExtrema(int x, int worldSize, out int xMin, out int xMax)
+        {
+            xMin = Mathf.Max(0, x - SizeInTiles);
+            xMax = Mathf.Min(x + SizeInTiles, worldSize - 1);
+        }
+
+        public static float RoundToTwoDecimals(float oldH, float oldDeltaH, float newDeltaH)
+        {
+            var newH = oldH - oldDeltaH + newDeltaH;
+            var roundedNewH = Mathf.Round(newH * 100) / 100;
+            var roundedNewDeltaH = roundedNewH - oldH + oldDeltaH;
+            Debug.Log($"oldH: {oldH}, oldDeltaH: {oldDeltaH}, newDeltaH: {newDeltaH}, newH: {newH}, roundedNewH: {roundedNewH}, roundedNewDeltaH: {roundedNewDeltaH}");
+            return roundedNewDeltaH;
         }
     }
 }

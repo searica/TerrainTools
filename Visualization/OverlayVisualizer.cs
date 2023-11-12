@@ -1,16 +1,17 @@
 ﻿using HarmonyLib;
-using Jotunn.Utils;
 using UnityEngine;
 
 namespace TerrainTools.Visualization
 {
-    // Helper classes for OverlayVisualizerImpls, intented to abstract away unecessary low level complexity.
+    // Helper classes for OverlayVisualizerImpls, intended to abstract away necessary low level complexity.
     public abstract class OverlayVisualizer : MonoBehaviour
     {
         protected Overlay primary;
         protected Overlay secondary;
         protected Overlay tertiary;
         protected HoverInfo hoverInfo;
+
+        protected static readonly Vector3 VerticalOffset = new(0, 0.05f, 0);
 
         private void Update()
         {
@@ -59,28 +60,28 @@ namespace TerrainTools.Visualization
         {
             overlay.StartSize = 3.0f;
             overlay.psr.material.mainTexture = IconCache.Box;
-            overlay.LocalPosition = new Vector3(0, 0.05f, 0);
+            overlay.LocalPosition = VerticalOffset;
         }
 
         protected void VisualizeRecoloringBounds(Overlay overlay)
         {
             overlay.StartSize = 4.0f;
             overlay.psr.material.mainTexture = IconCache.Box;
-            overlay.LocalPosition = new Vector3(0.5f, 0.05f, 0.5f);
+            overlay.LocalPosition = VerticalOffset;
         }
 
         protected void VisualizeIconInsideTerraformingBounds(Overlay overlay, Texture iconTexture)
         {
             overlay.StartSize = 2.5f;
             overlay.psr.material.mainTexture = iconTexture;
-            overlay.LocalPosition = new Vector3(0, 0.05f, 0);
+            overlay.LocalPosition = VerticalOffset;
         }
 
         protected void VisualizeIconInsideRecoloringBounds(Overlay overlay, Texture iconTexture)
         {
             overlay.StartSize = 3.0f;
             overlay.psr.material.mainTexture = iconTexture;
-            overlay.Position = transform.position + new Vector3(0.5f, 0.05f, 0.5f);
+            overlay.Position = transform.position + VerticalOffset;
         }
     }
 
@@ -96,7 +97,8 @@ namespace TerrainTools.Visualization
             if (hoverInfo.Enabled)
             {
                 hoverInfo.RotateToPlayer();
-                hoverInfo.Text = $"x: {secondary.Position.x:0}, y: {secondary.Position.z:0}, h: {secondary.Position.y - 0.05f:0.00000}";
+                var pos = secondary.Position - VerticalOffset;
+                hoverInfo.Text = $"x: {pos.x:0}, y: {pos.z:0}, h: {pos.y:0.00000}";
             }
         }
     }
