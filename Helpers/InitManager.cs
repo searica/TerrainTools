@@ -5,7 +5,7 @@ using Jotunn;
 using Jotunn.Configs;
 using Jotunn.Managers;
 using TerrainTools.Configs;
-using TerrainTools.Extensions;
+using System.Linq;
 
 namespace TerrainTools.Helpers
 {
@@ -13,6 +13,17 @@ namespace TerrainTools.Helpers
     {
         private static bool HasInitialized = false;
         internal static readonly Dictionary<string, GameObject> ToolRefs = new();
+
+        /// <summary>
+        ///     Track the where pieces have been inserted into each piece table. Used
+        ///     to manage the insertion position so that the insertion index is
+        ///     not dependent on how many other pieces have been added.
+        /// </summary>
+        private static readonly Dictionary<string, List<int>> InsertionIndexes = new()
+        {
+            {PieceTables.Hoe, new List<int>()},
+            {PieceTables.Cultivator, new List<int>()},
+        };
 
         internal static void InitToolPieces()
         {
@@ -148,10 +159,16 @@ namespace TerrainTools.Helpers
             if (position < 0)
             {
                 table.m_pieces.Add(prefab);
+                InsertionIndexes[pieceTable].Add(table.m_pieces.Count - 1);
             }
             else
             {
-                table.m_pieces.Insert(position, prefab);
+                // Shift position to account for how many pieces have been added before it
+                var index = position + InsertionIndexes[pieceTable].Where(x => x <= position).Count();
+
+                // Add piece at new insertion point
+                table.m_pieces.Insert(index, prefab);
+                InsertionIndexes[pieceTable].Add(position);
             }
 
             Log.LogDebug($"Added piece {prefab.name} | Token: {piece.TokenName()}");
