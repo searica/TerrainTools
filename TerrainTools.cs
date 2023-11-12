@@ -10,10 +10,10 @@ using Jotunn.Utils;
 using System.IO;
 using UnityEngine;
 using Jotunn.Managers;
-using Jotunn.Configs;
-using Jotunn.Entities;
-using TerrainTools.Visualization;
 using BepInEx.Configuration;
+using TerrainTools.Helpers;
+
+using TerrainTools.Configs;
 
 namespace TerrainTools
 {
@@ -44,10 +44,25 @@ namespace TerrainTools
 
         #endregion Section Names
 
+        #region Tool Configs
+
         /// <summary>
         ///     Dictionary of tool names to corresponding config entry that sets if they are enabled.
         /// </summary>
-        internal static readonly Dictionary<string, ConfigEntry<bool>> ToolConfigEntries = new();
+        private static readonly Dictionary<string, ConfigEntry<bool>> ToolConfigEntries = new();
+
+        private static bool UpdateTools = false;
+
+        internal static bool IsToolEnabled(string toolName)
+        {
+            if (ToolConfigEntries.TryGetValue(toolName, out ConfigEntry<bool> configEntry))
+            {
+                if (configEntry != null) return configEntry.Value;
+            }
+            return false;
+        }
+
+        #endregion Tool Configs
 
         #region Radius Configs
 
@@ -105,13 +120,33 @@ namespace TerrainTools
             SetUpConfigEntries();
 
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), harmonyInstanceId: PluginGUID);
-
             Game.isModded = true;
+
+            PrefabManager.OnVanillaPrefabsAvailable += InitManager.InitToolPieces;
 
             ConfigManager.SetupWatcher();
             ConfigManager.CheckForConfigManager();
 
-            PrefabManager.OnVanillaPrefabsAvailable += AddToolPieces;
+            // Update tools if config file reloaded
+            ConfigManager.OnConfigFileReloaded += () =>
+            {
+                if (UpdateTools)
+                {
+                    InitManager.UpdatePlugin();
+                    UpdateTools = false;
+                }
+            };
+
+            // Update tools if in-game config manager window is closed
+            ConfigManager.OnConfigWindowClosed += () =>
+            {
+                if (UpdateTools)
+                {
+                    InitManager.UpdatePlugin();
+                    ConfigManager.Save();
+                    UpdateTools = false;
+                }
+            };
         }
 
         public void OnDestroy()
@@ -153,163 +188,18 @@ namespace TerrainTools
                 "Modifer key to allow scroll wheel change. Use https://docs.unity3d.com/Manual/class-InputManager.html"
             );
 
+            foreach (var key in ToolConfigs.ToolConfigsMap.Keys)
+            {
+                var configEntry = ConfigManager.BindConfig(
+                    ToolsSection,
+                    key,
+                    true,
+                    "Set to true/enabled to add this terrain tool. Set to false/disabled to remove it."
+                );
+                configEntry.SettingChanged += delegate { UpdateTools = !UpdateTools || UpdateTools; };
+                ToolConfigEntries.Add(key, configEntry);
+            }
             ConfigManager.Save();
-        }
-
-        private void AddToolPieces()
-        {
-            AddToolPiece<LevelGroundOverlayVisualizer>(
-                "Level Terrain (Square)",
-                "mud_road_v2",
-                PieceTables.Hoe,
-                IconCache.MudRoadSquare
-            );
-
-            AddToolPiece<RaiseGroundOverlayVisualizer>(
-                "Raise Terrain (Precision)",
-                "raise_v2",
-                PieceTables.Hoe,
-                IconCache.RaiseSquare
-            );
-
-            AddToolPiece<PaveRoadOverlayVisualizer>(
-                "Pathen (Square)",
-                "path_v2",
-                PieceTables.Hoe,
-                IconCache.MudRoadPathSquare
-            );
-
-            AddToolPiece<PaveRoadOverlayVisualizer>(
-                "Cobblestone (Square)",
-                "paved_road_v2",
-                PieceTables.Hoe,
-                IconCache.PavedRoadSquare
-            );
-
-            AddToolPiece(
-                "Cobblestone Path",
-                "paved_road_v2",
-                PieceTables.Hoe,
-                IconCache.PavedRoadPath,
-                smooth: false
-            );
-
-            AddToolPiece<PaveRoadOverlayVisualizer>(
-                "Cobblestone Path (Square)",
-                "paved_road_v2",
-                PieceTables.Hoe,
-                IconCache.PavedRoadPathSquare,
-                smooth: false
-            );
-
-            AddToolPiece<CultivateOverlayVisualizer>(
-                "Cultivate (Square)",
-                "cultivate_v2",
-                PieceTables.Cultivator,
-                IconCache.CultivateSquare
-            );
-
-            AddToolPiece(
-                "Cultivate Path",
-                "cultivate_v2",
-                PieceTables.Cultivator,
-                IconCache.CultivatePath,
-                smooth: false
-            );
-
-            AddToolPiece<CultivateOverlayVisualizer>(
-                "Cultivate Path (Square)",
-                "cultivate_v2",
-                PieceTables.Cultivator,
-                IconCache.CultivatePathSquare,
-                smooth: false
-            );
-
-            AddToolPiece<SeedGrassOverlayVisualizer>(
-                "Replant (Square)",
-                "replant_v2",
-                PieceTables.Cultivator,
-                IconCache.ReplantSquare
-            );
-
-            AddToolPiece<RemoveModificationsOverlayVisualizer>(
-                "Remove Terrain Modifications",
-                "mud_road_v2",
-                PieceTables.Hoe,
-                IconCache.Remove,
-                level: false,
-                raise: false,
-                smooth: false,
-                clearPaint: false
-            );
-
-            PrefabManager.OnVanillaPrefabsAvailable -= AddToolPieces;
-        }
-
-        private void AddToolPiece<TOverlayVisualizer>(
-            string pieceName,
-            string basePieceName,
-            string pieceTable,
-            Texture2D iconTexture,
-            bool? level = null,
-            bool? raise = null,
-            bool? smooth = null,
-            bool? clearPaint = null
-        ) where TOverlayVisualizer : OverlayVisualizer
-        {
-            var piece = MakeToolPiece(pieceName, basePieceName, pieceTable, iconTexture, level, raise, smooth, clearPaint);
-            if (piece == null) { return; }
-            piece.PiecePrefab.AddComponent<TOverlayVisualizer>();
-            PieceManager.Instance.AddPiece(piece);
-        }
-
-        private void AddToolPiece(
-            string pieceName,
-            string basePieceName,
-            string pieceTable,
-            Texture2D iconTexture,
-            bool? level = null,
-            bool? raise = null,
-            bool? smooth = null,
-            bool? clearPaint = null
-        )
-        {
-            var piece = MakeToolPiece(pieceName, basePieceName, pieceTable, iconTexture, level, raise, smooth, clearPaint);
-            if (piece == null) { return; }
-            PieceManager.Instance.AddPiece(piece);
-        }
-
-        private static CustomPiece MakeToolPiece(
-            string pieceName,
-            string basePieceName,
-            string pieceTable,
-            Texture2D iconTexture,
-            bool? level = null,
-            bool? raise = null,
-            bool? smooth = null,
-            bool? clearPaint = null
-        )
-        {
-            if (PieceManager.Instance.GetPiece(pieceName) != null) { return null; }
-
-            var pieceIcon = Sprite.Create(iconTexture, new Rect(0, 0, iconTexture.width, iconTexture.height), Vector2.zero);
-            var piece = new CustomPiece(
-                pieceName,
-                basePieceName,
-                new PieceConfig
-                {
-                    Name = pieceName,
-                    Icon = pieceIcon,
-                    PieceTable = pieceTable
-                }
-            );
-
-            var settings = piece.PiecePrefab.GetComponent<TerrainOp>().m_settings;
-            settings.m_level = level != null ? level.Value : settings.m_level;
-            settings.m_raise = raise != null ? raise.Value : settings.m_raise;
-            settings.m_smooth = smooth != null ? smooth.Value : settings.m_smooth;
-            settings.m_paintCleared = clearPaint != null ? clearPaint.Value : settings.m_paintCleared;
-            return piece;
         }
     }
 

@@ -54,7 +54,7 @@ namespace TerrainTools.Visualization
         }
     }
 
-    public class PaveRoadOverlayVisualizer : HoverInfoEnabled
+    public class SquarePathOverlayVisualizer : HoverInfoEnabled
     {
         protected override void Initialize()
         {

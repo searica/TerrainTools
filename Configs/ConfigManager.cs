@@ -9,7 +9,6 @@ using System.IO;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.Rendering;
-using HoeRadius;
 
 namespace TerrainTools.Configs
 {
