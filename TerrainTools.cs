@@ -122,7 +122,8 @@ namespace TerrainTools
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), harmonyInstanceId: PluginGUID);
             Game.isModded = true;
 
-            PrefabManager.OnVanillaPrefabsAvailable += InitManager.InitToolPieces;
+            //PrefabManager.OnPrefabsRegistered += InitManager.InitToolPieces;
+            PieceManager.OnPiecesRegistered += InitManager.InitToolPieces;
 
             ConfigManager.SetupWatcher();
             ConfigManager.CheckForConfigManager();

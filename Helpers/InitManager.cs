@@ -19,10 +19,17 @@ namespace TerrainTools.Helpers
             if (HasInitialized) return;
             foreach (var key in ToolConfigs.ToolConfigsMap.Keys)
             {
-                var toolDB = ToolConfigs.ToolConfigsMap[key];
-                var piecePrefab = MakeToolPiece(toolDB);
-                RegisterPieceInPieceTable(piecePrefab, toolDB.pieceTable, PieceCategories.Misc, toolDB.insertIndex);
-                ToolRefs.Add(key, piecePrefab);
+                try
+                {
+                    var toolDB = ToolConfigs.ToolConfigsMap[key];
+                    var piecePrefab = MakeToolPiece(toolDB);
+                    RegisterPieceInPieceTable(piecePrefab, toolDB.pieceTable, "", toolDB.insertIndex);
+                    ToolRefs.Add(key, piecePrefab);
+                }
+                catch
+                {
+                    Log.LogWarning($"Failed to create: {key}");
+                }
             }
             HasInitialized = true;
         }
@@ -67,7 +74,7 @@ namespace TerrainTools.Helpers
             if (PieceManager.Instance.GetPiece(toolDB.pieceName) != null) { return null; }
 
             // get base prefab to clone
-            var basePrefab = PieceManager.Instance.GetPiece(toolDB.basePrefab)?.PiecePrefab;
+            var basePrefab = PrefabManager.Instance.GetPrefab(toolDB.basePrefab);
             if (basePrefab == null) { return null; }
 
             // clone base prefab and set name
