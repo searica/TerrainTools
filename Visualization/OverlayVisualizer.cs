@@ -101,39 +101,13 @@ namespace TerrainTools.Visualization
         }
     }
 
-    public abstract class SecondaryEnabledPrimaryDisabled : HoverInfoEnabled
-    {
-        protected override void OnRefresh()
-        {
-            base.OnRefresh();
-            primary.Enabled = false;
-            secondary.Enabled = true;
-        }
-    }
-
-    public abstract class SecondaryEnabledPrimaryEnabled : HoverInfoEnabled
-    {
-        protected override void OnRefresh()
-        {
-            base.OnRefresh();
-            primary.Enabled = true;
-            secondary.Enabled = true;
-        }
-    }
-
-    public abstract class SecondaryAndPrimaryEnabledAlways : OverlayVisualizer
-    {
-        protected override void OnRefresh()
-        {
-            primary.Enabled = true;
-            secondary.Enabled = true;
-        }
-    }
-
+    /// <summary>
+    ///     Blocks check for invalid placement height if custom overlay
+    /// </summary>
     [HarmonyPatch(typeof(Piece), "SetInvalidPlacementHeightlight")]
     public static class OverlayVisualizationRedshiftHeighlightBlocker
     {
-        private static bool Prefix(bool enabled, Piece __instance)
+        private static bool Prefix(Piece __instance)
         {
             return __instance.GetComponentInChildren<OverlayVisualizer>() == null;
         }

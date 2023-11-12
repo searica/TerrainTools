@@ -70,16 +70,18 @@ namespace TerrainTools.Visualization
         }
     }
 
-    public class CultivateOverlayVisualizer : PaveRoadOverlayVisualizer
+    public class CultivateOverlayVisualizer : HoverInfoEnabled
     {
         protected override void OnRefresh()
         {
             base.OnRefresh();
+            primary.Enabled = false;
+            secondary.Enabled = true;
             hoverInfo.Color = secondary.Color;
         }
     }
 
-    public class SeedGrassOverlayVisualizer : SecondaryEnabledPrimaryEnabled
+    public class SeedGrassOverlayVisualizer : HoverInfoEnabled
     {
         protected override void Initialize()
         {
@@ -89,9 +91,16 @@ namespace TerrainTools.Visualization
             primary.StartSize = 4.0f;
             primary.LocalPosition = new Vector3(0.5f, 2.5f, 0.5f);
         }
+
+        protected override void OnRefresh()
+        {
+            base.OnRefresh();
+            primary.Enabled = false;
+            secondary.Enabled = true;
+        }
     }
 
-    public class RemoveModificationsOverlayVisualizer : SecondaryAndPrimaryEnabledAlways
+    public class RemoveModificationsOverlayVisualizer : OverlayVisualizer
     {
         protected override void Initialize()
         {
@@ -108,7 +117,7 @@ namespace TerrainTools.Visualization
         }
     }
 
-    public abstract class UndoRedoModificationsOverlayVisualizer : SecondaryAndPrimaryEnabledAlways
+    public abstract class UndoRedoModificationsOverlayVisualizer : OverlayVisualizer
     {
         protected override void Initialize()
         {
