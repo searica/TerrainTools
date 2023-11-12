@@ -1,47 +1,48 @@
 ﻿using UnityEngine;
 
-namespace BetterHoe
+namespace TerrainTools
 {
     public static class GroundLevelSpinner
     {
         public const float MaxSpinner = 1.0f;
         public const float MinSpinner = 0.0f;
 
-        public static float value { get; private set; } = 1.0f;
+        public static float Value { get; private set; } = 1.0f;
 
         public static void Refresh()
         {
-            var scrollΔ = Keybindings.ScrollΔ();
-            if (scrollΔ > 0) {
-                up(scrollΔ);
-            }
-            if (scrollΔ < 0)
+            var scrollDelta = Keybindings.ScrollDelta();
+            if (scrollDelta > 0)
             {
-                down(scrollΔ);
+                Up(scrollDelta);
             }
-        }
-
-        private static void up(float scrollΔ)
-        {
-            if (value + scrollΔ > MaxSpinner)
+            if (scrollDelta < 0)
             {
-                value = MaxSpinner;
-            }
-            else
-            {
-                value = Mathf.Round((value + scrollΔ) * 100) / 100;
+                Down(scrollDelta);
             }
         }
 
-        private static void down(float scrollΔ)
+        private static void Up(float scrollDelta)
         {
-            if (value + scrollΔ < MinSpinner)
+            if (Value + scrollDelta > MaxSpinner)
             {
-                value = MinSpinner;
+                Value = MaxSpinner;
             }
             else
             {
-                value = Mathf.Round((value + scrollΔ) * 100) / 100;
+                Value = Mathf.Round((Value + scrollDelta) * 100) / 100;
+            }
+        }
+
+        private static void Down(float scrollDelta)
+        {
+            if (Value + scrollDelta < MinSpinner)
+            {
+                Value = MinSpinner;
+            }
+            else
+            {
+                Value = Mathf.Round((Value + scrollDelta) * 100) / 100;
             }
         }
     }

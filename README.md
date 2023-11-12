@@ -1,4 +1,4 @@
-# BetterHoe
+# TerrainTools
 Desc:
 
 **Server-Side Info**: This mod does work as a client-side only mod and only needs to be installed on the server if you wish to enforce configuration settings.

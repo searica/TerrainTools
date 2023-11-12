@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace BetterHoe.Extensions
+namespace TerrainTools.Extensions
 {
     /// <summary>
     ///     Helper class for C# Events.

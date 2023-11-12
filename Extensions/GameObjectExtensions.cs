@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace BetterHoe.Extensions
+namespace TerrainTools.Extensions
 {
     internal static class GameObjectExtensions
     {

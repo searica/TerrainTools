@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace BetterHoe.Extensions
+namespace TerrainTools.Extensions
 {
     internal static class ReflectionUtils
     {

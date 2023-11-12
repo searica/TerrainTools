@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace BetterHoe
+namespace TerrainTools.Visualization
 {
     // Minimal classes describing specific VFXs of specific "ToolOps" in a DSL-like form.
     public class LevelGroundOverlayVisualizer : SecondaryEnabledOnGridModePrimaryDisabledOnGridMode
@@ -19,9 +19,9 @@ namespace BetterHoe
         {
             base.Initialize();
             Freeze(secondary);
-            Freeze(tetriary);
+            Freeze(tertiary);
             VisualizeTerraformingBounds(secondary);
-            VisualizeTerraformingBounds(tetriary);
+            VisualizeTerraformingBounds(tertiary);
         }
 
         protected override void OnRefresh()
@@ -30,20 +30,21 @@ namespace BetterHoe
             if (Keybindings.GridModeEnabled)
             {
                 GroundLevelSpinner.Refresh();
-                secondary.locPosition = new Vector3(0f, GroundLevelSpinner.value, 0f);
+                secondary.LocalPosition = new Vector3(0f, GroundLevelSpinner.Value, 0f);
 
-                if (GroundLevelSpinner.value > 0f)
+                if (GroundLevelSpinner.Value > 0f)
                 {
-                    hoverInfo.text = $"h: +{secondary.locPosition.y:0.00}";
+                    hoverInfo.Text = $"h: +{secondary.LocalPosition.y:0.00}";
                 }
                 else
                 {
-                    hoverInfo.text = $"x: {secondary.position.x:0}, y: {secondary.position.z:0}, h: {secondary.position.y:0.00000}";
+                    hoverInfo.Text = $"x: {secondary.Position.x:0}, y: {secondary.Position.z:0}, h: {secondary.Position.y:0.00000}";
                 }
             }
-            tetriary.enabled = Keybindings.GridModeEnabled;
+            tertiary.Enabled = Keybindings.GridModeEnabled;
         }
     }
+
     public class PaveRoadOverlayVisualizer : SecondaryEnabledOnGridModePrimaryDisabledOnGridMode
     {
         protected override void Initialize()
@@ -59,7 +60,7 @@ namespace BetterHoe
         protected override void OnRefresh()
         {
             base.OnRefresh();
-            hoverInfo.color = secondary.color;
+            hoverInfo.Color = secondary.Color;
         }
     }
 
@@ -70,37 +71,39 @@ namespace BetterHoe
             base.Initialize();
             Freeze(secondary);
             VisualizeRecoloringBounds(secondary);
-            primary.locPosition = new Vector3(0, 2.0f, 0);
+            primary.LocalPosition = new Vector3(0, 2.0f, 0);
         }
 
         protected override void OnRefresh()
         {
             if (Keybindings.GridModeEnabled)
             {
-                primary.startSize = 4.0f;
-                primary.locPosition = new Vector3(0.5f, 2.5f, 0.5f);
+                primary.StartSize = 4.0f;
+                primary.LocalPosition = new Vector3(0.5f, 2.5f, 0.5f);
             }
             else
             {
-                primary.startSize = 5.5f;
-                primary.locPosition = new Vector3(0, 2.5f, 0);
+                primary.StartSize = 5.5f;
+                primary.LocalPosition = new Vector3(0, 2.5f, 0);
             }
             base.OnRefresh();
         }
+
         protected override void OnEnableGrid()
         {
             base.OnEnableGrid();
-            primary.enabled = false;
-            primary.startSize = 4.0f;
-            primary.locPosition = new Vector3(0.5f, 2.5f, 0.5f);
-            primary.enabled = true;
+            primary.Enabled = false;
+            primary.StartSize = 4.0f;
+            primary.LocalPosition = new Vector3(0.5f, 2.5f, 0.5f);
+            primary.Enabled = true;
         }
+
         protected override void OnDisableGrid()
         {
-            primary.enabled = false;
-            primary.locPosition = new Vector3(0, 2.5f, 0);
-            primary.startSize = 5.5f;
-            primary.enabled = true;
+            primary.Enabled = false;
+            primary.LocalPosition = new Vector3(0, 2.5f, 0);
+            primary.StartSize = 5.5f;
+            primary.Enabled = true;
             base.OnDisableGrid();
         }
     }
@@ -112,7 +115,7 @@ namespace BetterHoe
             Freeze(primary);
             SpeedUp(secondary);
             VisualizeTerraformingBounds(primary);
-            VisualizeIconInsideTerraformingBounds(secondary, cross);
+            VisualizeIconInsideTerraformingBounds(secondary, IconCache.Cross);
         }
     }
 
@@ -123,25 +126,19 @@ namespace BetterHoe
             Freeze(primary);
             Freeze(secondary);
             VisualizeRecoloringBounds(primary);
-            VisualizeIconInsideRecoloringBounds(secondary, icon());
+            VisualizeIconInsideRecoloringBounds(secondary, Icon());
         }
 
-        protected abstract Texture2D icon();
+        protected abstract Texture2D Icon();
     }
 
     public class UndoModificationsOverlayVisualizer : UndoRedoModificationsOverlayVisualizer
     {
-        protected override Texture2D icon()
-        {
-            return undo;
-        }
+        protected override Texture2D Icon() => IconCache.Undo;
     }
 
     public class RedoModificationsOverlayVisualizer : UndoRedoModificationsOverlayVisualizer
     {
-        protected override Texture2D icon()
-        {
-            return redo;
-        }
+        protected override Texture2D Icon() => IconCache.Redo;
     }
 }

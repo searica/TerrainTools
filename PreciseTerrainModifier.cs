@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using UnityEngine;
 
-namespace BetterHoe
+namespace TerrainTools
 {
     [HarmonyPatch(typeof(TerrainComp))]
     public static class PreciseTerrainModifier
@@ -10,7 +10,17 @@ namespace BetterHoe
 
         [HarmonyPrefix]
         [HarmonyPatch(nameof(TerrainComp.InternalDoOperation))]
-        private static bool InternalDoOperationPrefix(Vector3 pos, TerrainOp.Settings modifier, Heightmap ___m_hmap, int ___m_width, ref float[] ___m_levelDelta, ref float[] ___m_smoothDelta, ref Color[] ___m_paintMask, ref bool[] ___m_modifiedHeight, ref bool[] ___m_modifiedPaint)
+        private static bool InternalDoOperationPrefix(
+            Vector3 pos,
+            TerrainOp.Settings modifier,
+            Heightmap ___m_hmap,
+            int ___m_width,
+            ref float[] ___m_levelDelta,
+            ref float[] ___m_smoothDelta,
+            ref Color[] ___m_paintMask,
+            ref bool[] ___m_modifiedHeight,
+            ref bool[] ___m_modifiedPaint
+        )
         {
             if (!modifier.m_level && !modifier.m_raise && !modifier.m_smooth && !modifier.m_paintCleared)
             {
@@ -20,7 +30,14 @@ namespace BetterHoe
             return true;
         }
 
-        public static void SmoothenTerrain(Vector3 worldPos, Heightmap hMap, TerrainComp compiler, int worldWidth, ref float[] smoothΔ, ref bool[] modifiedHeight)
+        public static void SmoothenTerrain(
+            Vector3 worldPos,
+            Heightmap hMap,
+            TerrainComp compiler,
+            int worldWidth,
+            ref float[] smoothDelta,
+            ref bool[] modifiedHeight
+        )
         {
             Debug.Log("[INIT] Smooth Terrain Modification");
 
@@ -37,20 +54,29 @@ namespace BetterHoe
                 {
                     var tileIndex = y * worldSize + x;
                     var tileH = hMap.GetHeight(x, y);
-                    var Δh = referenceH - tileH;
-                    var oldΔh = smoothΔ[tileIndex];
-                    var newΔh = oldΔh + Δh;
-                    var roundedNewΔh = RoundToTwoDecimals(tileH, oldΔh, newΔh);
-                    var limΔh = Mathf.Clamp(roundedNewΔh, -1.0f, 1.0f);
-                    smoothΔ[tileIndex] = limΔh;
+                    var deltaH = referenceH - tileH;
+                    var oldDeltaH = smoothDelta[tileIndex];
+                    var newDeltaH = oldDeltaH + deltaH;
+                    var roundedNewDeltaH = RoundToTwoDecimals(tileH, oldDeltaH, newDeltaH);
+                    var limDeltaH = Mathf.Clamp(roundedNewDeltaH, -1.0f, 1.0f);
+                    smoothDelta[tileIndex] = limDeltaH;
                     modifiedHeight[tileIndex] = true;
-                    Debug.Log($"tilePos: ({x}, {y}), tileH: {tileH}, Δh: {Δh}, oldΔh: {oldΔh}, newΔh: {newΔh}, roundedNewΔh: {roundedNewΔh}, limΔh: {limΔh}");
+                    Debug.Log($"tilePos: ({x}, {y}), tileH: {tileH}, deltaH: {deltaH}, oldDeltaH: {oldDeltaH}, newDeltaH: {newDeltaH}, roundedNewDeltaH: {roundedNewDeltaH}, limDeltaH: {limDeltaH}");
                 }
             }
             Debug.Log("[SUCCESS] Smooth Terrain Modification");
         }
 
-        public static void RaiseTerrain(Vector3 worldPos, Heightmap hMap, TerrainComp compiler, int worldWidth, float power, ref float[] levelΔ, ref float[] smoothΔ, ref bool[] modifiedHeight)
+        public static void RaiseTerrain(
+            Vector3 worldPos,
+            Heightmap hMap,
+            TerrainComp compiler,
+            int worldWidth,
+            float power,
+            ref float[] levelDelta,
+            ref float[] smoothDelta,
+            ref bool[] modifiedHeight
+        )
         {
             Debug.Log("[INIT] Raise Terrain Modification");
 
@@ -67,24 +93,24 @@ namespace BetterHoe
                 {
                     var tileIndex = y * worldSize + x;
                     var tileH = hMap.GetHeight(x, y);
-                    var Δh = referenceH - tileH;
-                    if (Δh >= 0)
+                    var deltaH = referenceH - tileH;
+                    if (deltaH >= 0)
                     {
-                        var oldLevelΔ = levelΔ[tileIndex];
-                        var oldSmoothΔ = smoothΔ[tileIndex];
-                        var newLevelΔ = oldLevelΔ + oldSmoothΔ + Δh;
-                        var newSmoothΔ = 0f;
-                        var roundedNewLevelΔ = RoundToTwoDecimals(tileH, oldLevelΔ + oldSmoothΔ, newLevelΔ + newSmoothΔ);
-                        var limitedNewLevelΔ = Mathf.Clamp(roundedNewLevelΔ, -16.0f, 16.0f);
-                        levelΔ[tileIndex] = limitedNewLevelΔ;
-                        smoothΔ[tileIndex] = newSmoothΔ;
+                        var oldLevelDelta = levelDelta[tileIndex];
+                        var oldSmoothDelta = smoothDelta[tileIndex];
+                        var newLevelDelta = oldLevelDelta + oldSmoothDelta + deltaH;
+                        var newSmoothDelta = 0f;
+                        var roundedNewLevelDelta = RoundToTwoDecimals(tileH, oldLevelDelta + oldSmoothDelta, newLevelDelta + newSmoothDelta);
+                        var limitedNewLevelDelta = Mathf.Clamp(roundedNewLevelDelta, -16.0f, 16.0f);
+                        levelDelta[tileIndex] = limitedNewLevelDelta;
+                        smoothDelta[tileIndex] = newSmoothDelta;
                         modifiedHeight[tileIndex] = true;
-                        Debug.Log($"tilePos: ({x}, {y}), tileH: {tileH}, Δh: {Δh}, oldLevelΔ: {oldLevelΔ}, oldSmoothΔ: {oldSmoothΔ}, newLevelΔ: {newLevelΔ}, newSmoothΔ: {newSmoothΔ}, roundedNewLevelΔ: {roundedNewLevelΔ}, limitedNewLevelΔ: {limitedNewLevelΔ}");
+                        Debug.Log($"tilePos: ({x}, {y}), tileH: {tileH}, deltaH: {deltaH}, oldLevelDelta: {oldLevelDelta}, oldSmoothDelta: {oldSmoothDelta}, newLevelDelta: {newLevelDelta}, newSmoothDelta: {newSmoothDelta}, roundedNewLevelDelta: {roundedNewLevelDelta}, limitedNewLevelDelta: {limitedNewLevelDelta}");
                     }
                     else
                     {
-                        Debug.Log("Declined to process tile: Δh < 0!");
-                        Debug.Log($"tilePos: ({x}, {y}), tileH: {tileH}, Δh: {Δh}");
+                        Debug.Log("Declined to process tile: deltaH < 0!");
+                        Debug.Log($"tilePos: ({x}, {y}), tileH: {tileH}, deltaH: {deltaH}");
                     }
                 }
             }
@@ -92,7 +118,14 @@ namespace BetterHoe
             Debug.Log("[SUCCESS] Raise Terrain Modification");
         }
 
-        public static void RecolorTerrain(Vector3 worldPos, TerrainModifier.PaintType paintType, Heightmap hMap, int worldWidth, ref Color[] paintMask, ref bool[] modifiedPaint)
+        public static void RecolorTerrain(
+            Vector3 worldPos,
+            TerrainModifier.PaintType paintType,
+            Heightmap hMap,
+            int worldWidth,
+            ref Color[] paintMask,
+            ref bool[] modifiedPaint
+        )
         {
             Debug.Log("[INIT] Color Terrain Modification");
             worldPos -= new Vector3(0.5f, 0, 0.5f);
@@ -116,7 +149,14 @@ namespace BetterHoe
             Debug.Log("[SUCCESS] Color Terrain Modification");
         }
 
-        public static void RemoveTerrainModifications(Vector3 worldPos, Heightmap hMap, int worldWidth, ref float[] levelΔ, ref float[] smoothΔ, ref bool[] modifiedHeight)
+        public static void RemoveTerrainModifications(
+            Vector3 worldPos,
+            Heightmap hMap,
+            int worldWidth,
+            ref float[] levelDelta,
+            ref float[] smoothDelta,
+            ref bool[] modifiedHeight
+        )
         {
             Debug.Log("[INIT] Remove Terrain Modifications");
 
@@ -131,8 +171,8 @@ namespace BetterHoe
                 for (var y = yMin; y <= yMax; y++)
                 {
                     var tileIndex = y * worldSize + x;
-                    levelΔ[tileIndex] = 0;
-                    smoothΔ[tileIndex] = 0;
+                    levelDelta[tileIndex] = 0;
+                    smoothDelta[tileIndex] = 0;
                     modifiedHeight[tileIndex] = false;
                     Debug.Log($"tilePos: ({x}, {y}), tileIndex: {tileIndex}");
                 }
@@ -154,20 +194,30 @@ namespace BetterHoe
             xMax = Mathf.Min(x + SizeInTiles, worldSize - 1);
         }
 
-        public static float RoundToTwoDecimals(float oldH, float oldΔh, float newΔh)
+        public static float RoundToTwoDecimals(float oldH, float oldDeltaH, float newDeltaH)
         {
-            var newH = oldH - oldΔh + newΔh;
+            var newH = oldH - oldDeltaH + newDeltaH;
             var roundedNewH = Mathf.Round(newH * 100) / 100;
-            var roundedNewΔh = roundedNewH - oldH + oldΔh;
-            Debug.Log($"oldH: {oldH}, oldΔH: {oldΔh}, newΔH: {newΔh}, newH: {newH}, roundedNewH: {roundedNewH}, roundedNewΔh: {roundedNewΔh}");
-            return roundedNewΔh;
+            var roundedNewDeltaH = roundedNewH - oldH + oldDeltaH;
+            Debug.Log($"oldH: {oldH}, oldDeltaH: {oldDeltaH}, newDeltaH: {newDeltaH}, newH: {newH}, roundedNewH: {roundedNewH}, roundedNewDeltaH: {roundedNewDeltaH}");
+            return roundedNewDeltaH;
         }
 
         [HarmonyPrefix]
         [HarmonyPatch(nameof(TerrainComp.SmoothTerrain))]
-        private static bool SmoothTerrianPrefix(Vector3 worldPos, float radius, bool square, float power, TerrainComp __instance, Heightmap ___m_hmap, int ___m_width, ref float[] ___m_smoothDelta, ref bool[] ___m_modifiedHeight)
+        private static bool SmoothTerrianPrefix(
+            Vector3 worldPos,
+            float radius,
+            bool square,
+            float power,
+            TerrainComp __instance,
+            Heightmap ___m_hmap,
+            int ___m_width,
+            ref float[] ___m_smoothDelta,
+            ref bool[] ___m_modifiedHeight
+        )
         {
-            if (ClientSideGridModeOverride.IsGridModeEnabled(radius))
+            if (IsGridModeEnabled(radius))
             {
                 SmoothenTerrain(worldPos, ___m_hmap, __instance, ___m_width, ref ___m_smoothDelta, ref ___m_modifiedHeight);
                 return false;
@@ -180,9 +230,21 @@ namespace BetterHoe
 
         [HarmonyPrefix]
         [HarmonyPatch(nameof(TerrainComp.RaiseTerrain))]
-        private static bool RaiseTerrainPrefix(Vector3 worldPos, float radius, float delta, bool square, float power, TerrainComp __instance, Heightmap ___m_hmap, int ___m_width, ref float[] ___m_levelDelta, ref float[] ___m_smoothDelta, ref bool[] ___m_modifiedHeight)
+        private static bool RaiseTerrainPrefix(
+            Vector3 worldPos,
+            float radius,
+            float delta,
+            bool square,
+            float power,
+            TerrainComp __instance,
+            Heightmap ___m_hmap,
+            int ___m_width,
+            ref float[] ___m_levelDelta,
+            ref float[] ___m_smoothDelta,
+            ref bool[] ___m_modifiedHeight
+        )
         {
-            if (ClientSideGridModeOverride.IsGridModeEnabled(radius))
+            if (IsGridModeEnabled(radius))
             {
                 RaiseTerrain(worldPos, ___m_hmap, __instance, ___m_width, delta, ref ___m_levelDelta, ref ___m_smoothDelta, ref ___m_modifiedHeight);
                 return false;
@@ -195,7 +257,17 @@ namespace BetterHoe
 
         [HarmonyPrefix]
         [HarmonyPatch(nameof(TerrainComp.PaintCleared))]
-        private static bool PreciseColorModificaton(Vector3 worldPos, float radius, TerrainModifier.PaintType paintType, bool heightCheck, bool apply, Heightmap ___m_hmap, int ___m_width, ref Color[] ___m_paintMask, ref bool[] ___m_modifiedPaint)
+        private static bool PreciseColorModificaton(
+            Vector3 worldPos,
+            float radius,
+            TerrainModifier.PaintType paintType,
+            bool heightCheck,
+            bool apply,
+            Heightmap ___m_hmap,
+            int ___m_width,
+            ref Color[] ___m_paintMask,
+            ref bool[] ___m_modifiedPaint
+        )
         {
             if (IsGridModeEnabled(radius))
             {
@@ -222,7 +294,7 @@ namespace BetterHoe
                 if (modifier.m_settings.m_raise && modifier.m_settings.m_raiseDelta >= 0)
                 {
                     modifier.m_settings.m_raiseRadius = float.NegativeInfinity;
-                    modifier.m_settings.m_raiseDelta = GroundLevelSpinner.value;
+                    modifier.m_settings.m_raiseDelta = GroundLevelSpinner.Value;
                 }
                 if (modifier.m_settings.m_paintCleared)
                 {

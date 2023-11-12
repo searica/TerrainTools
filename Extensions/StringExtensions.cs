@@ -1,6 +1,6 @@
 ﻿// Ignore Spelling: MVBP
 
-namespace BetterHoe.Extensions
+namespace TerrainTools.Extensions
 {
     internal static class StringExtensions
     {

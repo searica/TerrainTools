@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace BetterHoe.Extensions
+namespace TerrainTools.Extensions
 {
     internal static class TypeExtensions
     {
@@ -73,7 +73,7 @@ namespace BetterHoe.Extensions
                 {
                     continue;
                 }
-                // Passed all tests, lets set the value
+                // Passed all tests, lets set the Value
                 targetField.SetValue(source, srcField.GetValue(target));
             }
         }

@@ -1,21 +1,47 @@
 ﻿using UnityEngine;
 
-namespace BetterHoe
+namespace TerrainTools.Visualization
 {
     public class Overlay
     {
-        private GameObject go { get; }
-        private ParticleSystem.Particle[] particles { get; } = new ParticleSystem.Particle[2];
-        public Transform transform { get; }
+        private GameObject GameObject { get; }
+        private ParticleSystem.Particle[] Particles => new ParticleSystem.Particle[2];
+        private Transform Transform { get; }
+
         public ParticleSystem ps { get; }
         public ParticleSystemRenderer psr { get; }
         public ParticleSystem.MainModule psm { get; }
-        public bool enabled { get { return go.activeSelf; } set { go.SetActive(value); } }
-        public Vector3 position { get { return transform.position; } set { transform.position = value; } }
-        public Vector3 locPosition { get { return transform.localPosition; } set { transform.localPosition = value; } }
-        public Quaternion rotation { get { return transform.rotation; } set { transform.rotation = value; } }
-        public Color color { get { ps.GetParticles(particles, 2); return particles[1].GetCurrentColor(ps); } }
-        public Color startColor
+
+        public bool Enabled
+        {
+            get { return GameObject.activeSelf; }
+            set { GameObject.SetActive(value); }
+        }
+
+        public Vector3 Position
+        {
+            get { return Transform.position; }
+            set { Transform.position = value; }
+        }
+
+        public Vector3 LocalPosition
+        {
+            get { return Transform.localPosition; }
+            set { Transform.localPosition = value; }
+        }
+
+        public Quaternion Rotation
+        {
+            get { return Transform.rotation; }
+            set { Transform.rotation = value; }
+        }
+
+        public Color Color
+        {
+            get { ps.GetParticles(Particles, 2); return Particles[1].GetCurrentColor(ps); }
+        }
+
+        public Color StartColor
         {
             get { return psm.startColor.color; }
             set
@@ -24,17 +50,42 @@ namespace BetterHoe
                 psmainStartColor.color = value;
             }
         }
-        public float startSize { get { return psm.startSize.constant; } set { var psMain = ps.main; psMain.startSize = value; } }
-        public float startSpeed { get { return psm.startSize.constant; } set { var psMain = ps.main; psMain.startSpeed = value; } }
-        public float startLifetime { get { return psm.startLifetime.constant; } set { var psMain = ps.main; psMain.startLifetime = value; } }
-        public bool sizeOverLifetimeEnabled { get { return ps.sizeOverLifetime.enabled; } set { var psSizeOverLifetime = ps.sizeOverLifetime; psSizeOverLifetime.enabled = value; } }
-        public ParticleSystem.MinMaxCurve sizeOverLifetime { get { return ps.sizeOverLifetime.size; } set { var psSizeOverLifetime = ps.sizeOverLifetime; psSizeOverLifetime.size = value; } }
+
+        public float StartSize
+        {
+            get { return psm.startSize.constant; }
+            set { var psMain = ps.main; psMain.startSize = value; }
+        }
+
+        public float StartSpeed
+        {
+            get { return psm.startSize.constant; }
+            set { var psMain = ps.main; psMain.startSpeed = value; }
+        }
+
+        public float StartLifetime
+        {
+            get { return psm.startLifetime.constant; }
+            set { var psMain = ps.main; psMain.startLifetime = value; }
+        }
+
+        public bool SizeOverLifetimeEnabled
+        {
+            get { return ps.sizeOverLifetime.enabled; }
+            set { var psSizeOverLifetime = ps.sizeOverLifetime; psSizeOverLifetime.enabled = value; }
+        }
+
+        public ParticleSystem.MinMaxCurve SizeOverLifetime
+        {
+            get { return ps.sizeOverLifetime.size; }
+            set { var psSizeOverLifetime = ps.sizeOverLifetime; psSizeOverLifetime.size = value; }
+        }
 
         public Overlay(Transform transform)
         {
-            this.transform = transform;
+            this.Transform = transform;
 
-            go = transform.gameObject;
+            GameObject = transform.gameObject;
             ps = transform.GetComponentInChildren<ParticleSystem>();
             psr = transform.GetComponentInChildren<ParticleSystemRenderer>();
         }

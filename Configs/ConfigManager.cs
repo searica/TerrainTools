@@ -3,14 +3,14 @@
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
-using BetterHoe.Extensions;
+using TerrainTools.Extensions;
 using System;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace BetterHoe.Configs
+namespace TerrainTools.Configs
 {
     internal class ConfigManager
     {
@@ -136,7 +136,7 @@ namespace BetterHoe.Configs
                 LoggerLevel.Low,
                 "Low will log basic information about the mod. Medium will log information that " +
                 "is useful for troubleshooting. High will log a lot of information, do not set " +
-                "it to this without good reason as it will slow down your game.",
+                "it to this without good reason as it will slow Down your game.",
                 synced: false
             );
             Save();
@@ -146,7 +146,7 @@ namespace BetterHoe.Configs
 
         /// <summary>
         ///     Sets SaveOnConfigSet to false and returns
-        ///     the value prior to calling this method.
+        ///     the Value prior to calling this method.
         /// </summary>
         /// <returns></returns>
         private static bool DisableSaveOnConfigSet()
@@ -157,7 +157,7 @@ namespace BetterHoe.Configs
         }
 
         /// <summary>
-        ///     Set the value for the SaveOnConfigSet field.
+        ///     Set the Value for the SaveOnConfigSet field.
         /// </summary>
         /// <param name="value"></param>
         internal static void SaveOnConfigSet(bool value)
@@ -214,7 +214,7 @@ namespace BetterHoe.Configs
 
         /// <summary>
         ///     Checks for in-game configuration manager and
-        ///     sets up OnConfigWindowClosed event if it is present
+        ///     sets Up OnConfigWindowClosed event if it is present
         /// </summary>
         internal static void CheckForConfigManager()
         {

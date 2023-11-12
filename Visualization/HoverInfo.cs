@@ -1,36 +1,60 @@
 ﻿using UnityEngine;
 
-namespace BetterHoe
+namespace TerrainTools.Visualization
 {
     public class HoverInfo
     {
-        private GameObject go { get; }
-        private Transform transform { get; }
-        private TextMesh textMesh { get; }
-        public string text { get { return textMesh.text; } set { textMesh.text = value; } }
-        public bool enabled { get { return go.activeSelf; } set { go.SetActive(value); } }
-        public Color color { get { return textMesh.color; } set { textMesh.color = value; } }
+        private GameObject _gameObject;
+        private Transform _transform;
+        private TextMesh _textMesh;
+
+        public string Text
+        {
+            get { return _textMesh.text; }
+            set { _textMesh.text = value; }
+        }
+
+        public bool Enabled
+        {
+            get { return _gameObject.activeSelf; }
+            set { _gameObject.SetActive(value); }
+        }
+
+        public Color Color
+        {
+            get { return _textMesh.color; }
+            set { _textMesh.color = value; }
+        }
 
         public HoverInfo(Transform parentTransform)
         {
-            go = new GameObject();
-            go.transform.parent = parentTransform;
-            transform = go.transform;
+            _gameObject = new GameObject();
+            _gameObject.transform.parent = parentTransform;
+            _transform = _gameObject.transform;
 
-            textMesh = go.AddComponent<TextMesh>();
-            textMesh.transform.localPosition = Vector3.zero;
+            _textMesh = _gameObject.AddComponent<TextMesh>();
+            _textMesh.transform.localPosition = Vector3.zero;
+
             //Fix: normalize the secondary VFX scale away from the hoverInfo scale
-            textMesh.transform.localScale = new Vector3(0.1f / parentTransform.localScale.x, 0.1f / parentTransform.localScale.y, 0.1f / parentTransform.localScale.z);
-            textMesh.anchor = TextAnchor.MiddleCenter;
-            textMesh.alignment = TextAlignment.Center;
-            textMesh.fontSize = 16;
+            _textMesh.transform.localScale = new Vector3(
+                0.1f / parentTransform.localScale.x,
+                0.1f / parentTransform.localScale.y,
+                0.1f / parentTransform.localScale.z
+            );
+            _textMesh.anchor = TextAnchor.MiddleCenter;
+            _textMesh.alignment = TextAlignment.Center;
+            _textMesh.fontSize = 16;
         }
 
         public void RotateToPlayer()
         {
-            var playerXAxisDirection = new Vector3(GameCamera.m_instance.transform.position.x, transform.position.y, GameCamera.m_instance.transform.position.z);
-            transform.LookAt(playerXAxisDirection, Vector3.up);
-            transform.Rotate(90f, 180f, 0f);
+            var playerXAxisDirection = new Vector3(
+                GameCamera.m_instance.transform.position.x,
+                _transform.position.y,
+                GameCamera.m_instance.transform.position.z
+            );
+            _transform.LookAt(playerXAxisDirection, Vector3.up);
+            _transform.Rotate(90f, 180f, 0f);
         }
     }
 }

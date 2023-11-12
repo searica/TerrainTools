@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace BetterHoe.Extensions
+namespace TerrainTools.Extensions
 {
     internal static class TransformExtensions
     {
