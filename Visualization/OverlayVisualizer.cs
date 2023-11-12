@@ -11,7 +11,7 @@ namespace TerrainTools.Visualization
         protected Overlay tertiary;
         protected HoverInfo hoverInfo;
 
-        protected static readonly Vector3 VerticalOffset = new(0, 0.05f, 0);
+        internal static readonly Vector3 VerticalOffset = new(0, 0.05f, 0);
 
         private void Update()
         {
@@ -63,17 +63,17 @@ namespace TerrainTools.Visualization
             overlay.LocalPosition = VerticalOffset;
         }
 
-        protected void VisualizeRecoloringBounds(Overlay overlay)
-        {
-            overlay.StartSize = 4.0f;
-            overlay.psr.material.mainTexture = IconCache.Box;
-            overlay.LocalPosition = VerticalOffset;
-        }
-
         protected void VisualizeIconInsideTerraformingBounds(Overlay overlay, Texture iconTexture)
         {
             overlay.StartSize = 2.5f;
             overlay.psr.material.mainTexture = iconTexture;
+            overlay.LocalPosition = VerticalOffset;
+        }
+
+        protected void VisualizeRecoloringBounds(Overlay overlay)
+        {
+            overlay.StartSize = 4.0f;
+            overlay.psr.material.mainTexture = IconCache.Box;
             overlay.LocalPosition = VerticalOffset;
         }
 

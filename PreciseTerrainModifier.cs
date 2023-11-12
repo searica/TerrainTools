@@ -246,36 +246,6 @@ namespace TerrainTools
             Debug.Log("[SUCCESS] Raise Terrain Modification");
         }
 
-        public static void RecolorTerrain(
-            Vector3 worldPos,
-            TerrainModifier.PaintType paintType,
-            Heightmap hMap,
-            int worldWidth,
-            ref Color[] paintMask,
-            ref bool[] modifiedPaint
-        )
-        {
-            Debug.Log("[INIT] Color Terrain Modification");
-            hMap.WorldToVertex(worldPos, out var xPos, out var yPos);
-            Debug.Log($"worldPos: {worldPos}, vertexPos: ({xPos}, {yPos})");
-
-            var tileColor = ResolveColor(paintType);
-            var removeColor = tileColor == Color.black;
-            FindExtrema(xPos, worldWidth, out var xMin, out var xMax);
-            FindExtrema(yPos, worldWidth, out var yMin, out var yMax);
-            for (var x = xMin; x <= xMax; x++)
-            {
-                for (var y = yMin; y <= yMax; y++)
-                {
-                    var tileIndex = y * worldWidth + x;
-                    paintMask[tileIndex] = tileColor;
-                    modifiedPaint[tileIndex] = !removeColor;
-                    Debug.Log($"tilePos: ({x}, {y}), tileIndex: {tileIndex}, tileColor: {tileColor}");
-                }
-            }
-            Debug.Log("[SUCCESS] Color Terrain Modification");
-        }
-
         public static void RemoveTerrainModifications(
             Vector3 worldPos,
             Heightmap hMap,
@@ -305,6 +275,36 @@ namespace TerrainTools
                 }
             }
             Debug.Log("[SUCCESS] Remove Terrain Modifications");
+        }
+
+        public static void RecolorTerrain(
+            Vector3 worldPos,
+            TerrainModifier.PaintType paintType,
+            Heightmap hMap,
+            int worldWidth,
+            ref Color[] paintMask,
+            ref bool[] modifiedPaint
+        )
+        {
+            Debug.Log("[INIT] Color Terrain Modification");
+            hMap.WorldToVertex(worldPos, out var xPos, out var yPos);
+            Debug.Log($"worldPos: {worldPos}, vertexPos: ({xPos}, {yPos})");
+
+            var tileColor = ResolveColor(paintType);
+            var removeColor = tileColor == Color.black;
+            FindExtrema(xPos, worldWidth, out var xMin, out var xMax);
+            FindExtrema(yPos, worldWidth, out var yMin, out var yMax);
+            for (var x = xMin; x <= xMax; x++)
+            {
+                for (var y = yMin; y <= yMax; y++)
+                {
+                    var tileIndex = y * worldWidth + x;
+                    paintMask[tileIndex] = tileColor;
+                    modifiedPaint[tileIndex] = !removeColor;
+                    Debug.Log($"tilePos: ({x}, {y}), tileIndex: {tileIndex}, tileColor: {tileColor}");
+                }
+            }
+            Debug.Log("[SUCCESS] Color Terrain Modification");
         }
 
         public static Color ResolveColor(TerrainModifier.PaintType paintType)
