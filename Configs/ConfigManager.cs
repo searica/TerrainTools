@@ -9,6 +9,7 @@ using System.IO;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.Rendering;
+using HoeRadius;
 
 namespace TerrainTools.Configs
 {
@@ -21,9 +22,9 @@ namespace TerrainTools.Configs
         private static BaseUnityPlugin ConfigurationManager;
         private const string ConfigManagerGUID = "com.bepis.bepinex.configurationmanager";
 
-        private static readonly AcceptableValueList<bool> AcceptableBoolValuesList = new(new bool[] { false, true });
-
-        private const string MainSection = "Global";
+        private static readonly string MainSection = SetStringPriority("Global", 3);
+        private static readonly string RadiusSection = SetStringPriority("Radius", 2);
+        private static readonly string ToolsSection = SetStringPriority("Tools", 1);
 
         #region Events
 
@@ -120,6 +121,24 @@ namespace TerrainTools.Configs
 
         #endregion BindConfig
 
+        // Tool Configs
+        // Need to be able to keep a reference to each tool I add
+        // So I can enable and disable them as needed based on config changes
+        // Should set up an InitManager to deal with that
+
+        // Radius configs
+        internal static ConfigEntry<bool> UseScrollWheel;
+
+        internal static ConfigEntry<KeyCode> ScrollModKey;
+        internal static ConfigEntry<KeyCode> IncreaseHotKey;
+        internal static ConfigEntry<KeyCode> DecreaseHotKey;
+        internal static ConfigEntry<float> ScrollWheelScale;
+        internal static ConfigEntry<float> HotkeyScale;
+
+        private static float lastOriginalRadius;
+        private static float lastModdedRadius;
+        private static float lastTotalDelta;
+
         internal static void Init(string GUID, ConfigFile config)
         {
             configFile = config;
@@ -139,6 +158,51 @@ namespace TerrainTools.Configs
                 "it to this without good reason as it will slow Down your game.",
                 synced: false
             );
+
+            UseScrollWheel = BindConfig(
+                RadiusSection,
+                "UseScrollWheel",
+                true,
+                "Use scroll wheel to modify radius"
+            );
+
+            ScrollWheelScale = BindConfig(
+                RadiusSection,
+                "ScrollWheelScale",
+                0.1f,
+                "Scroll wheel change scale",
+                new AcceptableValueRange<float>(0.05f, 2f)
+            );
+
+            ScrollModKey = BindConfig(
+                RadiusSection,
+                "ScrollModKey",
+                KeyCode.LeftAlt,
+                "Modifer key to allow scroll wheel change. Use https://docs.unity3d.com/Manual/class-InputManager.html"
+            );
+
+            IncreaseHotKey = BindConfig(
+                RadiusSection,
+                "IncreaseHotKey",
+                KeyCode.None,
+                "Hotkey to increase radius. Use https://docs.unity3d.com/Manual/class-InputManager.html"
+            );
+
+            DecreaseHotKey = BindConfig(
+                RadiusSection,
+                "DecreaseHotKey",
+                KeyCode.None,
+                "Hotkey to decrease radius. Use https://docs.unity3d.com/Manual/class-InputManager.html"
+            );
+
+            HotkeyScale = BindConfig(
+                RadiusSection,
+                "HotkeyScale",
+                0.1f,
+                "Hotkey change scale",
+                new AcceptableValueRange<float>(0.05f, 2f)
+            );
+
             Save();
         }
 

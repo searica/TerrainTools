@@ -1,9 +1,10 @@
 ﻿using HarmonyLib;
+using TerrainTools.Configs;
 using TerrainTools.Extensions;
 using TerrainTools.Visualization;
 using UnityEngine;
 
-namespace TerrainTools
+namespace TerrainTools.Helpers
 {
     [HarmonyPatch(typeof(TerrainComp))]
     public static class PreciseTerrainModifier
@@ -162,13 +163,14 @@ namespace TerrainTools
             ref bool[] modifiedHeight
         )
         {
-            Debug.Log("[INIT] Smooth Terrain Modification");
-
+            if (ConfigManager.IsVerbosityMedium) { Log.LogInfo("[INIT] Smooth Terrain Modification"); }
             var worldSize = worldWidth + 1;
             hMap.WorldToVertex(worldPos, out var xPos, out var yPos);
             var referenceH = worldPos.y - compiler.transform.position.y;
-            Debug.Log($"worldPos: {worldPos}, xPos: {xPos}, yPos: {yPos}, referenceH: {referenceH}");
-
+            if (ConfigManager.IsVerbosityMedium)
+            {
+                Log.LogInfo($"worldPos: {worldPos}, xPos: {xPos}, yPos: {yPos}, referenceH: {referenceH}");
+            }
             FindExtrema(xPos, worldSize, out var xMin, out var xMax);
             FindExtrema(yPos, worldSize, out var yMin, out var yMax);
             for (var x = xMin; x <= xMax; x++)
@@ -184,10 +186,13 @@ namespace TerrainTools
                     var limDeltaH = Mathf.Clamp(roundedNewDeltaH, -1.0f, 1.0f);
                     smoothDelta[tileIndex] = limDeltaH;
                     modifiedHeight[tileIndex] = true;
-                    Debug.Log($"tilePos: ({x}, {y}), tileH: {tileH}, deltaH: {deltaH}, oldDeltaH: {oldDeltaH}, newDeltaH: {newDeltaH}, roundedNewDeltaH: {roundedNewDeltaH}, limDeltaH: {limDeltaH}");
+                    if (ConfigManager.IsVerbosityMedium)
+                    {
+                        Log.LogInfo($"tilePos: ({x}, {y}), tileH: {tileH}, deltaH: {deltaH}, oldDeltaH: {oldDeltaH}, newDeltaH: {newDeltaH}, roundedNewDeltaH: {roundedNewDeltaH}, limDeltaH: {limDeltaH}");
+                    }
                 }
             }
-            Debug.Log("[SUCCESS] Smooth Terrain Modification");
+            if (ConfigManager.IsVerbosityMedium) { Log.LogInfo("[SUCCESS] Smooth Terrain Modification"); }
         }
 
         public static void RaiseTerrain(
@@ -201,13 +206,14 @@ namespace TerrainTools
             ref bool[] modifiedHeight
         )
         {
-            Debug.Log("[INIT] Raise Terrain Modification");
-
+            if (ConfigManager.IsVerbosityMedium) { Log.LogInfo("[INIT] Raise Terrain Modification"); }
             var worldSize = worldWidth + 1;
             hMap.WorldToVertex(worldPos, out var xPos, out var yPos);
             var referenceH = worldPos.y - compiler.transform.position.y + power;
-            Debug.Log($"worldPos: {worldPos}, xPos: {xPos}, yPos: {yPos}, power: {power}, referenceH: {referenceH}");
-
+            if (ConfigManager.IsVerbosityMedium)
+            {
+                Log.LogInfo($"worldPos: {worldPos}, xPos: {xPos}, yPos: {yPos}, power: {power}, referenceH: {referenceH}");
+            }
             FindExtrema(xPos, worldSize, out var xMin, out var xMax);
             FindExtrema(yPos, worldSize, out var yMin, out var yMax);
             for (var x = xMin; x <= xMax; x++)
@@ -233,17 +239,23 @@ namespace TerrainTools
                         smoothDelta[tileIndex] = newSmoothDelta;
                         modifiedHeight[tileIndex] = true;
 
-                        Debug.Log($"tilePos: ({x}, {y}), tileH: {tileH}, deltaH: {deltaH}, oldLevelDelta: {oldLevelDelta}, oldSmoothDelta: {oldSmoothDelta}, newLevelDelta: {newLevelDelta}, newSmoothDelta: {newSmoothDelta}, roundedNewLevelDelta: {roundedNewLevelDelta}, limitedNewLevelDelta: {limitedNewLevelDelta}");
+                        if (ConfigManager.IsVerbosityMedium)
+                        {
+                            Log.LogInfo($"tilePos: ({x}, {y}), tileH: {tileH}, deltaH: {deltaH}, oldLevelDelta: {oldLevelDelta}, oldSmoothDelta: {oldSmoothDelta}, newLevelDelta: {newLevelDelta}, newSmoothDelta: {newSmoothDelta}, roundedNewLevelDelta: {roundedNewLevelDelta}, limitedNewLevelDelta: {limitedNewLevelDelta}");
+                        }
                     }
                     else
                     {
-                        Debug.Log("Declined to process tile: deltaH < 0!");
-                        Debug.Log($"tilePos: ({x}, {y}), tileH: {tileH}, deltaH: {deltaH}");
+                        if (ConfigManager.IsVerbosityMedium)
+                        {
+                            Log.LogInfo("Declined to process tile: deltaH < 0!");
+                            Log.LogInfo($"tilePos: ({x}, {y}), tileH: {tileH}, deltaH: {deltaH}");
+                        }
                     }
                 }
             }
 
-            Debug.Log("[SUCCESS] Raise Terrain Modification");
+            if (ConfigManager.IsVerbosityMedium) { Log.LogInfo("[SUCCESS] Raise Terrain Modification"); }
         }
 
         public static void RemoveTerrainModifications(
@@ -255,11 +267,11 @@ namespace TerrainTools
             ref bool[] modifiedHeight
         )
         {
-            Debug.Log("[INIT] Remove Terrain Modifications");
+            if (ConfigManager.IsVerbosityMedium) { Log.LogInfo("[INIT] Remove Terrain Modifications"); }
 
             var worldSize = worldWidth + 1;
             hMap.WorldToVertex(worldPos, out var xPos, out var yPos);
-            Debug.Log($"worldPos: {worldPos}, vertexPos: ({xPos}, {yPos})");
+            if (ConfigManager.IsVerbosityMedium) { Log.LogInfo($"worldPos: {worldPos}, vertexPos: ({xPos}, {yPos})"); }
 
             FindExtrema(xPos, worldSize, out var xMin, out var xMax);
             FindExtrema(yPos, worldSize, out var yMin, out var yMax);
@@ -271,10 +283,10 @@ namespace TerrainTools
                     levelDelta[tileIndex] = 0;
                     smoothDelta[tileIndex] = 0;
                     modifiedHeight[tileIndex] = false;
-                    Debug.Log($"tilePos: ({x}, {y}), tileIndex: {tileIndex}");
+                    if (ConfigManager.IsVerbosityMedium) { Log.LogInfo($"tilePos: ({x}, {y}), tileIndex: {tileIndex}"); }
                 }
             }
-            Debug.Log("[SUCCESS] Remove Terrain Modifications");
+            if (ConfigManager.IsVerbosityMedium) { Log.LogInfo("[SUCCESS] Remove Terrain Modifications"); }
         }
 
         public static void RecolorTerrain(
@@ -286,9 +298,9 @@ namespace TerrainTools
             ref bool[] modifiedPaint
         )
         {
-            Debug.Log("[INIT] Color Terrain Modification");
+            if (ConfigManager.IsVerbosityMedium) { Log.LogInfo("[INIT] Color Terrain Modification"); }
             hMap.WorldToVertex(worldPos, out var xPos, out var yPos);
-            Debug.Log($"worldPos: {worldPos}, vertexPos: ({xPos}, {yPos})");
+            if (ConfigManager.IsVerbosityMedium) { Log.LogInfo($"worldPos: {worldPos}, vertexPos: ({xPos}, {yPos})"); }
 
             var tileColor = ResolveColor(paintType);
             var removeColor = tileColor == Color.black;
@@ -301,10 +313,13 @@ namespace TerrainTools
                     var tileIndex = y * worldWidth + x;
                     paintMask[tileIndex] = tileColor;
                     modifiedPaint[tileIndex] = !removeColor;
-                    Debug.Log($"tilePos: ({x}, {y}), tileIndex: {tileIndex}, tileColor: {tileColor}");
+                    if (ConfigManager.IsVerbosityMedium)
+                    {
+                        Log.LogInfo($"tilePos: ({x}, {y}), tileIndex: {tileIndex}, tileColor: {tileColor}");
+                    }
                 }
             }
-            Debug.Log("[SUCCESS] Color Terrain Modification");
+            if (ConfigManager.IsVerbosityMedium) { Log.LogInfo("[SUCCESS] Color Terrain Modification"); }
         }
 
         public static Color ResolveColor(TerrainModifier.PaintType paintType)
@@ -326,7 +341,10 @@ namespace TerrainTools
             var newH = oldH - oldDeltaH + newDeltaH;
             var roundedNewH = Mathf.Round(newH * 100) / 100;
             var roundedNewDeltaH = roundedNewH - oldH + oldDeltaH;
-            Debug.Log($"oldH: {oldH}, oldDeltaH: {oldDeltaH}, newDeltaH: {newDeltaH}, newH: {newH}, roundedNewH: {roundedNewH}, roundedNewDeltaH: {roundedNewDeltaH}");
+            if (ConfigManager.IsVerbosityMedium)
+            {
+                Log.LogInfo($"oldH: {oldH}, oldDeltaH: {oldDeltaH}, newDeltaH: {newDeltaH}, newH: {newH}, roundedNewH: {roundedNewH}, roundedNewDeltaH: {roundedNewDeltaH}");
+            }
             return roundedNewDeltaH;
         }
     }
