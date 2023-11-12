@@ -73,13 +73,9 @@ namespace TerrainTools.Helpers
             // prevent duplicates
             if (PieceManager.Instance.GetPiece(toolDB.pieceName) != null) { return null; }
 
-            // get base prefab to clone
-            var basePrefab = PrefabManager.Instance.GetPrefab(toolDB.basePrefab);
-            if (basePrefab == null) { return null; }
-
             // clone base prefab and set name
-            var toolPrefab = basePrefab.DeepCopy();
-            toolPrefab.name = toolDB.name;
+            var toolPrefab = PrefabManager.Instance.CreateClonedPrefab(toolDB.name, toolDB.basePrefab);
+            if (toolDB == null) { return null; }
 
             // customize piece component
             var toolPiece = toolPrefab.GetComponent<Piece>();
