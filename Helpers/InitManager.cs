@@ -130,6 +130,11 @@ namespace TerrainTools.Helpers
             var name = prefab.name;
             var hash = name.GetStableHashCode();
 
+            if (PrefabManager.Instance.GetPrefab(name) == null)
+            {
+                PrefabManager.Instance.AddPrefab(prefab);
+            }
+
             if (ZNetScene.instance != null && !ZNetScene.instance.m_namedPrefabs.ContainsKey(hash))
             {
                 PrefabManager.Instance.RegisterToZNetScene(prefab);
