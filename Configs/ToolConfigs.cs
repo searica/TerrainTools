@@ -10,72 +10,78 @@ namespace TerrainTools.Configs
         {
             // Hoe Tools
             {
-                "Level Terrain (Square)",
+                "mud_road_v2_sq",
                 new ToolDB(
-                    name: "Level Terrain (Square)",
+                    name: "mud_road_v2_sq",
                     basePrefab:"mud_road_v2",
-                    pieceName: "Level Terrain (Square)",
-                    pieceDesc: "",
+                    pieceName: "Level ground(square)",
+                    pieceDesc: "Levels ground according to the world grid based on player position. (Use shift+click to level ground based on where you are pointing instead)",
                     icon: IconCache.MudRoadSquare,
                     pieceTable: PieceTables.Hoe,
-                    overlayType: typeof(LevelGroundOverlayVisualizer)
+                    overlayType: typeof(LevelGroundOverlayVisualizer),
+                    insertIndex: 1
                 )
             },
+
             {
-                "Raise Terrain (Precision)",
+                "raise_v2_precise",
                 new ToolDB(
-                    name: "Raise Terrain (Precision)",
+                    name: "raise_v2_precise",
                     basePrefab:"raise_v2",
-                    pieceName: "Raise Terrain (Precision)",
-                    pieceDesc: "",
+                    pieceName: "Raise ground (precision)",
+                    pieceDesc: "Raise ground with precision accuracy by using scroll wheel to set ground height.",
                     icon: IconCache.RaiseSquare,
                     pieceTable: PieceTables.Hoe,
-                    overlayType: typeof(RaiseGroundOverlayVisualizer)
+                    overlayType: typeof(RaiseGroundOverlayVisualizer),
+                    insertIndex: 2
                 )
             },
+
             {
-                "Pathen (Square)",
+                "path_v2_square",
                 new ToolDB(
-                    name: "Pathen (Square)",
-                    basePrefab:"",
-                    pieceName: "Pathen (Square)",
-                    pieceDesc: "path_v2",
+                    name: "path_v2_square",
+                    basePrefab:"path_v2",
+                    pieceName: "Pathen (square)",
+                    pieceDesc: "Creates a dirt path according to the world grid without affecting ground height.",
                     icon: IconCache.MudRoadPathSquare,
                     pieceTable: PieceTables.Hoe,
-                    overlayType: typeof(SquarePathOverlayVisualizer)
+                    overlayType: typeof(SquarePathOverlayVisualizer),
+                    insertIndex: 3
                 )
             },
+
             {
-                "Cobblestone (Square)",
+                "paved_road_v2_square",
                 new ToolDB(
-                    name: "Cobblestone (Square)",
+                    name: "Paved road (Square)",
                     basePrefab:"paved_road_v2",
-                    pieceName: "Cobblestone (Square)",
-                    pieceDesc: "",
+                    pieceName: "Paved road (square)",
+                    pieceDesc: "Creates a paved path according to the world grid and levels ground based on player position. (Use shift+click to level ground based on where you are pointing)",
                     icon: IconCache.PavedRoadSquare,
                     pieceTable: PieceTables.Hoe,
                     overlayType: typeof(SquarePathOverlayVisualizer)
                 )
             },
             {
-                "Cobblestone Path",
+                "paved_road_v2_path",
                 new ToolDB(
-                    name: "Cobblestone Path",
+                    name: "paved_road_v2_path",
                     basePrefab:"paved_road_v2",
-                    pieceName: "Cobblestone Path",
-                    pieceDesc: "",
+                    pieceName: "Paved road (path)",
+                    pieceDesc: "Creates a paved path without affecting ground height",
                     icon: IconCache.PavedRoadPath,
                     pieceTable: PieceTables.Hoe,
                     smooth: false
                 )
             },
             {
-                "Cobblestone Path (Square)",
+                "paved_road_v2_path_square",
                 new ToolDB(
-                    name: "Cobblestone Path (Square)",
+                    name: "paved_road_v2_path_square",
                     basePrefab:"paved_road_v2",
-                    pieceName: "Cobblestone Path (Square)",
-                    pieceDesc: "",
+                    pieceName: "Paved road (path, square)",
+                    pieceDesc: "Created a paved path according to the world grid without affecting ground height",
                     icon: IconCache.PavedRoadPathSquare,
                     pieceTable: PieceTables.Hoe,
                     overlayType: typeof(SquarePathOverlayVisualizer),
@@ -83,12 +89,12 @@ namespace TerrainTools.Configs
                 )
             },
             {
-                "Remove Terrain Modifications",
+                "remove_terrain_mods",
                 new ToolDB(
-                    name: "Remove Terrain Modifications",
+                    name: "remove_terrain_mods",
                     basePrefab:"mud_road_v2",
                     pieceName: "Remove Terrain Modifications",
-                    pieceDesc: "",
+                    pieceDesc: "Resets ground height and paint",
                     icon: IconCache.Remove,
                     pieceTable: PieceTables.Hoe,
                     overlayType: typeof(RemoveModificationsOverlayVisualizer),
@@ -101,144 +107,58 @@ namespace TerrainTools.Configs
 
             // Cultivator Tools
             {
-                "Cultivate (Square)",
+                "cultivate_v2_square",
                 new ToolDB(
-                    name: "Cultivate (Square)",
+                    name: "cultivate_v2_square",
                     basePrefab:"cultivate_v2",
-                    pieceName: "Cultivate (Square)",
-                    pieceDesc: "",
+                    pieceName: "Cultivate (square)",
+                    pieceDesc: "Cultivates ground according to the world grid and levels terrain based on player position. (Use shift+click to level ground based on where you are pointing)",
                     icon: IconCache.CultivateSquare,
                     pieceTable: PieceTables.Cultivator,
-                    overlayType: typeof(CultivateOverlayVisualizer)
+                    overlayType: typeof(CultivateOverlayVisualizer),
+                    insertIndex: 1
                 )
             },
             {
-                "Cultivate Path",
+                "cultivate_v2_path",
                 new ToolDB(
-                    name: "Cultivate Path",
+                    name: "cultivate_v2_path",
                     basePrefab:"cultivate_v2",
-                    pieceName: "Cultivate Path",
-                    pieceDesc: "",
+                    pieceName: "Cultivate (path)",
+                    pieceDesc: "Cultivates ground without affecting ground height.",
                     icon: IconCache.CultivatePath,
                     pieceTable: PieceTables.Cultivator,
-                    smooth: false
+                    smooth: false,
+                    insertIndex: 1
                 )
             },
             {
-                "Cultivate Path (Square)",
+                "cultivate_v2_path_square",
                 new ToolDB(
-                    name: "Cultivate Path (Square)",
+                    name: "cultivate_v2_path_square",
                     basePrefab:"cultivate_v2",
-                    pieceName: "Cultivate Path (Square)",
-                    pieceDesc: "",
+                    pieceName: "Cultivate (path, square)",
+                    pieceDesc: "Cultivates ground according to the world grid without affecting ground height.",
                     icon: IconCache.CultivatePathSquare,
                     pieceTable: PieceTables.Cultivator,
                     overlayType: typeof(CultivateOverlayVisualizer),
-                    smooth: false
+                    smooth: false,
+                    insertIndex: 1
                 )
             },
             {
-                "Replant (Square)",
+                "replant_v2_square",
                 new ToolDB(
-                    name: "Replant (Square)",
+                    name: "replant_v2_square",
                     basePrefab:"replant_v2",
-                    pieceName: "Replant (Square)",
-                    pieceDesc: "",
+                    pieceName: "Replant (square)",
+                    pieceDesc: "Replants terrain according to world grid without affecting ground height.",
                     icon: IconCache.ReplantSquare,
                     pieceTable: PieceTables.Cultivator,
-                    overlayType: typeof(SeedGrassOverlayVisualizer)
+                    overlayType: typeof(SeedGrassOverlayVisualizer),
+                    insertIndex: 2
                 )
             },
         };
     }
 }
-
-//private void AddToolPieces()
-//{
-//    AddToolPiece<LevelGroundOverlayVisualizer>(
-//        "Level Terrain (Square)",
-//        "mud_road_v2",
-//        PieceTables.Hoe,
-//        IconCache.MudRoadSquare
-//    );
-
-//    AddToolPiece<RaiseGroundOverlayVisualizer>(
-//        "Raise Terrain (Precision)",
-//        "raise_v2",
-//        PieceTables.Hoe,
-//        IconCache.RaiseSquare
-//    );
-
-//    AddToolPiece<SquarePathOverlayVisualizer>(
-//        "Pathen (Square)",
-//        "path_v2",
-//        PieceTables.Hoe,
-//        IconCache.MudRoadPathSquare
-//    );
-
-//    AddToolPiece<SquarePathOverlayVisualizer>(
-//        "Cobblestone (Square)",
-//        "paved_road_v2",
-//        PieceTables.Hoe,
-//        IconCache.PavedRoadSquare
-//    );
-
-//    AddToolPiece(
-//        "Cobblestone Path",
-//        "paved_road_v2",
-//        PieceTables.Hoe,
-//        IconCache.PavedRoadPath,
-//        smooth: false
-//    );
-
-//    AddToolPiece<SquarePathOverlayVisualizer>(
-//        "Cobblestone Path (Square)",
-//        "paved_road_v2",
-//        PieceTables.Hoe,
-//        IconCache.PavedRoadPathSquare,
-//        smooth: false
-//    );
-
-//    AddToolPiece<CultivateOverlayVisualizer>(
-//        "Cultivate (Square)",
-//        "cultivate_v2",
-//        PieceTables.Cultivator,
-//        IconCache.CultivateSquare
-//    );
-
-//    AddToolPiece(
-//        "Cultivate Path",
-//        "cultivate_v2",
-//        PieceTables.Cultivator,
-//        IconCache.CultivatePath,
-//        smooth: false
-//    );
-
-//    AddToolPiece<CultivateOverlayVisualizer>(
-//        "Cultivate Path (Square)",
-//        "cultivate_v2",
-//        PieceTables.Cultivator,
-//        IconCache.CultivatePathSquare,
-//        smooth: false
-//    );
-
-//    AddToolPiece<SeedGrassOverlayVisualizer>(
-//        "Replant (Square)",
-//        "replant_v2",
-//        PieceTables.Cultivator,
-//        IconCache.ReplantSquare
-//    );
-
-//    AddToolPiece<RemoveModificationsOverlayVisualizer>(
-//        "Remove Terrain Modifications",
-//        "mud_road_v2",
-//        PieceTables.Hoe,
-//        IconCache.Remove,
-//        level: false,
-//        raise: false,
-//        smooth: false,
-//        clearPaint: false
-//    );
-
-//    PrefabManager.OnVanillaPrefabsAvailable -= AddToolPieces;
-//}
