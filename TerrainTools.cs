@@ -5,6 +5,7 @@ using BepInEx.Logging;
 using HarmonyLib;
 using TerrainTools.Configs;
 using System.Reflection;
+using System.Collections.Generic;
 using Jotunn.Utils;
 using System.IO;
 using UnityEngine;
@@ -12,6 +13,7 @@ using Jotunn.Managers;
 using Jotunn.Configs;
 using Jotunn.Entities;
 using TerrainTools.Visualization;
+using BepInEx.Configuration;
 
 namespace TerrainTools
 {
@@ -32,6 +34,33 @@ namespace TerrainTools
         private static TerrainTools Instance { get; set; }
 
         internal static Texture2D LoadTextureFromDisk(string fileName) => AssetUtils.LoadTexture(Path.Combine(Path.GetDirectoryName(Instance.Info.Location), fileName));
+
+        #region Section Names
+
+        private static readonly string MainSection = ConfigManager.SetStringPriority("Global", 3);
+
+        private static readonly string RadiusSection = ConfigManager.SetStringPriority("Radius", 2);
+        private static readonly string ToolsSection = ConfigManager.SetStringPriority("Tools", 1);
+
+        #endregion Section Names
+
+        /// <summary>
+        ///     Dictionary of tool names to corresponding config entry that sets if they are enabled.
+        /// </summary>
+        internal static readonly Dictionary<string, ConfigEntry<bool>> ToolConfigEntries = new();
+
+        #region Radius Configs
+
+        internal static ConfigEntry<bool> UseScrollWheel;
+
+        internal static ConfigEntry<KeyCode> ScrollModKey;
+        internal static ConfigEntry<float> ScrollWheelScale;
+
+        private static float lastOriginalRadius;
+        private static float lastModdedRadius;
+        private static float lastTotalDelta;
+
+        #endregion Radius Configs
 
         // Roadmap
 
@@ -73,7 +102,7 @@ namespace TerrainTools
             Log.Init(Logger);
 
             ConfigManager.Init(PluginGUID, Config);
-            ConfigManager.SetUpConfig();
+            SetUpConfigEntries();
 
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), harmonyInstanceId: PluginGUID);
 
@@ -87,6 +116,43 @@ namespace TerrainTools
 
         public void OnDestroy()
         {
+            ConfigManager.Save();
+        }
+
+        internal static void SetUpConfigEntries()
+        {
+            Log.Verbosity = ConfigManager.BindConfig(
+                MainSection,
+                "Verbosity",
+                LogLevel.Low,
+                "Low will log basic information about the mod. Medium will log information that " +
+                "is useful for troubleshooting. High will log a lot of information, do not set " +
+                "it to this without good reason as it will slow Down your game.",
+                synced: false
+            );
+
+            UseScrollWheel = ConfigManager.BindConfig(
+                RadiusSection,
+                "UseScrollWheel",
+                true,
+                "Use scroll wheel to modify radius"
+            );
+
+            ScrollWheelScale = ConfigManager.BindConfig(
+                RadiusSection,
+                "ScrollWheelScale",
+                0.1f,
+                "Scroll wheel change scale",
+                new AcceptableValueRange<float>(0.05f, 2f)
+            );
+
+            ScrollModKey = ConfigManager.BindConfig(
+                RadiusSection,
+                "ScrollModKey",
+                KeyCode.LeftAlt,
+                "Modifer key to allow scroll wheel change. Use https://docs.unity3d.com/Manual/class-InputManager.html"
+            );
+
             ConfigManager.Save();
         }
 
@@ -248,10 +314,27 @@ namespace TerrainTools
     }
 
     /// <summary>
-    /// Helper class for properly logging from static contexts.
+    ///     Log level to control output to BepInEx log
+    /// </summary>
+    internal enum LogLevel
+    {
+        Low = 0,
+        Medium = 1,
+        High = 2,
+    }
+
+    /// <summary>
+    ///     Helper class for properly logging from static contexts.
     /// </summary>
     internal static class Log
     {
+        #region Verbosity
+
+        internal static ConfigEntry<LogLevel> Verbosity { get; set; }
+        internal static LogLevel VerbosityLevel => Verbosity.Value;
+
+        #endregion Verbosity
+
         internal static ManualLogSource _logSource;
 
         internal static void Init(ManualLogSource logSource)
@@ -265,7 +348,13 @@ namespace TerrainTools
 
         internal static void LogFatal(object data) => _logSource.LogFatal(data);
 
-        internal static void LogInfo(object data) => _logSource.LogInfo(data);
+        internal static void LogInfo(object data, LogLevel level = LogLevel.Low)
+        {
+            if (VerbosityLevel == level)
+            {
+                _logSource.LogInfo(data);
+            }
+        }
 
         internal static void LogMessage(object data) => _logSource.LogMessage(data);
 
