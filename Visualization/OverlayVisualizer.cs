@@ -31,26 +31,12 @@ namespace TerrainTools.Visualization
                 Initialize();
             }
 
-            if (Keybindings.GridModFreshlyEnabled)
-            {
-                OnEnableGrid();
-            }
-
-            if (Keybindings.GridModFreshlyDisabled)
-            {
-                OnDisableGrid();
-            }
-
             OnRefresh();
         }
 
         protected abstract void Initialize();
 
         protected abstract void OnRefresh();
-
-        protected abstract void OnEnableGrid();
-
-        protected abstract void OnDisableGrid();
 
         protected void SpeedUp(Overlay overlay)
         {
@@ -113,31 +99,25 @@ namespace TerrainTools.Visualization
                 hoverInfo.Text = $"x: {secondary.Position.x:0}, y: {secondary.Position.z:0}, h: {secondary.Position.y - 0.05f:0.00000}";
             }
         }
-
-        protected override void OnEnableGrid()
-        { }
-
-        protected override void OnDisableGrid()
-        { }
     }
 
-    public abstract class SecondaryEnabledOnGridModePrimaryDisabledOnGridMode : HoverInfoEnabled
+    public abstract class SecondaryEnabledPrimaryDisabled : HoverInfoEnabled
     {
         protected override void OnRefresh()
         {
             base.OnRefresh();
-            primary.Enabled = Keybindings.GridModeDisabled;
-            secondary.Enabled = Keybindings.GridModeEnabled;
+            primary.Enabled = false;
+            secondary.Enabled = true;
         }
     }
 
-    public abstract class SecondaryEnabledOnGridModePrimaryEnabledAlways : HoverInfoEnabled
+    public abstract class SecondaryEnabledPrimaryEnabled : HoverInfoEnabled
     {
         protected override void OnRefresh()
         {
             base.OnRefresh();
             primary.Enabled = true;
-            secondary.Enabled = Keybindings.GridModeEnabled;
+            secondary.Enabled = true;
         }
     }
 
@@ -148,12 +128,6 @@ namespace TerrainTools.Visualization
             primary.Enabled = true;
             secondary.Enabled = true;
         }
-
-        protected override void OnEnableGrid()
-        { }
-
-        protected override void OnDisableGrid()
-        { }
     }
 
     [HarmonyPatch(typeof(Piece), "SetInvalidPlacementHeightlight")]

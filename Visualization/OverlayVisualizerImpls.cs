@@ -3,7 +3,7 @@
 namespace TerrainTools.Visualization
 {
     // Minimal classes describing specific VFXs of specific "ToolOps" in a DSL-like form.
-    public class LevelGroundOverlayVisualizer : SecondaryEnabledOnGridModePrimaryDisabledOnGridMode
+    public class LevelGroundOverlayVisualizer : HoverInfoEnabled
     {
         protected override void Initialize()
         {
@@ -11,9 +11,16 @@ namespace TerrainTools.Visualization
             SpeedUp(secondary);
             VisualizeTerraformingBounds(secondary);
         }
+
+        protected override void OnRefresh()
+        {
+            base.OnRefresh();
+            primary.Enabled = false;
+            secondary.Enabled = true;
+        }
     }
 
-    public class RaiseGroundOverlayVisualizer : SecondaryEnabledOnGridModePrimaryEnabledAlways
+    public class RaiseGroundOverlayVisualizer : HoverInfoEnabled
     {
         protected override void Initialize()
         {
@@ -27,31 +34,39 @@ namespace TerrainTools.Visualization
         protected override void OnRefresh()
         {
             base.OnRefresh();
-            if (Keybindings.GridModeEnabled)
-            {
-                GroundLevelSpinner.Refresh();
-                secondary.LocalPosition = new Vector3(0f, GroundLevelSpinner.Value, 0f);
+            primary.Enabled = true;
+            secondary.Enabled = true;
 
-                if (GroundLevelSpinner.Value > 0f)
-                {
-                    hoverInfo.Text = $"h: +{secondary.LocalPosition.y:0.00}";
-                }
-                else
-                {
-                    hoverInfo.Text = $"x: {secondary.Position.x:0}, y: {secondary.Position.z:0}, h: {secondary.Position.y:0.00000}";
-                }
+            GroundLevelSpinner.Refresh();
+            secondary.LocalPosition = new Vector3(0f, GroundLevelSpinner.Value, 0f);
+
+            if (GroundLevelSpinner.Value > 0f)
+            {
+                hoverInfo.Text = $"h: +{secondary.LocalPosition.y:0.00}";
             }
-            tertiary.Enabled = Keybindings.GridModeEnabled;
+            else
+            {
+                hoverInfo.Text = $"x: {secondary.Position.x:0}, y: {secondary.Position.z:0}, h: {secondary.Position.y:0.00000}";
+            }
+
+            tertiary.Enabled = true;
         }
     }
 
-    public class PaveRoadOverlayVisualizer : SecondaryEnabledOnGridModePrimaryDisabledOnGridMode
+    public class PaveRoadOverlayVisualizer : HoverInfoEnabled
     {
         protected override void Initialize()
         {
             base.Initialize();
             SpeedUp(secondary);
             VisualizeRecoloringBounds(secondary);
+        }
+
+        protected override void OnRefresh()
+        {
+            base.OnRefresh();
+            primary.Enabled = false;
+            secondary.Enabled = true;
         }
     }
 
@@ -64,47 +79,15 @@ namespace TerrainTools.Visualization
         }
     }
 
-    public class SeedGrassOverlayVisualizer : SecondaryEnabledOnGridModePrimaryEnabledAlways
+    public class SeedGrassOverlayVisualizer : SecondaryEnabledPrimaryEnabled
     {
         protected override void Initialize()
         {
             base.Initialize();
             Freeze(secondary);
             VisualizeRecoloringBounds(secondary);
-            primary.LocalPosition = new Vector3(0, 2.0f, 0);
-        }
-
-        protected override void OnRefresh()
-        {
-            if (Keybindings.GridModeEnabled)
-            {
-                primary.StartSize = 4.0f;
-                primary.LocalPosition = new Vector3(0.5f, 2.5f, 0.5f);
-            }
-            else
-            {
-                primary.StartSize = 5.5f;
-                primary.LocalPosition = new Vector3(0, 2.5f, 0);
-            }
-            base.OnRefresh();
-        }
-
-        protected override void OnEnableGrid()
-        {
-            base.OnEnableGrid();
-            primary.Enabled = false;
             primary.StartSize = 4.0f;
             primary.LocalPosition = new Vector3(0.5f, 2.5f, 0.5f);
-            primary.Enabled = true;
-        }
-
-        protected override void OnDisableGrid()
-        {
-            primary.Enabled = false;
-            primary.LocalPosition = new Vector3(0, 2.5f, 0);
-            primary.StartSize = 5.5f;
-            primary.Enabled = true;
-            base.OnDisableGrid();
         }
     }
 
@@ -117,6 +100,12 @@ namespace TerrainTools.Visualization
             VisualizeTerraformingBounds(primary);
             VisualizeIconInsideTerraformingBounds(secondary, IconCache.Cross);
         }
+
+        protected override void OnRefresh()
+        {
+            primary.Enabled = true;
+            secondary.Enabled = true;
+        }
     }
 
     public abstract class UndoRedoModificationsOverlayVisualizer : SecondaryAndPrimaryEnabledAlways
@@ -127,6 +116,12 @@ namespace TerrainTools.Visualization
             Freeze(secondary);
             VisualizeRecoloringBounds(primary);
             VisualizeIconInsideRecoloringBounds(secondary, Icon());
+        }
+
+        protected override void OnRefresh()
+        {
+            primary.Enabled = true;
+            secondary.Enabled = true;
         }
 
         protected abstract Texture2D Icon();
