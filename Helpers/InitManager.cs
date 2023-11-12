@@ -28,13 +28,15 @@ namespace TerrainTools.Helpers
         internal static void InitToolPieces()
         {
             if (HasInitialized) return;
+            FixVanillaToolDescriptions();
+
             foreach (var key in ToolConfigs.ToolConfigsMap.Keys)
             {
                 try
                 {
                     var toolDB = ToolConfigs.ToolConfigsMap[key];
                     var piecePrefab = MakeToolPiece(toolDB);
-                    RegisterPieceInPieceTable(piecePrefab, toolDB.pieceTable, "", toolDB.insertIndex);
+                    RegisterPieceInPieceTable(piecePrefab, toolDB.pieceTable, null, toolDB.insertIndex);
                     ToolRefs.Add(key, piecePrefab);
                 }
                 catch
@@ -42,7 +44,54 @@ namespace TerrainTools.Helpers
                     Log.LogWarning($"Failed to create: {key}");
                 }
             }
+
             HasInitialized = true;
+        }
+
+        internal static void FixVanillaToolDescriptions()
+        {
+            SetDescription(
+               "mud_road_v2",
+               "Levels ground. (Use shift + click to level ground based on where you are pointing)"
+           );
+
+            SetDescription(
+                "raise_v2",
+                "Raise ground based on player position. (Use shift + click to raise ground based on where you are pointing)"
+            );
+
+            SetDescription(
+                "path_v2",
+                "Creates a dirt path without affecting ground height."
+            );
+
+            SetDescription(
+                "paved_road_v2",
+                "Creates a paved path and levels ground based on player position. (Use shift+click to level ground based on where you are pointing)"
+            );
+
+            SetDescription(
+                "cultivate_v2",
+                "Cultivates ground and levels ground based on player position. (Use shift + click to raise ground based on where you are pointing)"
+            );
+
+            SetDescription(
+                "replant_v2",
+                "Replants terrain without affecting ground height."
+            );
+        }
+
+        private static void SetDescription(string prefabName, string description)
+        {
+            var prefabPiece = PrefabManager.Instance.GetPrefab(prefabName)?.GetComponent<Piece>();
+            if (prefabPiece != null)
+            {
+                prefabPiece.m_description = description;
+            }
+            else
+            {
+                Log.LogWarning($"Could not set description for: {prefabName}");
+            }
         }
 
         /// <summary>
