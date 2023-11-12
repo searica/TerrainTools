@@ -91,16 +91,14 @@ namespace TerrainTools
                 "Level Terrain (Square)",
                 "mud_road_v2",
                 PieceTables.Hoe,
-                IconCache.MudRoadSquare,
-                level: true
+                IconCache.MudRoadSquare
             );
 
             AddToolPiece<LevelGroundOverlayVisualizer>(
                 "Raise Terrain (Square)",
                 "raise_v2",
                 PieceTables.Hoe,
-                IconCache.RaiseSquare,
-                raise: true
+                IconCache.RaiseSquare
             );
 
             AddToolPiece<PaveRoadOverlayVisualizer>(
@@ -111,10 +109,18 @@ namespace TerrainTools
             );
 
             AddToolPiece<PaveRoadOverlayVisualizer>(
-                "Pathen Stone (Square)",
+                "Cobblestone (Square)",
                 "paved_road_v2",
                 PieceTables.Hoe,
                 IconCache.PavedRoadSquare
+            );
+
+            AddToolPiece<PaveRoadOverlayVisualizer>(
+                "Cobblestone Path (Square)",
+                "paved_road_v2",
+                PieceTables.Hoe,
+                IconCache.PavedRoadPathSquare,
+                smooth: false
             );
 
             AddToolPiece<CultivateOverlayVisualizer>(
@@ -122,6 +128,14 @@ namespace TerrainTools
                 "cultivate_v2",
                 PieceTables.Cultivator,
                 IconCache.CultivateSquare
+            );
+
+            AddToolPiece<CultivateOverlayVisualizer>(
+                "Cultivate Path (Square)",
+                "cultivate_v2",
+                PieceTables.Cultivator,
+                IconCache.CultivatePathSquare,
+                smooth: false
             );
 
             AddToolPiece<SeedGrassOverlayVisualizer>(

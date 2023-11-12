@@ -1,4 +1,6 @@
 ﻿using HarmonyLib;
+using TerrainTools.Extensions;
+using TerrainTools.Visualization;
 using UnityEngine;
 
 namespace TerrainTools
@@ -11,29 +13,37 @@ namespace TerrainTools
         [HarmonyPrefix]
         [HarmonyPatch(nameof(TerrainComp.InternalDoOperation))]
         private static bool InternalDoOperationPrefix(
+            TerrainComp __instance,
             Vector3 pos,
-            TerrainOp.Settings modifier,
-            Heightmap ___m_hmap,
-            int ___m_width,
-            ref float[] ___m_levelDelta,
-            ref float[] ___m_smoothDelta,
-            ref Color[] ___m_paintMask,
-            ref bool[] ___m_modifiedHeight,
-            ref bool[] ___m_modifiedPaint
+            TerrainOp.Settings modifier
         )
         {
             if (!modifier.m_level && !modifier.m_raise && !modifier.m_smooth && !modifier.m_paintCleared)
             {
-                RemoveTerrainModifications(pos, ___m_hmap, ___m_width, ref ___m_levelDelta, ref ___m_smoothDelta, ref ___m_modifiedHeight);
-                RecolorTerrain(pos, TerrainModifier.PaintType.Reset, ___m_hmap, ___m_width, ref ___m_paintMask, ref ___m_modifiedPaint);
+                RemoveTerrainModifications(
+                    pos,
+                    __instance.m_hmap,
+                    __instance.m_width,
+                    ref __instance.m_levelDelta,
+                    ref __instance.m_smoothDelta,
+                    ref __instance.m_modifiedHeight
+                );
+                RecolorTerrain(
+                    pos,
+                    TerrainModifier.PaintType.Reset,
+                    __instance.m_hmap,
+                    __instance.m_width,
+                    ref __instance.m_paintMask,
+                    ref __instance.m_modifiedPaint
+                );
             }
             return true;
         }
 
         public static void SmoothenTerrain(
+            TerrainComp compiler,
             Vector3 worldPos,
             Heightmap hMap,
-            TerrainComp compiler,
             int worldWidth,
             ref float[] smoothDelta,
             ref bool[] modifiedHeight
@@ -68,9 +78,9 @@ namespace TerrainTools
         }
 
         public static void RaiseTerrain(
+            TerrainComp compiler,
             Vector3 worldPos,
             Heightmap hMap,
-            TerrainComp compiler,
             int worldWidth,
             float power,
             ref float[] levelDelta,
@@ -206,20 +216,21 @@ namespace TerrainTools
         [HarmonyPrefix]
         [HarmonyPatch(nameof(TerrainComp.SmoothTerrain))]
         private static bool SmoothTerrianPrefix(
-            Vector3 worldPos,
-            float radius,
-            bool square,
-            float power,
             TerrainComp __instance,
-            Heightmap ___m_hmap,
-            int ___m_width,
-            ref float[] ___m_smoothDelta,
-            ref bool[] ___m_modifiedHeight
+            Vector3 worldPos,
+            float radius
         )
         {
             if (IsGridModeEnabled(radius))
             {
-                SmoothenTerrain(worldPos, ___m_hmap, __instance, ___m_width, ref ___m_smoothDelta, ref ___m_modifiedHeight);
+                SmoothenTerrain(
+                    __instance,
+                    worldPos,
+                    __instance.m_hmap,
+                    __instance.m_width,
+                    ref __instance.m_smoothDelta,
+                    ref __instance.m_modifiedHeight
+                );
                 return false;
             }
             else
@@ -231,22 +242,24 @@ namespace TerrainTools
         [HarmonyPrefix]
         [HarmonyPatch(nameof(TerrainComp.RaiseTerrain))]
         private static bool RaiseTerrainPrefix(
+            TerrainComp __instance,
             Vector3 worldPos,
             float radius,
-            float delta,
-            bool square,
-            float power,
-            TerrainComp __instance,
-            Heightmap ___m_hmap,
-            int ___m_width,
-            ref float[] ___m_levelDelta,
-            ref float[] ___m_smoothDelta,
-            ref bool[] ___m_modifiedHeight
+            float delta
         )
         {
             if (IsGridModeEnabled(radius))
             {
-                RaiseTerrain(worldPos, ___m_hmap, __instance, ___m_width, delta, ref ___m_levelDelta, ref ___m_smoothDelta, ref ___m_modifiedHeight);
+                RaiseTerrain(
+                    __instance,
+                    worldPos,
+                    __instance.m_hmap,
+                    __instance.m_width,
+                    delta,
+                    ref __instance.m_levelDelta,
+                    ref __instance.m_smoothDelta,
+                    ref __instance.m_modifiedHeight
+                );
                 return false;
             }
             else
@@ -258,20 +271,22 @@ namespace TerrainTools
         [HarmonyPrefix]
         [HarmonyPatch(nameof(TerrainComp.PaintCleared))]
         private static bool PreciseColorModificaton(
+            TerrainComp __instance,
             Vector3 worldPos,
             float radius,
-            TerrainModifier.PaintType paintType,
-            bool heightCheck,
-            bool apply,
-            Heightmap ___m_hmap,
-            int ___m_width,
-            ref Color[] ___m_paintMask,
-            ref bool[] ___m_modifiedPaint
+            TerrainModifier.PaintType paintType
         )
         {
             if (IsGridModeEnabled(radius))
             {
-                RecolorTerrain(worldPos, paintType, ___m_hmap, ___m_width, ref ___m_paintMask, ref ___m_modifiedPaint);
+                RecolorTerrain(
+                    worldPos,
+                    paintType,
+                    __instance.m_hmap,
+                    __instance.m_width,
+                    ref __instance.m_paintMask,
+                    ref __instance.m_modifiedPaint
+                );
                 return false;
             }
             else
@@ -283,9 +298,11 @@ namespace TerrainTools
         // DIRTY HACK: bend the flow to our will with a hijacked "unused" variable. Thus is the life of the modder ;)
         [HarmonyPrefix]
         [HarmonyPatch(nameof(TerrainComp.ApplyOperation))]
-        private static bool ClientSideGridModeOverride(TerrainOp modifier)
+        private static void ClientSideGridModeOverride(TerrainOp modifier)
         {
-            if (Keybindings.GridModeEnabled)
+            if (modifier?.gameObject == null) { return; }
+
+            if (modifier.gameObject.HasComponentInChildren<OverlayVisualizer>())
             {
                 if (modifier.m_settings.m_smooth)
                 {
@@ -301,7 +318,6 @@ namespace TerrainTools
                     modifier.m_settings.m_paintRadius = float.NegativeInfinity;
                 }
             }
-            return true;
         }
 
         // DIRTY HACK: This is surely how I will be remembered ;)
