@@ -11,7 +11,7 @@ namespace TerrainTools.Visualization
         protected Overlay tertiary;
         protected HoverInfo hoverInfo;
 
-        internal static readonly Vector3 VerticalOffset = new(0, 0.05f, 0);
+        internal static readonly Vector3 VerticalOffset = new(0, 0.075f, 0);
 
         private void Update()
         {
@@ -94,6 +94,7 @@ namespace TerrainTools.Visualization
 
         protected override void OnRefresh()
         {
+            hoverInfo.Enabled = TerrainTools.IsHoverInforEnabled;
             if (hoverInfo.Enabled)
             {
                 hoverInfo.RotateToPlayer();
@@ -107,7 +108,7 @@ namespace TerrainTools.Visualization
     ///     Blocks check for invalid placement height if custom overlay
     /// </summary>
     [HarmonyPatch(typeof(Piece), "SetInvalidPlacementHeightlight")]
-    public static class OverlayVisualizationRedshiftHeighlightBlocker
+    public static class OverlayVisualizationRedshiftHeigthlightBlocker
     {
         private static bool Prefix(Piece __instance)
         {
