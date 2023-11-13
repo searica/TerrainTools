@@ -4,9 +4,9 @@ namespace TerrainTools.Visualization
 {
     public class HoverInfo
     {
-        private GameObject _gameObject;
-        private Transform _transform;
-        private TextMesh _textMesh;
+        private readonly GameObject _gameObject;
+        private readonly Transform _transform;
+        private readonly TextMesh _textMesh;
 
         public string Text
         {
