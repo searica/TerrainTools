@@ -12,6 +12,7 @@ using UnityEngine;
 using Jotunn.Managers;
 using BepInEx.Configuration;
 using TerrainTools.Helpers;
+using TerrainTools.Extensions;
 
 namespace TerrainTools
 {
@@ -238,6 +239,10 @@ namespace TerrainTools
 
         internal static void LogFatal(object data) => _logSource.LogFatal(data);
 
+        internal static void LogMessage(object data) => _logSource.LogMessage(data);
+
+        internal static void LogWarning(object data) => _logSource.LogWarning(data);
+
         internal static void LogInfo(object data, LogLevel level = LogLevel.Low)
         {
             if (VerbosityLevel >= level)
@@ -246,8 +251,42 @@ namespace TerrainTools
             }
         }
 
-        internal static void LogMessage(object data) => _logSource.LogMessage(data);
+        internal static void LogGameObject(GameObject prefab, bool includeChildren = false)
+        {
+            LogInfo("***** " + prefab.name + " *****");
+            foreach (Component compo in prefab.GetComponents<Component>())
+            {
+                LogComponent(compo);
+            }
 
-        internal static void LogWarning(object data) => _logSource.LogWarning(data);
+            if (!includeChildren) { return; }
+
+            LogInfo("***** " + prefab.name + " (children) *****");
+            foreach (Transform child in prefab.transform)
+            {
+                LogInfo($" - {child.gameObject.name}");
+                foreach (Component compo in child.gameObject.GetComponents<Component>())
+                {
+                    LogComponent(compo);
+                }
+            }
+        }
+
+        internal static void LogComponent(Component compo)
+        {
+            LogInfo($"--- {compo.GetType().Name}: {compo.name} ---");
+
+            PropertyInfo[] properties = compo.GetType().GetProperties(ReflectionUtils.AllBindings);
+            foreach (var property in properties)
+            {
+                LogInfo($" - {property.Name} = {property.GetValue(compo)}");
+            }
+
+            FieldInfo[] fields = compo.GetType().GetFields(ReflectionUtils.AllBindings);
+            foreach (var field in fields)
+            {
+                LogInfo($" - {field.Name} = {field.GetValue(compo)}");
+            }
+        }
     }
 }
