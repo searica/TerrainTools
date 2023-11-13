@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using TerrainTools.Configs;
 using TerrainTools.Extensions;
 using TerrainTools.Visualization;
 using UnityEngine;
