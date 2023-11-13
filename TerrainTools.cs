@@ -23,7 +23,7 @@ namespace TerrainTools
         internal const string Author = "Searica";
         public const string PluginName = "TerrainTools";
         public const string PluginGUID = $"{Author}.Valheim.{PluginName}";
-        public const string PluginVersion = "0.0.1";
+        public const string PluginVersion = "0.1.0";
 
         // Use this class to add your own localization to the game
         // https://valheim-modding.github.io/Jotunn/tutorials/localization.html
@@ -43,6 +43,9 @@ namespace TerrainTools
         #endregion Section Names
 
         #region Tool Configs
+
+        private static ConfigEntry<bool> HoverInfoEnabled;
+        internal static bool IsHoverInforEnabled => HoverInfoEnabled.Value;
 
         /// <summary>
         ///     Dictionary of tool names to corresponding config entry that sets if they are enabled.
@@ -64,25 +67,18 @@ namespace TerrainTools
 
         #region Radius Configs
 
-        internal static ConfigEntry<bool> UseScrollWheel;
-
-        internal static ConfigEntry<KeyCode> ScrollModKey;
-        internal static ConfigEntry<float> ScrollWheelScale;
-
-        private static float lastOriginalRadius;
-        private static float lastModdedRadius;
-        private static float lastTotalDelta;
+        internal static ConfigEntry<bool> EnableRadiusModifier;
+        internal static ConfigEntry<KeyCode> _ScrollModKey;
+        internal static ConfigEntry<float> _ScrollWheelScale;
+        internal static ConfigEntry<float> _MaxRadius;
+        internal static bool IsEnableRadiusModifier => EnableRadiusModifier.Value;
+        internal static float MaxRadius => _MaxRadius.Value;
+        internal static KeyCode ScrollModKey => _ScrollModKey.Value;
+        internal static float ScrollWheelScale => _ScrollWheelScale.Value;
 
         #endregion Radius Configs
 
-        // Add feature:
-        // - Hotkey to let scroll wheel change size of any of the above
-        // - Add better descriptions to all the hoe pieces (if they smooth terrain or not)
-
         // Configuration:
-        // - Option to enable/disable each of the above tools
-        // - Options to set max and min size for when changing tool size
-        // - Configure hotkey for changing size with scroll wheel
         // - Configure whether the hover info shows or not (terrain height info)
 
         // Stretch Goal:
@@ -155,14 +151,21 @@ namespace TerrainTools
                 synced: false
             );
 
-            UseScrollWheel = ConfigManager.BindConfig(
+            EnableRadiusModifier = ConfigManager.BindConfig(
                 RadiusSection,
-                "UseScrollWheel",
+                ConfigManager.SetStringPriority("RadiusModifier", 1),
                 true,
-                "Use scroll wheel to modify radius"
+                "Set to true/enabled to allow modifying the radius of terrain tools using the scroll wheel."
             );
 
-            ScrollWheelScale = ConfigManager.BindConfig(
+            _ScrollModKey = ConfigManager.BindConfig(
+                RadiusSection,
+                "ScrollModKey",
+                KeyCode.LeftAlt,
+                "Modifier key to allow scroll wheel change."
+            );
+
+            _ScrollWheelScale = ConfigManager.BindConfig(
                 RadiusSection,
                 "ScrollWheelScale",
                 0.1f,
@@ -170,11 +173,19 @@ namespace TerrainTools
                 new AcceptableValueRange<float>(0.05f, 2f)
             );
 
-            ScrollModKey = ConfigManager.BindConfig(
+            _MaxRadius = ConfigManager.BindConfig(
                 RadiusSection,
-                "ScrollModKey",
-                KeyCode.LeftAlt,
-                "Modifer key to allow scroll wheel change. Use https://docs.unity3d.com/Manual/class-InputManager.html"
+                "MaxRadius",
+                10f,
+                "Maximum radius of terrain tools.",
+                new AcceptableValueRange<float>(4f, 20f)
+            );
+
+            HoverInfoEnabled = ConfigManager.BindConfig(
+                ToolsSection,
+                ConfigManager.SetStringPriority("HoverInfo", 1),
+                true,
+                "Set to true/enabled to show terrain height when using square terrain tools."
             );
 
             foreach (var key in ToolConfigs.ToolConfigsMap.Keys)
@@ -229,7 +240,7 @@ namespace TerrainTools
 
         internal static void LogInfo(object data, LogLevel level = LogLevel.Low)
         {
-            if (VerbosityLevel == level)
+            if (VerbosityLevel >= level)
             {
                 _logSource.LogInfo(data);
             }
