@@ -1,8 +1,10 @@
 ﻿using HarmonyLib;
+using UnityEngine;
 using TerrainTools.Visualization;
 using TerrainTools.Extensions;
 using System.Collections.Generic;
 using System.Reflection.Emit;
+using TerrainTools.Helpers;
 
 namespace TerrainTools.Patches
 {
@@ -37,9 +39,13 @@ namespace TerrainTools.Patches
         private static bool UpdateCamera_BlockScroll_Delegate(Player localPlayer)
         {
             var selectedPiece = localPlayer?.GetSelectedPiece();
-            if (selectedPiece != null && selectedPiece.gameObject.HasComponentInChildren<RaiseGroundOverlayVisualizer>())
+            if (selectedPiece?.gameObject != null)
             {
-                return true;
+                if (selectedPiece.gameObject.HasComponentInChildren<RaiseGroundOverlayVisualizer>())
+                {
+                    return true;
+                }
+                if (RadiusModifier.ShouldModifyRadius()) { return true; }
             }
 
             return localPlayer.CanRotatePiece();
