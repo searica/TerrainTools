@@ -14,6 +14,7 @@ Quality of life building mod that improves how terrain manipulation with the hoe
 - Lets you change the radius of terrain tools using the scroll wheel.
 - Configurable hotkey to enable changing radius.
 - Configurable maximum tool radius.
+- Camera zoom is blocked while modifying tool radius.
 
 ### New Terrain Tools
 - Adds a version of each terrain tool that doesn't affect the terrain height when used.
