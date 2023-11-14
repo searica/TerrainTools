@@ -41,11 +41,12 @@ namespace TerrainTools.Patches
             var selectedPiece = localPlayer?.GetSelectedPiece();
             if (selectedPiece?.gameObject != null)
             {
-                if (selectedPiece.gameObject.HasComponentInChildren<RaiseGroundOverlayVisualizer>())
+                if (selectedPiece.gameObject.HasComponentInChildren<RaiseGroundOverlayVisualizer>() ||
+                    RadiusModifier.ShouldModifyRadius() ||
+                    HardnessModifier.ShouldModifyHardness())
                 {
                     return true;
                 }
-                if (RadiusModifier.ShouldModifyRadius()) { return true; }
             }
 
             return localPlayer.CanRotatePiece();

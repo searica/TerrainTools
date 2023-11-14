@@ -28,21 +28,42 @@ namespace TerrainTools
 
         private static TerrainTools Instance { get; set; }
 
-        internal static Texture2D LoadTextureFromDisk(string fileName) => AssetUtils.LoadTexture(Path.Combine(Path.GetDirectoryName(Instance.Info.Location), fileName));
+        private static string ParentDir;
+        private static string ResourcesDir;
+
+        internal static Texture2D LoadTextureFromDisk(string fileName)
+        {
+            ParentDir ??= Path.GetDirectoryName(Instance.Info.Location);
+            ResourcesDir ??= Path.Combine(ParentDir, "Resources");
+            return AssetUtils.LoadTexture(Path.Combine(ResourcesDir, fileName));
+        }
+
+        //private static string JoinPaths(params string[] paths)
+        //{
+        //    if (paths.Length == 0) return string.Empty;
+        //    if (paths.Length == 1) return paths[0];
+        //    var joinedPath = paths[0];
+        //    for (int i = 1; i < paths.Length; i++)
+        //    {
+        //        joinedPath = Path.Combine(joinedPath, paths[i]);
+        //    }
+        //    return joinedPath;
+        //}
 
         #region Section Names
 
         private static readonly string MainSection = ConfigManager.SetStringPriority("Global", 3);
 
         private static readonly string RadiusSection = ConfigManager.SetStringPriority("Radius", 2);
-        private static readonly string ToolsSection = ConfigManager.SetStringPriority("Tools", 1);
+        private static readonly string HardnessSection = ConfigManager.SetStringPriority("Hardness", 1);
+        private static readonly string ToolsSection = ConfigManager.SetStringPriority("Tools", 0);
 
         #endregion Section Names
 
         #region Tool Configs
 
-        private static ConfigEntry<bool> HoverInfoEnabled;
-        internal static bool IsHoverInforEnabled => HoverInfoEnabled.Value;
+        private static ConfigEntry<bool> hoverInfoEnabled;
+        internal static bool IsHoverInforEnabled => hoverInfoEnabled.Value;
 
         /// <summary>
         ///     Dictionary of tool names to corresponding config entry that sets if they are enabled.
@@ -64,16 +85,29 @@ namespace TerrainTools
 
         #region Radius Configs
 
-        internal static ConfigEntry<bool> EnableRadiusModifier;
-        internal static ConfigEntry<KeyCode> _ScrollModKey;
-        internal static ConfigEntry<float> _ScrollWheelScale;
-        internal static ConfigEntry<float> _MaxRadius;
-        internal static bool IsEnableRadiusModifier => EnableRadiusModifier.Value;
-        internal static float MaxRadius => _MaxRadius.Value;
-        internal static KeyCode ScrollModKey => _ScrollModKey.Value;
-        internal static float ScrollWheelScale => _ScrollWheelScale.Value;
+        private static ConfigEntry<bool> enableRadiusModifier;
+        private static ConfigEntry<KeyCode> radiusModKey;
+        private static ConfigEntry<float> radiusScrollScale;
+        private static ConfigEntry<float> maxRadius;
+        internal static bool IsEnableRadiusModifier => enableRadiusModifier.Value;
+        internal static float MaxRadius => maxRadius.Value;
+        internal static KeyCode RadiusKey => radiusModKey.Value;
+        internal static float RadiusScrollScale => radiusScrollScale.Value;
 
         #endregion Radius Configs
+
+        #region Hardness Configs
+
+        private static ConfigEntry<bool> enableHardnessModifier;
+        private static ConfigEntry<KeyCode> hardnessModKey;
+        private static ConfigEntry<float> hardnessScrollScale;
+        private static ConfigEntry<MessageHud.MessageType> hardnessMsgType;
+        internal static bool IsEnableHardnessModifier => enableHardnessModifier.Value;
+        internal static KeyCode HardnessKey => hardnessModKey.Value;
+        internal static float HardnessScrollScale => hardnessScrollScale.Value;
+        internal static MessageHud.MessageType HardnessMsgType => hardnessMsgType.Value;
+
+        #endregion Hardness Configs
 
         // Stretch Goal:
         // - Add a shovel tool that lets you lower terrain
@@ -145,7 +179,7 @@ namespace TerrainTools
                 synced: false
             );
 
-            EnableRadiusModifier = ConfigManager.BindConfig(
+            enableRadiusModifier = ConfigManager.BindConfig(
                 RadiusSection,
                 ConfigManager.SetStringPriority("RadiusModifier", 1),
                 true,
@@ -153,22 +187,22 @@ namespace TerrainTools
                 "Note: Radius cannot be changed on square terraforming tools."
             );
 
-            _ScrollModKey = ConfigManager.BindConfig(
+            radiusModKey = ConfigManager.BindConfig(
                 RadiusSection,
-                "ScrollModKey",
+                "RadiusModKey",
                 KeyCode.LeftAlt,
                 "Modifier key that must be held down when using scroll wheel to change the radius of terrain tools."
             );
 
-            _ScrollWheelScale = ConfigManager.BindConfig(
+            radiusScrollScale = ConfigManager.BindConfig(
                 RadiusSection,
-                "ScrollWheelScale",
+                "RadiusScrollScale",
                 0.1f,
                 "Scroll wheel change scale",
                 new AcceptableValueRange<float>(0.05f, 2f)
             );
 
-            _MaxRadius = ConfigManager.BindConfig(
+            maxRadius = ConfigManager.BindConfig(
                 RadiusSection,
                 "MaxRadius",
                 10f,
@@ -176,7 +210,37 @@ namespace TerrainTools
                 new AcceptableValueRange<float>(4f, 20f)
             );
 
-            HoverInfoEnabled = ConfigManager.BindConfig(
+            enableHardnessModifier = ConfigManager.BindConfig(
+                HardnessSection,
+                ConfigManager.SetStringPriority("HardnessModifier", 1),
+                true,
+                "Set to true/enabled to allow modifying the hardness of terrain tools using the scroll wheel. " +
+                "Note: Hardness cannot be changed on square terraforming tools."
+            );
+
+            hardnessModKey = ConfigManager.BindConfig(
+                HardnessSection,
+                "HardnessModKey",
+                KeyCode.LeftControl,
+                "Modifier key that must be held down when using scroll wheel to change the hardness of terrain tools."
+            );
+
+            hardnessScrollScale = ConfigManager.BindConfig(
+                HardnessSection,
+                "HardnessScrollScale",
+                0.1f,
+                "Scroll wheel change scale",
+                new AcceptableValueRange<float>(0.05f, 2f)
+            );
+
+            hardnessMsgType = ConfigManager.BindConfig(
+                HardnessSection,
+                "HardnessNotification",
+                MessageHud.MessageType.TopLeft,
+                "Location and notification type to display when hardness is changed."
+            );
+
+            hoverInfoEnabled = ConfigManager.BindConfig(
                 ToolsSection,
                 ConfigManager.SetStringPriority("HoverInfo", 1),
                 true,

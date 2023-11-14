@@ -38,14 +38,14 @@ namespace TerrainTools.Helpers
 
                 if (ShouldModifyRadius())
                 {
-                    SetRadius(__instance, Input.mouseScrollDelta.y * TerrainTools.ScrollWheelScale);
+                    SetRadius(__instance, Input.mouseScrollDelta.y * TerrainTools.RadiusScrollScale);
                 }
             }
         }
 
         internal static bool ShouldModifyRadius()
         {
-            return TerrainTools.IsEnableRadiusModifier && Input.GetKey(TerrainTools.ScrollModKey) && Input.mouseScrollDelta.y != 0;
+            return TerrainTools.IsEnableRadiusModifier && Input.GetKey(TerrainTools.RadiusKey) && Input.mouseScrollDelta.y != 0;
         }
 
         [HarmonyPatch(typeof(TerrainOp))]
