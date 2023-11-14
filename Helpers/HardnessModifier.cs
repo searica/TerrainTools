@@ -11,6 +11,7 @@ namespace TerrainTools.Helpers
         internal static float lastOriginalPower;
         internal static float lastModdedPower;
         internal static float lastTotalDelta;
+        private static float lastDisplayedPower;
         private const float MinPower = 1f;
         private const float MaxPower = 30f;
 
@@ -114,20 +115,19 @@ namespace TerrainTools.Helpers
 
                 lastOriginalPower = originalPower;
             }
-            Log.LogInfo($"Modified hardness: {moddedPower}");
-            if (lastOriginalPower > 0 && Mathf.Abs(lastModdedPower - moddedPower) >= 1)
+            lastModdedPower = moddedPower;
+
+            if (lastOriginalPower > 0 && Mathf.Abs(lastDisplayedPower - lastModdedPower) >= 1)
             {
                 Log.LogInfo($"total delta {lastTotalDelta}", LogLevel.Medium);
 
                 var toolIcon = player.m_placementGhost?.GetComponent<Piece>()?.m_icon;
                 if (toolIcon != null)
                 {
-                    var displayValue = Mathf.RoundToInt(moddedPower);
-                    player.Message(TerrainTools.HardnessMsgType, $"Terrain tool hardness: {displayValue}", icon: toolIcon);
+                    lastDisplayedPower = Mathf.Round(moddedPower);
+                    player.Message(TerrainTools.HardnessMsgType, $"Terrain tool hardness: {lastDisplayedPower}", icon: toolIcon);
                 }
             }
-
-            lastModdedPower = moddedPower;
         }
     }
 }
