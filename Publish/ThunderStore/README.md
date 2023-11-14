@@ -14,6 +14,7 @@ Quality of life building mod that improves how terrain manipulation with the hoe
 - Lets you change the radius of terrain tools using the scroll wheel.
 - Configurable hotkey to enable changing radius.
 - Configurable maximum tool radius.
+- Camera zoom is blocked while modifying tool radius.
 
 ### New Terrain Tools
 - Adds a version of each terrain tool that doesn't affect the terrain height when used.
@@ -21,6 +22,11 @@ Quality of life building mod that improves how terrain manipulation with the hoe
 - Adds a precision raise ground tool that lets you set the exact height you want to raise the terrain by using the scroll wheel on your mouse.
 - Adds a remove terrain modifications tool that lets you reset terrain.
 
+#### Hoe
+<img src="https://github.com/searica/TerrainTools/blob/main/Media/HoeTools.png"></img>
+
+#### Cultivator
+<img src="https://github.com/searica/TerrainTools/blob/main/Media/CultivatorTools.png"></img>
 
 ## Instructions
 If you are using a mod manager for Thunderstore simply install the mod from there. If you are not using a mod manager then, you need a modded instance of Valheim (BepInEx) and the Jotunn plugin installed.
