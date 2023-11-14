@@ -24,7 +24,7 @@ namespace TerrainTools
         internal const string Author = "Searica";
         public const string PluginName = "TerrainTools";
         public const string PluginGUID = $"{Author}.Valheim.{PluginName}";
-        public const string PluginVersion = "0.1.0";
+        public const string PluginVersion = "1.0.0";
 
         // Use this class to add your own localization to the game
         // https://valheim-modding.github.io/Jotunn/tutorials/localization.html
@@ -78,9 +78,6 @@ namespace TerrainTools
         internal static float ScrollWheelScale => _ScrollWheelScale.Value;
 
         #endregion Radius Configs
-
-        // Configuration:
-        // - Configure whether the hover info shows or not (terrain height info)
 
         // Stretch Goal:
         // - Add a shovel tool that lets you lower terrain
@@ -156,14 +153,15 @@ namespace TerrainTools
                 RadiusSection,
                 ConfigManager.SetStringPriority("RadiusModifier", 1),
                 true,
-                "Set to true/enabled to allow modifying the radius of terrain tools using the scroll wheel."
+                "Set to true/enabled to allow modifying the radius of terrain tools using the scroll wheel. " +
+                "Note: Radius cannot be changed on square terraforming tools."
             );
 
             _ScrollModKey = ConfigManager.BindConfig(
                 RadiusSection,
                 "ScrollModKey",
                 KeyCode.LeftAlt,
-                "Modifier key to allow scroll wheel change."
+                "Modifier key that must be held down when using scroll wheel to change the radius of terrain tools."
             );
 
             _ScrollWheelScale = ConfigManager.BindConfig(
