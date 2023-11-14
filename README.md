@@ -95,7 +95,7 @@ My mods will always be free to use but if you feel like saying thanks you can ti
 ## Source Code
 Source code is available on Github.
 
-| Github Repository: | <button style="font-size:20px"><img height="18" src="https://github.githubassets.com/favicons/favicon-dark.svg"></img><a href="https://github.com/searica/TerrainTools"> TerrainTools</button> |
+| Github Repository: | <img height="18" src="https://github.githubassets.com/favicons/favicon-dark.svg"></img> [TerrainTools](https://github.com/searica/TerrainTools)  |
 |-----------|---------------|
 
 ### Contributions
