@@ -53,7 +53,7 @@ namespace TerrainTools.Helpers
             SetDescription(
                "mud_road_v2",
                "Levels ground. (Use shift + click to level ground based on where you are pointing)"
-           );
+            );
 
             SetDescription(
                 "raise_v2",
