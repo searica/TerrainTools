@@ -104,7 +104,7 @@ namespace TerrainTools.Configs
             configFile = config;
             configFile.SaveOnConfigSet = false;
             ConfigFileName = GUID + ".cfg";
-            ConfigFileFullPath = string.Concat(Paths.ConfigPath, Path.DirectorySeparatorChar, ConfigFileName);
+            ConfigFileFullPath = Path.Combine(Paths.ConfigPath, ConfigFileName);
         }
 
         #region Saving
