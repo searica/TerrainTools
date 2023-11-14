@@ -19,7 +19,7 @@ Quality of life building mod that improves how terrain manipulation with the hoe
 ### New Terrain Tools
 - Adds a version of each terrain tool that doesn't affect the terrain height when used.
 - Adds square versions of all terrain tools that modify terrain according to the world grid (so you can enjoy clean edges).
-- Adds a precision raise ground tool that lets you set the exact height you want to raise the terrain by using the scroll wheel on your mouse.
+- Adds a precision raise ground tool that lets[R E A D M E]() you set the exact height you want to raise the terrain by using the scroll wheel on your mouse.
 - Adds a remove terrain modifications tool that lets you reset terrain.
 
 #### Hoe
@@ -66,12 +66,12 @@ Changes made to the configuration settings will be reflected in-game immediately
 
 ### Tools Section:
 
-**HoverInfo**
+**HoverInfo**  [Synced with Server]
 - Set to true/enabled to show terrain height when using square terrain tools.
     - Acceptable values: True, False
     - Default value: true
 
-**ToolName** 
+**ToolName**  [Synced with Server]
 - Set to true/enabled to add this terrain tool. Set to false/disabled to remove it.
     - Acceptable values: True, False
     - Default value: true
