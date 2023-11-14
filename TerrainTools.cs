@@ -24,7 +24,7 @@ namespace TerrainTools
         internal const string Author = "Searica";
         public const string PluginName = "TerrainTools";
         public const string PluginGUID = $"{Author}.Valheim.{PluginName}";
-        public const string PluginVersion = "1.0.3";
+        public const string PluginVersion = "1.1.0";
 
         private static TerrainTools Instance { get; set; }
 
@@ -101,11 +101,13 @@ namespace TerrainTools
         private static ConfigEntry<bool> enableHardnessModifier;
         private static ConfigEntry<KeyCode> hardnessModKey;
         private static ConfigEntry<float> hardnessScrollScale;
-        private static ConfigEntry<MessageHud.MessageType> hardnessMsgType;
+
         internal static bool IsEnableHardnessModifier => enableHardnessModifier.Value;
         internal static KeyCode HardnessKey => hardnessModKey.Value;
         internal static float HardnessScrollScale => hardnessScrollScale.Value;
-        internal static MessageHud.MessageType HardnessMsgType => hardnessMsgType.Value;
+
+        //private static ConfigEntry<MessageHud.MessageType> hardnessMsgType;
+        //internal static MessageHud.MessageType HardnessMsgType => hardnessMsgType.Value;
 
         #endregion Hardness Configs
 
@@ -215,7 +217,8 @@ namespace TerrainTools
                 ConfigManager.SetStringPriority("HardnessModifier", 1),
                 true,
                 "Set to true/enabled to allow modifying the hardness of terrain tools using the scroll wheel. " +
-                "Note: Hardness cannot be changed on square terraforming tools."
+                "Note: Hardness cannot be changed on square terraforming tools and tools that do not alter " +
+                "ground height do not have a hardness."
             );
 
             hardnessModKey = ConfigManager.BindConfig(
@@ -231,13 +234,6 @@ namespace TerrainTools
                 0.1f,
                 "Scroll wheel change scale",
                 new AcceptableValueRange<float>(0.05f, 2f)
-            );
-
-            hardnessMsgType = ConfigManager.BindConfig(
-                HardnessSection,
-                "HardnessNotification",
-                MessageHud.MessageType.TopLeft,
-                "Location and notification type to display when hardness is changed."
             );
 
             hoverInfoEnabled = ConfigManager.BindConfig(

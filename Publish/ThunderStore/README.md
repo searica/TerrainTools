@@ -16,10 +16,15 @@ Quality of life building mod that improves how terrain manipulation with the hoe
 - Configurable maximum tool radius.
 - Camera zoom is blocked while modifying tool radius.
 
+### Modifiable Tool Hardness
+- Lets you change the "hardness" of terrain tools using the scroll wheel. "Hardness" refers to how uniformly the effect is applied over the radius of the tool, so increasing the hardness will apply the effect more uniformly.
+- Configurable hotkey to enable changing hardness.
+- Camera zoom is blocked while modifying tool hardness.
+
 ### New Terrain Tools
 - Adds a version of each terrain tool that doesn't affect the terrain height when used.
 - Adds square versions of all terrain tools that modify terrain according to the world grid (so you can enjoy clean edges).
-- Adds a precision raise ground tool that lets[R E A D M E]() you set the exact height you want to raise the terrain by using the scroll wheel on your mouse.
+- Adds a precision raise ground tool that lets you set the exact height you want to raise the terrain by using the scroll wheel on your mouse.
 - Adds a remove terrain modifications tool that lets you reset terrain.
 
 #### Hoe
@@ -49,12 +54,12 @@ Changes made to the configuration settings will be reflected in-game immediately
     - Acceptable values: True, False
     - Default value: true
 
-**ScrollModKey** [Synced with Server]
+**RadiusModKeyModKey** [Synced with Server]
 - Modifier key that must be held down when using scroll wheel to change the radius of terrain tools.
     - Acceptable values: KeyCodes
     - Default value: LeftAlt
 
-**ScrollWheelScale** [Synced with Server]
+**RadiusScrollScale** [Synced with Server]
 - Scroll wheel change scale.
     - Acceptable values: (0.05, 2)
     - Default value: 0.1
@@ -64,6 +69,23 @@ Changes made to the configuration settings will be reflected in-game immediately
     - Acceptable values: (4, 20)
     - Default value: 10
 
+### Hardness Section:
+
+**HardnessModifier** [Synced with Server]
+- Set to true/enabled to allow modifying the hardness of terrain tools using the scroll wheel. Note: Hardness cannot be changed on square terraforming tools and tools that do not alter ground height do not have a hardness.
+    - Acceptable values: True, False
+    - Default value: true
+
+**HardnessModKey** [Synced with Server]
+- Modifier key that must be held down when using scroll wheel to change the hardness of terrain tools.
+    - Acceptable values: KeyCodes
+    - Default value: LeftControl
+
+**HardnessScrollScale** [Synced with Server]
+- Scroll wheel change scale.
+    - Acceptable values: (0.05, 2)
+    - Default value: 0.1
+    
 ### Tools Section:
 
 **HoverInfo**  [Synced with Server]
@@ -85,6 +107,9 @@ None so far, tell me if you find any.
 
 ## Compatibility
 Should be fully compatible with everything except other mods that let you change the radius of terrain manipulation tools as they will likely conflict.
+
+### Partial Incompatibility
+**ValheimPlus** While TerrainTools does work with ValheimPlus there are some UI glitches. ValheimPlus freezes the animations for the terrain tools so you can't visualize the effect size properly and the hover info on square tools does not update correctly. It may be possible to fix this via changing something in ValheimPlus's configuration.
 
 ## Donations/Tips
 My mods will always be free to use but if you feel like saying thanks you can tip/donate.

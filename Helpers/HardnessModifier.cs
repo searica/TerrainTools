@@ -125,7 +125,7 @@ namespace TerrainTools.Helpers
                 if (toolIcon != null)
                 {
                     lastDisplayedPower = Mathf.Round(moddedPower);
-                    player.Message(TerrainTools.HardnessMsgType, $"Terrain tool hardness: {lastDisplayedPower}", icon: toolIcon);
+                    player.Message(MessageHud.MessageType.Center, $"Terrain tool hardness: {lastDisplayedPower}", icon: toolIcon);
                 }
             }
         }
