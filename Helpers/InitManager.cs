@@ -72,7 +72,7 @@ namespace TerrainTools.Helpers
 
             SetDescription(
                 "cultivate_v2",
-                "Cultivates ground and levels ground based on player position. (Use shift + click to raise ground based on where you are pointing)"
+                "Cultivates ground and levels ground based on player position. (Use shift + click to level ground based on where you are pointing)"
             );
 
             SetDescription(
