@@ -23,10 +23,10 @@ Quality of life building mod that improves how terrain manipulation with the hoe
 - Adds a remove terrain modifications tool that lets you reset terrain.
 
 #### Hoe
-<img src="https://github.com/searica/TerrainTools/blob/main/Media/HoeTools.png"></img>
+<img src="https://raw.githubusercontent.com/searica/TerrainTools/main/Media/HoeTools.png"></img>
 
 #### Cultivator
-<img src="https://github.com/searica/TerrainTools/blob/main/Media/CultivatorTools.png"></img>
+<img src="https://raw.githubusercontent.com/searica/TerrainTools/main/Media/CultivatorTools.png"></img>
 
 ## Instructions
 If you are using a mod manager for Thunderstore simply install the mod from there. If you are not using a mod manager then, you need a modded instance of Valheim (BepInEx) and the Jotunn plugin installed.
