@@ -1,7 +1,7 @@
 ﻿{
   "name": "TerrainTools",
   "description": "Quality of life building mod that improves how terrain manipulation with the hoe and cultivator works and adds new terrain manipulation tools.",
-  "version_number": "1.0.2",
+  "version_number": "1.0.3",
   "website_url": "https://discord.gg/sFmGTBYN6n",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.2202",

@@ -24,7 +24,7 @@ namespace TerrainTools
         internal const string Author = "Searica";
         public const string PluginName = "TerrainTools";
         public const string PluginGUID = $"{Author}.Valheim.{PluginName}";
-        public const string PluginVersion = "1.0.2";
+        public const string PluginVersion = "1.0.3";
 
         private static TerrainTools Instance { get; set; }
 
