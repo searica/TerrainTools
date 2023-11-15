@@ -28,6 +28,16 @@ namespace TerrainTools
         public const string PluginGUID = $"{Author}.Valheim.TerrainTools";
         public const string PluginVersion = "1.1.0";
 
+        internal static Sprite LoadEmbeddedTextureAsSprite(string fileName)
+        {
+            var texture = LoadTextureFromResources(fileName);
+            if (texture == null) { return null; }
+
+            var pivot = new Vector2(0.5f, 0.5f);
+            var units = 100f;
+            return Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), pivot, units);
+        }
+
         internal static Texture2D LoadTextureFromResources(string fileName)
         {
             var extension = Path.GetExtension(fileName).ToLower();
@@ -40,7 +50,7 @@ namespace TerrainTools
 
             Bitmap resource = Properties.Resources.ResourceManager.GetObject(fileName) as Bitmap;
             using (var mStream = new MemoryStream())
-        {
+            {
                 resource.Save(mStream, ImageFormat.Png);
                 var buffer = new byte[mStream.Length];
                 mStream.Position = 0;
@@ -126,6 +136,7 @@ namespace TerrainTools
             Game.isModded = true;
 
             PieceManager.OnPiecesRegistered += InitManager.InitToolPieces;
+            var foo = GUIManager.Instance; // fix shutdown NRE
 
             ConfigManager.SetupWatcher();
             ConfigManager.CheckForConfigManager();
