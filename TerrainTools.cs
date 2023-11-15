@@ -13,6 +13,8 @@ using Jotunn.Managers;
 using BepInEx.Configuration;
 using TerrainTools.Helpers;
 using TerrainTools.Extensions;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace TerrainTools
 {
@@ -26,29 +28,28 @@ namespace TerrainTools
         public const string PluginGUID = $"{Author}.Valheim.{PluginName}";
         public const string PluginVersion = "1.1.0";
 
-        private static TerrainTools Instance { get; set; }
-
-        private static string ParentDir;
-        private static string ResourcesDir;
-
-        internal static Texture2D LoadTextureFromDisk(string fileName)
+        internal static Texture2D LoadTextureFromResources(string fileName)
         {
-            ParentDir ??= Path.GetDirectoryName(Instance.Info.Location);
-            ResourcesDir ??= Path.Combine(ParentDir, "Resources");
-            return AssetUtils.LoadTexture(Path.Combine(ResourcesDir, fileName));
-        }
+            var extension = Path.GetExtension(fileName).ToLower();
+            if (extension != ".png" && extension != ".jpg")
+            {
+                Log.LogWarning("LoadTextureFromResources can only load png or jpg textures");
+                return null;
+            }
+            fileName = Path.GetFileNameWithoutExtension(fileName);
 
-        //private static string JoinPaths(params string[] paths)
-        //{
-        //    if (paths.Length == 0) return string.Empty;
-        //    if (paths.Length == 1) return paths[0];
-        //    var joinedPath = paths[0];
-        //    for (int i = 1; i < paths.Length; i++)
-        //    {
-        //        joinedPath = Path.Combine(joinedPath, paths[i]);
-        //    }
-        //    return joinedPath;
-        //}
+            Bitmap resource = Properties.Resources.ResourceManager.GetObject(fileName) as Bitmap;
+            using (var mStream = new MemoryStream())
+        {
+                resource.Save(mStream, ImageFormat.Png);
+                var buffer = new byte[mStream.Length];
+                mStream.Position = 0;
+                mStream.Read(buffer, 0, buffer.Length);
+                var texture = new Texture2D(0, 0);
+                texture.LoadImage(buffer);
+                return texture;
+            }
+        }
 
         #region Section Names
 
