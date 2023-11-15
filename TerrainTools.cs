@@ -24,8 +24,8 @@ namespace TerrainTools
     internal class TerrainTools : BaseUnityPlugin
     {
         internal const string Author = "Searica";
-        public const string PluginName = "TerrainTools";
-        public const string PluginGUID = $"{Author}.Valheim.{PluginName}";
+        public const string PluginName = "AdvancedTerrainModifiers";
+        public const string PluginGUID = $"{Author}.Valheim.TerrainTools";
         public const string PluginVersion = "1.1.0";
 
         internal static Texture2D LoadTextureFromResources(string fileName)
