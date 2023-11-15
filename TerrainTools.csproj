@@ -52,7 +52,45 @@
 		<None Remove="Package\plugins\**" />
 	</ItemGroup>
 	<ItemGroup>
+		<None Remove="Resources\box.png" />
+		<None Remove="Resources\cross.png" />
+		<None Remove="Resources\cultivate_v2_path.png" />
+		<None Remove="Resources\cultivate_v2_path_square.png" />
+		<None Remove="Resources\cultivate_v2_square.png" />
+		<None Remove="Resources\mud_road_v2_square.png" />
+		<None Remove="Resources\path_v2_square.png" />
+		<None Remove="Resources\paved_road_v2_path.png" />
+		<None Remove="Resources\paved_road_v2_path_square.png" />
+		<None Remove="Resources\paved_road_v2_square.png" />
+		<None Remove="Resources\raise.png" />
+		<None Remove="Resources\raise_v2_square.png" />
+		<None Remove="Resources\redo.png" />
+		<None Remove="Resources\remove.png" />
+		<None Remove="Resources\replant_v2_square.png" />
+		<None Remove="Resources\smooth.png" />
+		<None Remove="Resources\undo.png" />
+	</ItemGroup>
+	<ItemGroup>
 		<Content Include="Package\icon.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Resources\box.png" />
+		<EmbeddedResource Include="Resources\cross.png" />
+		<EmbeddedResource Include="Resources\cultivate_v2_path.png" />
+		<EmbeddedResource Include="Resources\cultivate_v2_path_square.png" />
+		<EmbeddedResource Include="Resources\cultivate_v2_square.png" />
+		<EmbeddedResource Include="Resources\mud_road_v2_square.png" />
+		<EmbeddedResource Include="Resources\path_v2_square.png" />
+		<EmbeddedResource Include="Resources\paved_road_v2_path.png" />
+		<EmbeddedResource Include="Resources\paved_road_v2_path_square.png" />
+		<EmbeddedResource Include="Resources\paved_road_v2_square.png" />
+		<EmbeddedResource Include="Resources\raise.png" />
+		<EmbeddedResource Include="Resources\raise_v2_square.png" />
+		<EmbeddedResource Include="Resources\redo.png" />
+		<EmbeddedResource Include="Resources\remove.png" />
+		<EmbeddedResource Include="Resources\replant_v2_square.png" />
+		<EmbeddedResource Include="Resources\smooth.png" />
+		<EmbeddedResource Include="Resources\undo.png" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="HarmonyX" Version="2.9.0" />
@@ -65,7 +103,20 @@
 		<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
 	</ItemGroup>
 	<ItemGroup>
-		<Folder Include="Publish\Nexus\" />
+		<Compile Update="Properties\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
+	<ItemGroup>
+		<Folder Include="Publish\" />
 	</ItemGroup>
 	<PropertyGroup>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>

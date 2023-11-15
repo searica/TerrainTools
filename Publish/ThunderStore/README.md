@@ -3,15 +3,16 @@ Quality of life building mod that improves how terrain manipulation with the hoe
 
 **Server-Side Info**: This mod does work as a client-side only mod and only needs to be installed on the server if you wish to enforce configuration settings.
 
+**Note**: This is the same mod as [TerrainTools by Searica](https://valheim.thunderstore.io/package/Searica/TerrainTools/) and the version that will be maintained. Turns out there is another mod named TerrainTools already on Thunderstore so I have changed the name for the sake of clarity.
+
 ## Features
 
 ### Multiplayer Support
-- All terrain operations, including resetting terrain modifications, works in multiplayer and are synced to other players.
+- All terrain operations, including resetting terrain modifications, work in multiplayer and are synced to other players.
 
 ### Quality of Life
 - Adds descriptions of how each terrain tool works for all Vanilla terrain tools.
 - All new features can be enabled/disabled from the configuration file.
-
 
 ### Modifiable Tool Radius
 - Lets you change the radius of terrain tools using the scroll wheel.
@@ -103,7 +104,7 @@ Changes made to the configuration settings will be reflected in-game immediately
 
 
 ## Known Issues
-None so far, tell me if you find any.
+Reseting terrain modifications on the edge of a zone when there are significant differences in terrain height can result in the terrain appearing to tear. To fix this you can hit the tear in the fabric of reality with a pickaxe, or just walk to the other zone and reset the terrain while in that zone. This isn't something I plan to fix and it's largely a product of how terrain and zones work in Valheim.
 
 ## Planned Improvements
 - Add a shovel that lets you lower terrain.
