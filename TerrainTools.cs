@@ -117,8 +117,6 @@ namespace TerrainTools
 
         public void Awake()
         {
-            Instance = this;
-
             Log.Init(Logger);
 
             ConfigManager.Init(PluginGUID, Config);
