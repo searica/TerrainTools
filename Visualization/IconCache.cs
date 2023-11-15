@@ -26,7 +26,7 @@ namespace TerrainTools.Visualization
             {
                 if (_cultivateSquare == null)
                 {
-                    _cultivateSquare = TerrainTools.LoadTextureFromDisk("cultivate_v2_square.png");
+                    _cultivateSquare = TerrainTools.LoadTextureFromResources("cultivate_v2_square.png");
                 }
                 return _cultivateSquare;
             }
@@ -38,7 +38,7 @@ namespace TerrainTools.Visualization
             {
                 if (_cultivatePathSquare == null)
                 {
-                    _cultivatePathSquare = TerrainTools.LoadTextureFromDisk("cultivate_v2_path_square.png");
+                    _cultivatePathSquare = TerrainTools.LoadTextureFromResources("cultivate_v2_path_square.png");
                 }
                 return _cultivatePathSquare;
             }
@@ -50,7 +50,7 @@ namespace TerrainTools.Visualization
             {
                 if (_cultivatePath == null)
                 {
-                    _cultivatePath = TerrainTools.LoadTextureFromDisk("cultivate_v2_path.png");
+                    _cultivatePath = TerrainTools.LoadTextureFromResources("cultivate_v2_path.png");
                 }
                 return _cultivatePath;
             }
@@ -62,7 +62,7 @@ namespace TerrainTools.Visualization
             {
                 if (_replantSquare == null)
                 {
-                    _replantSquare = TerrainTools.LoadTextureFromDisk("replant_v2_square.png");
+                    _replantSquare = TerrainTools.LoadTextureFromResources("replant_v2_square.png");
                 }
                 return _replantSquare;
             }
@@ -74,7 +74,7 @@ namespace TerrainTools.Visualization
             {
                 if (_raiseSquare == null)
                 {
-                    _raiseSquare = TerrainTools.LoadTextureFromDisk("raise_v2_square.png");
+                    _raiseSquare = TerrainTools.LoadTextureFromResources("raise_v2_square.png");
                 }
                 return _raiseSquare;
             }
@@ -86,7 +86,7 @@ namespace TerrainTools.Visualization
             {
                 if (_mudRoadPathSquare == null)
                 {
-                    _mudRoadPathSquare = TerrainTools.LoadTextureFromDisk("path_v2_square.png");
+                    _mudRoadPathSquare = TerrainTools.LoadTextureFromResources("path_v2_square.png");
                 }
                 return _mudRoadPathSquare;
             }
@@ -98,7 +98,7 @@ namespace TerrainTools.Visualization
             {
                 if (_mudRoadSquare == null)
                 {
-                    _mudRoadSquare = TerrainTools.LoadTextureFromDisk("mud_road_v2_square.png");
+                    _mudRoadSquare = TerrainTools.LoadTextureFromResources("mud_road_v2_square.png");
                 }
                 return _mudRoadSquare;
             }
@@ -110,7 +110,7 @@ namespace TerrainTools.Visualization
             {
                 if (_pavedRoadPath == null)
                 {
-                    _pavedRoadPath = TerrainTools.LoadTextureFromDisk("paved_road_v2_path.png");
+                    _pavedRoadPath = TerrainTools.LoadTextureFromResources("paved_road_v2_path.png");
                 }
                 return _pavedRoadPath;
             }
@@ -122,7 +122,7 @@ namespace TerrainTools.Visualization
             {
                 if (_pavedRoadPathSquare == null)
                 {
-                    _pavedRoadPathSquare = TerrainTools.LoadTextureFromDisk("paved_road_v2_path_square.png");
+                    _pavedRoadPathSquare = TerrainTools.LoadTextureFromResources("paved_road_v2_path_square.png");
                 }
                 return _pavedRoadPathSquare;
             }
@@ -134,7 +134,7 @@ namespace TerrainTools.Visualization
             {
                 if (_pavedRoadSquare == null)
                 {
-                    _pavedRoadSquare = TerrainTools.LoadTextureFromDisk("paved_road_v2_square.png");
+                    _pavedRoadSquare = TerrainTools.LoadTextureFromResources("paved_road_v2_square.png");
                 }
                 return _pavedRoadSquare;
             }
@@ -146,7 +146,7 @@ namespace TerrainTools.Visualization
             {
                 if (_remove == null)
                 {
-                    _remove = TerrainTools.LoadTextureFromDisk("remove.png");
+                    _remove = TerrainTools.LoadTextureFromResources("remove.png");
                 }
                 return _remove;
             }
@@ -158,7 +158,7 @@ namespace TerrainTools.Visualization
             {
                 if (_cross == null)
                 {
-                    _cross = TerrainTools.LoadTextureFromDisk("cross.png");
+                    _cross = TerrainTools.LoadTextureFromResources("cross.png");
                 }
                 return _cross;
             }
@@ -170,7 +170,7 @@ namespace TerrainTools.Visualization
             {
                 if (_undo == null)
                 {
-                    _undo = TerrainTools.LoadTextureFromDisk("undo.png");
+                    _undo = TerrainTools.LoadTextureFromResources("undo.png");
                 }
                 return _undo;
             }
@@ -182,7 +182,7 @@ namespace TerrainTools.Visualization
             {
                 if (_redo == null)
                 {
-                    _redo = TerrainTools.LoadTextureFromDisk("redo.png");
+                    _redo = TerrainTools.LoadTextureFromResources("redo.png");
                 }
                 return _redo;
             }
@@ -194,7 +194,7 @@ namespace TerrainTools.Visualization
             {
                 if (_box == null)
                 {
-                    _box = TerrainTools.LoadTextureFromDisk("box.png");
+                    _box = TerrainTools.LoadTextureFromResources("box.png");
                 }
                 return _box;
             }

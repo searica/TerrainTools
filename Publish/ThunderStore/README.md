@@ -1,9 +1,12 @@
-# TerrainTools
+# AdvancedTerrainModifiers
 Quality of life building mod that improves how terrain manipulation with the hoe and cultivator works and adds new terrain manipulation tools.
 
 **Server-Side Info**: This mod does work as a client-side only mod and only needs to be installed on the server if you wish to enforce configuration settings.
 
 ## Features
+
+### Multiplayer Support
+- All terrain operations, including resetting terrain modifications, works in multiplayer and are synced to other players.
 
 ### Quality of Life
 - Adds descriptions of how each terrain tool works for all Vanilla terrain tools.
