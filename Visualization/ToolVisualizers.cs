@@ -40,14 +40,15 @@ namespace TerrainTools.Visualization
 
             GroundLevelSpinner.Refresh();
             secondary.LocalPosition = new Vector3(0f, GroundLevelSpinner.Value, 0f);
-
+            var pos = secondary.Position - VerticalOffset;
             if (GroundLevelSpinner.Value > 0f)
             {
-                hoverInfo.Text = $"h: +{secondary.LocalPosition.y:0.00}";
+                var deltaH = secondary.LocalPosition.y;
+                hoverInfo.Text = $"x: {pos.x:0}, y: {pos.y - deltaH:0.000}, z: {pos.z:0}\n\nh: +{deltaH:0.000}";
             }
             else
             {
-                hoverInfo.Text = $"x: {secondary.Position.x:0}, y: {secondary.Position.z:0}, h: {secondary.Position.y:0.00000}";
+                hoverInfo.Text = $"x: {pos.x:0}, y: {pos.y:0.000}, z: {pos.z:0}";
             }
 
             tertiary.Enabled = true;

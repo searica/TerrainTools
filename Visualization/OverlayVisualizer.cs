@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using TerrainTools.Helpers;
 using UnityEngine;
 
 namespace TerrainTools.Visualization
@@ -99,7 +100,7 @@ namespace TerrainTools.Visualization
             {
                 hoverInfo.RotateToPlayer();
                 var pos = secondary.Position - VerticalOffset;
-                hoverInfo.Text = $"x: {pos.x:0}, y: {pos.z:0}, h: {pos.y:0.00000}";
+                hoverInfo.Text = $"x: {pos.x:0}, y: {pos.y:0.000}, z: {pos.z:0}";
             }
         }
     }
