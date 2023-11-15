@@ -3,7 +3,7 @@ Quality of life building mod that improves how terrain manipulation with the hoe
 
 **Server-Side Info**: This mod does work as a client-side only mod and only needs to be installed on the server if you wish to enforce configuration settings.
 
-**Note**: This is the same mod as [TerrainTools by Searica](https://valheim.thunderstore.io/package/Searica/TerrainTools/) and the version that will be maintained. Turns out there is another mod named TerrainTools already on Thunderstore so I have changed the name for the sake of clarity.
+**Note**: This is the same mod as [TerrainTools by Searica](https://valheim.thunderstore.io/package/Searica/TerrainTools/). Turns out there is another mod named TerrainTools already on Thunderstore so I have changed the name for the sake of clarity and deprecated the upload that was named TerrainTools.
 
 ## Features
 
