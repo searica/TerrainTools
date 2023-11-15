@@ -136,7 +136,6 @@ namespace TerrainTools
             Game.isModded = true;
 
             PieceManager.OnPiecesRegistered += InitManager.InitToolPieces;
-            var foo = GUIManager.Instance; // fix shutdown NRE
 
             ConfigManager.SetupWatcher();
             ConfigManager.CheckForConfigManager();
