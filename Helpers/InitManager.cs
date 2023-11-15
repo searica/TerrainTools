@@ -52,12 +52,12 @@ namespace TerrainTools.Helpers
         {
             SetDescription(
                "mud_road_v2",
-               "Levels ground. (Use shift + click to level ground based on where you are pointing)"
+               "Levels ground based on player position. Use shift + click to level ground based on where you are pointing (this will smooth the terrain)."
             );
 
             SetDescription(
                 "raise_v2",
-                "Raise ground based on player position. (Use shift + click to raise ground based on where you are pointing)"
+                "Raise grounds up to a maximum of 8 m above it's original height."
             );
 
             SetDescription(
@@ -67,12 +67,12 @@ namespace TerrainTools.Helpers
 
             SetDescription(
                 "paved_road_v2",
-                "Creates a paved path and levels ground based on player position. (Use shift+click to level ground based on where you are pointing)"
+                "Creates a paved path and levels ground based on player position. Use shift+click to level ground based on where you are pointing (this will smooth the terrain)."
             );
 
             SetDescription(
                 "cultivate_v2",
-                "Cultivates ground and levels ground based on player position. (Use shift + click to level ground based on where you are pointing)"
+                "Cultivates ground and levels ground based on player position. Use shift + click to level ground based on where you are pointing (this will smooth the terrain)."
             );
 
             SetDescription(
