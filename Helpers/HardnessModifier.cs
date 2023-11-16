@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using System.Collections.Generic;
 using TerrainTools.Extensions;
 using TerrainTools.Visualization;
 using UnityEngine;
@@ -8,12 +9,31 @@ namespace TerrainTools.Helpers
     [HarmonyPatch]
     internal class HardnessModifier
     {
-        internal static float lastOriginalPower;
-        internal static float lastModdedPower;
-        internal static float lastTotalDelta;
-        private static float lastDisplayedPower;
-        private const float MinPower = 1f;
-        private const float MaxPower = 30f;
+        /* For Raise Power the effect over the tool radius is calculated as:
+         * y = (1 - x/radius)^p where x is distance from center.
+         *
+         * For Smooth Power the effect over the tool radius is calculated as:
+         * y = 1 - (x/radius)^p
+         *
+         * So for smoothing, increasing the power increases the "hardness" or evenness of the effect over the area.
+         *
+         * But for raising, increasing the power decreases the "hardness" or evenness of the effect over the area.
+         */
+        private static bool SmoothToolIsInUse = false;
+        private static float lastModdedSmoothPwr;
+        private static float lastTotalSmoothDelta;
+        private const float MinSmoothPwr = 1f;
+        private const float MaxSmoothPwr = 30f;
+
+        private static bool RaiseToolIsInUse = false;
+        private static float lastModdedRaisePwr;
+        private static float lastTotalRaiseDelta;
+        private const float MinRaisePwr = 0.05f;
+        private const float MaxRaisePwr = 1f;
+
+        private const float DisplayThreshold = 0.9f; // percentage
+        private static float lastDisplayedSmoothHardness;
+        private static float lastDisplayedRaiseHardness;
 
         [HarmonyPatch(typeof(Player))]
         internal class PlayerPatch
@@ -23,17 +43,22 @@ namespace TerrainTools.Helpers
             [HarmonyPatch(nameof(Player.Update))]
             private static void UpdatePrefix(Player __instance)
             {
-                if (
-                    __instance == null
-                    || !__instance.InPlaceMode()
-                    || Hud.IsPieceSelectionVisible()
-                )
+                if (__instance == null || !__instance.InPlaceMode() || Hud.IsPieceSelectionVisible())
                 {
-                    if (lastOriginalPower != 0)
+                    if (SmoothToolIsInUse)
                     {
-                        lastOriginalPower = 0;
-                        lastModdedPower = 0;
-                        lastTotalDelta = 0;
+                        SmoothToolIsInUse = false;
+                        lastModdedSmoothPwr = 0;
+                        lastTotalSmoothDelta = 0;
+                        lastDisplayedSmoothHardness = -1;
+                        SetPower(__instance, 0);
+                    }
+                    if (RaiseToolIsInUse)
+                    {
+                        RaiseToolIsInUse = false;
+                        lastModdedRaisePwr = 0;
+                        lastTotalRaiseDelta = 0;
+                        lastDisplayedRaiseHardness = -1;
                         SetPower(__instance, 0);
                     }
                     return;
@@ -66,21 +91,16 @@ namespace TerrainTools.Helpers
 
                 if (__instance.m_settings.m_raise)
                 {
-                    __instance.m_settings.m_raisePower = ModifyPower(__instance.m_settings.m_raisePower, lastTotalDelta);
+                    __instance.m_settings.m_raisePower = ModifyRaisePower(__instance.m_settings.m_raisePower, lastTotalRaiseDelta);
                     Log.LogInfo($"Applying raise Power {__instance.m_settings.m_raisePower}", LogLevel.Medium);
                 }
 
                 if (__instance.m_settings.m_smooth)
                 {
-                    __instance.m_settings.m_smoothPower = ModifyPower(__instance.m_settings.m_smoothPower, lastTotalDelta);
+                    __instance.m_settings.m_smoothPower = ModifySmoothPower(__instance.m_settings.m_smoothPower, lastTotalSmoothDelta);
                     Log.LogInfo($"Applying smooth Power {__instance.m_settings.m_smoothPower}", LogLevel.Medium);
                 }
             }
-        }
-
-        private static float ModifyPower(float power, float delta)
-        {
-            return Mathf.Clamp(power + delta, MinPower, MaxPower);
         }
 
         private static void SetPower(Player player, float delta)
@@ -94,40 +114,131 @@ namespace TerrainTools.Helpers
             var terrainOp = piece.gameObject.GetComponent<TerrainOp>();
             if (terrainOp == null) { return; }
 
-            Log.LogInfo($"Adjusting Power by {delta}", LogLevel.Medium);
+            SetSmoothPower(terrainOp, delta);
+            SetRaisePower(terrainOp, delta);
 
-            float originalPower = 0;
-            float moddedPower = ModifyPower(lastModdedPower, delta);
-            lastTotalDelta += delta;
-
-            if (lastOriginalPower == 0)
+            var updateMsg = new List<string>();
+            if (SmoothToolIsInUse)
             {
-                if (terrainOp.m_settings.m_raise && originalPower < terrainOp.m_settings.m_raisePower)
+                var smoothHardness = GetSmoothPowerDisplayValue(lastModdedSmoothPwr);
+                if (Mathf.Abs(smoothHardness - lastDisplayedSmoothHardness) > DisplayThreshold)
                 {
-                    originalPower = terrainOp.m_settings.m_raisePower;
-                    moddedPower = ModifyPower(terrainOp.m_settings.m_raisePower, delta);
+                    lastDisplayedSmoothHardness = Mathf.Round(smoothHardness);
+                    updateMsg.Add($"Terrain tool smoothing hardness: {smoothHardness:0}%");
                 }
-                if (terrainOp.m_settings.m_smooth && originalPower < terrainOp.m_settings.m_smoothPower)
-                {
-                    originalPower = terrainOp.m_settings.m_smoothPower;
-                    moddedPower = ModifyPower(terrainOp.m_settings.m_smoothPower, delta);
-                }
-
-                lastOriginalPower = originalPower;
             }
-            lastModdedPower = moddedPower;
-
-            if (lastOriginalPower > 0 && Mathf.Abs(lastDisplayedPower - lastModdedPower) >= 1)
+            if (RaiseToolIsInUse)
             {
-                Log.LogInfo($"total delta {lastTotalDelta}", LogLevel.Medium);
-
+                var raiseHardness = GetRaisePowerDisplayValue(lastModdedRaisePwr);
+                Log.LogInfo($"Raise hardness: {raiseHardness}");
+                if (Mathf.Abs(raiseHardness - lastDisplayedRaiseHardness) > DisplayThreshold)
+                {
+                    lastDisplayedRaiseHardness = Mathf.Round(raiseHardness);
+                    updateMsg.Add($"Terrain tool raise hardness: {raiseHardness:0}%");
+                }
+            }
+            if (SmoothToolIsInUse || RaiseToolIsInUse)
+            {
                 var toolIcon = player.m_placementGhost?.GetComponent<Piece>()?.m_icon;
-                if (toolIcon != null)
+                if (toolIcon != null && updateMsg.Count > 0)
                 {
-                    lastDisplayedPower = Mathf.Round(moddedPower);
-                    player.Message(MessageHud.MessageType.Center, $"Terrain tool hardness: {lastDisplayedPower}", icon: toolIcon);
+                    player.Message(MessageHud.MessageType.Center, string.Join("\n", updateMsg.ToArray()), icon: toolIcon);
                 }
             }
+        }
+
+        private static void SetSmoothPower(TerrainOp terrainOp, float delta)
+        {
+            if (!terrainOp.m_settings.m_smooth) { return; }
+
+            Log.LogInfo($"Adjusting Smooth Power by {delta}", LogLevel.High);
+
+            if (!SmoothToolIsInUse) // new terrain tool
+            {
+                SmoothToolIsInUse = true;
+                lastModdedSmoothPwr = ModifySmoothPower(terrainOp.m_settings.m_smoothPower, delta);
+            }
+            else
+            {
+                lastModdedSmoothPwr = ModifySmoothPower(lastModdedSmoothPwr, delta);
+            }
+            lastTotalSmoothDelta += delta;
+            Log.LogInfo($"Total smooth power delta {lastTotalSmoothDelta}", LogLevel.High);
+        }
+
+        private static void SetRaisePower(TerrainOp terrainOp, float delta)
+        {
+            if (!terrainOp.m_settings.m_raise) { return; }
+
+            delta = ConvertSmoothDeltaToRaiseDelta(delta);
+
+            Log.LogInfo($"Adjusting Raise Power by {delta}", LogLevel.High);
+
+            if (!RaiseToolIsInUse) // new terrain tool
+            {
+                RaiseToolIsInUse = true;
+                lastModdedRaisePwr = ModifyRaisePower(terrainOp.m_settings.m_raisePower, delta);
+            }
+            else
+            {
+                lastModdedRaisePwr = ModifyRaisePower(lastModdedRaisePwr, delta);
+            }
+            lastTotalRaiseDelta += delta;
+            Log.LogInfo($"Total raise power delta {lastTotalRaiseDelta}", LogLevel.High);
+        }
+
+        /// <summary>
+        ///     Converts delta for smooth power to be appropriate for raise power
+        ///     since they have different value ranges and opposite signs
+        /// </summary>
+        /// <param name="delta"></param>
+        /// <returns></returns>
+        private static float ConvertSmoothDeltaToRaiseDelta(float delta)
+        {
+            var deltaFraction = delta / (MaxSmoothPwr - MinSmoothPwr);
+            return -1 * deltaFraction * (MaxRaisePwr - MinRaisePwr);
+        }
+
+        /// <summary>
+        ///     Get Smooth Power as a percentage of maximum hardness
+        /// </summary>
+        /// <param name="power"></param>
+        /// <returns></returns>
+        private static float GetSmoothPowerDisplayValue(float power)
+        {
+            return ((power - MinSmoothPwr) / (MaxSmoothPwr - MinSmoothPwr)) * 100;
+        }
+
+        /// <summary>
+        ///     Get Raise Power as a percentage of maximum hardness
+        /// </summary>
+        /// <param name="power"></param>
+        /// <returns></returns>
+        private static float GetRaisePowerDisplayValue(float power)
+        {
+            return ((MaxRaisePwr - power) / (MaxRaisePwr - MinRaisePwr)) * 100;
+        }
+
+        /// <summary>
+        ///     Modifies power value and clamps to bounds for smooth power.
+        /// </summary>
+        /// <param name="power"></param>
+        /// <param name="delta"></param>
+        /// <returns></returns>
+        private static float ModifySmoothPower(float power, float delta)
+        {
+            return Mathf.Clamp(power + delta, MinSmoothPwr, MaxSmoothPwr);
+        }
+
+        /// <summary>
+        ///     Modifies power value and clamps to bounds for raise power.
+        /// </summary>
+        /// <param name="power"></param>
+        /// <param name="delta"></param>
+        /// <returns></returns>
+        private static float ModifyRaisePower(float power, float delta)
+        {
+            return Mathf.Clamp(power + delta, MinRaisePwr, MaxRaisePwr);
         }
     }
 }
