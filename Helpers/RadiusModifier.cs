@@ -8,6 +8,7 @@ namespace TerrainTools.Helpers
     [HarmonyPatch]
     internal class RadiusModifier
     {
+        private static bool RadiusToolIsInUse = false;
         internal static float lastOriginalRadius;
         internal static float lastModdedRadius;
         internal static float lastTotalDelta;
@@ -26,8 +27,9 @@ namespace TerrainTools.Helpers
                     || Hud.IsPieceSelectionVisible()
                 )
                 {
-                    if (lastOriginalRadius != 0)
+                    if (RadiusToolIsInUse)
                     {
+                        RadiusToolIsInUse = false;
                         lastOriginalRadius = 0;
                         lastModdedRadius = 0;
                         lastTotalDelta = 0;
@@ -105,51 +107,68 @@ namespace TerrainTools.Helpers
 
             Log.LogInfo($"Adjusting radius by {delta}", LogLevel.Medium);
 
-            float originalRadius = 0;
-            float moddedRadius = ModifyRadius(lastModdedRadius, delta);
-            lastTotalDelta += delta;
-
-            if (lastOriginalRadius == 0)
+            if (!RadiusToolIsInUse)
             {
-                if (terrainOp.m_settings.m_level && originalRadius < terrainOp.m_settings.m_levelRadius)
+                if (TryGetMaximumRadius(terrainOp, out var radius))
                 {
-                    originalRadius = terrainOp.m_settings.m_levelRadius;
-                    moddedRadius = ModifyRadius(terrainOp.m_settings.m_levelRadius, delta);
+                    RadiusToolIsInUse = true;
+                    lastOriginalRadius = radius;
+                    lastModdedRadius = ModifyRadius(radius, delta);
+                    lastTotalDelta += delta;
                 }
-                if (terrainOp.m_settings.m_raise && originalRadius < terrainOp.m_settings.m_raiseRadius)
-                {
-                    originalRadius = terrainOp.m_settings.m_raiseRadius;
-                    moddedRadius = ModifyRadius(terrainOp.m_settings.m_raiseRadius, delta);
-                }
-                if (terrainOp.m_settings.m_smooth && originalRadius < terrainOp.m_settings.m_smoothRadius)
-                {
-                    originalRadius = terrainOp.m_settings.m_smoothRadius;
-                    moddedRadius = ModifyRadius(terrainOp.m_settings.m_smoothRadius, delta);
-                }
-                if (terrainOp.m_settings.m_paintCleared && originalRadius < terrainOp.m_settings.m_paintRadius)
-                {
-                    originalRadius = terrainOp.m_settings.m_paintRadius;
-                    moddedRadius = ModifyRadius(terrainOp.m_settings.m_paintRadius, delta);
-                }
-                lastOriginalRadius = originalRadius;
             }
-            lastModdedRadius = moddedRadius;
+            else
+            {
+                lastModdedRadius = ModifyRadius(lastModdedRadius, delta);
+                lastTotalDelta += delta;
+            }
 
-            if (lastOriginalRadius > 0 && lastModdedRadius > 0)
+            if (RadiusToolIsInUse)
             {
                 Log.LogInfo($"total delta {lastTotalDelta}", LogLevel.Medium);
 
-                var ghost = player.m_placementGhost?.transform.Find("_GhostOnly");
-                if (ghost != null)
+                var ghost = player.m_placementGhost?.transform.Find("_GhostOnly")?.gameObject;
+                if (ghost == null) { return; }
+
+                // handle pieces like path_v2 that have the particle effect nested in a child of _GhostOnly
+                var particleEffect = ghost.GetComponentInChildren<ParticleSystem>()?.gameObject;
+                if (particleEffect != null)
                 {
                     Log.LogInfo($"Adjusting ghost scale to {lastModdedRadius / lastOriginalRadius}x", LogLevel.Medium);
-                    ghost.localScale = new Vector3(
+                    particleEffect.transform.localScale = new Vector3(
                         lastModdedRadius / lastOriginalRadius,
                         lastModdedRadius / lastOriginalRadius,
                         lastModdedRadius / lastOriginalRadius
                     );
                 }
             }
+        }
+
+        /// <summary>
+        ///     Find the maximum radius value within the TerrainOp Settings
+        /// </summary>
+        /// <param name="terrainOp"></param>
+        /// <returns></returns>
+        private static bool TryGetMaximumRadius(TerrainOp terrainOp, out float maxRadius)
+        {
+            maxRadius = 0f;
+            if (terrainOp.m_settings.m_level && maxRadius < terrainOp.m_settings.m_levelRadius)
+            {
+                maxRadius = terrainOp.m_settings.m_levelRadius;
+            }
+            if (terrainOp.m_settings.m_raise && maxRadius < terrainOp.m_settings.m_raiseRadius)
+            {
+                maxRadius = terrainOp.m_settings.m_raiseRadius;
+            }
+            if (terrainOp.m_settings.m_smooth && maxRadius < terrainOp.m_settings.m_smoothRadius)
+            {
+                maxRadius = terrainOp.m_settings.m_smoothRadius;
+            }
+            if (terrainOp.m_settings.m_paintCleared && maxRadius < terrainOp.m_settings.m_paintRadius)
+            {
+                maxRadius = terrainOp.m_settings.m_paintRadius;
+            }
+            return maxRadius != 0f;
         }
     }
 }
