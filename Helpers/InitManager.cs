@@ -6,6 +6,8 @@ using Jotunn.Configs;
 using Jotunn.Managers;
 using TerrainTools.Configs;
 using System.Linq;
+using static UnityEngine.GridBrushBase;
+using System.Data.SqlTypes;
 
 namespace TerrainTools.Helpers
 {
@@ -145,10 +147,20 @@ namespace TerrainTools.Helpers
 
             // customize terrain op component
             var settings = toolPrefab.GetComponent<TerrainOp>().m_settings;
-            settings.m_level = toolDB.level != null ? toolDB.level.Value : settings.m_level;
-            settings.m_raise = toolDB.raise != null ? toolDB.raise.Value : settings.m_raise;
-            settings.m_smooth = toolDB.smooth != null ? toolDB.smooth.Value : settings.m_smooth;
-            settings.m_paintCleared = toolDB.clearPaint != null ? toolDB.clearPaint.Value : settings.m_paintCleared;
+            settings.m_level = UpdateValueIfNeeded(settings.m_level, toolDB.level);
+            settings.m_levelRadius = UpdateValueIfNeeded(settings.m_levelRadius, toolDB.levelRadius);
+
+            settings.m_raise = UpdateValueIfNeeded(settings.m_raise, toolDB.raise);
+            settings.m_raiseRadius = UpdateValueIfNeeded(settings.m_raiseRadius, toolDB.raiseRadius);
+            settings.m_raisePower = UpdateValueIfNeeded(settings.m_raisePower, toolDB.raisePower);
+            settings.m_raiseDelta = UpdateValueIfNeeded(settings.m_raiseDelta, toolDB.raiseDelta);
+
+            settings.m_smooth = UpdateValueIfNeeded(settings.m_smooth, toolDB.smooth);
+            settings.m_smoothRadius = UpdateValueIfNeeded(settings.m_smoothRadius, toolDB.smoothRadius);
+            settings.m_smoothPower = UpdateValueIfNeeded(settings.m_smoothPower, toolDB.smoothPower);
+
+            settings.m_paintCleared = UpdateValueIfNeeded(settings.m_paintCleared, toolDB.clearPaint);
+            settings.m_paintRadius = UpdateValueIfNeeded(settings.m_paintRadius, toolDB.paintRadius);
 
             // apply custom visualization overlay if desired
             if (toolDB.overlayType != null)
@@ -156,6 +168,11 @@ namespace TerrainTools.Helpers
                 toolPrefab.AddComponent(toolDB.overlayType);
             }
             return toolPrefab;
+        }
+
+        private static T UpdateValueIfNeeded<T>(T source, Nullable<T> newValue) where T : struct
+        {
+            return newValue != null ? newValue.Value : source;
         }
 
         /// <summary>
