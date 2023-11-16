@@ -14,9 +14,16 @@ namespace TerrainTools.Configs
         public int insertIndex;
         public Type overlayType;
         public bool? level;
+        public float? levelRadius;
         public bool? raise;
+        public float? raiseRadius;
+        public float? raisePower;
+        public float? raiseDelta;
         public bool? smooth;
+        public float? smoothRadius;
+        public float? smoothPower;
         public bool? clearPaint;
+        public float? paintRadius;
 
         public ToolDB(
             string name,
@@ -28,9 +35,16 @@ namespace TerrainTools.Configs
             int insertIndex = -1,
             Type overlayType = null,
             bool? level = null,
+            float? levelRadius = null,
             bool? raise = null,
+            float? raiseRadius = null,
+            float? raisePower = null,
+            float? raiseDelta = null,
             bool? smooth = null,
-            bool? clearPaint = null
+            float? smoothRadius = null,
+            float? smoothPower = null,
+            bool? clearPaint = null,
+            float? paintRadius = null
         )
         {
             this.name = name;
@@ -45,9 +59,19 @@ namespace TerrainTools.Configs
                 this.overlayType = overlayType;
             }
             this.level = level;
+            this.levelRadius = levelRadius;
+
             this.raise = raise;
+            this.raiseRadius = raiseRadius;
+            this.raisePower = raisePower;
+            this.raiseDelta = raiseDelta;
+
             this.smooth = smooth;
+            this.smoothRadius = smoothRadius;
+            this.smoothPower = smoothPower;
+
             this.clearPaint = clearPaint;
+            this.paintRadius = paintRadius;
         }
     }
 }

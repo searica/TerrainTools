@@ -38,6 +38,23 @@ namespace TerrainTools.Configs
             },
 
             {
+                "lower_v2",
+                new ToolDB(
+                    name: "lower_v2",
+                    basePrefab:"raise_v2",
+                    pieceName: "Lower ground",
+                    pieceDesc: "Lowers ground.",
+                    icon: IconCache.RaiseSquare,
+                    pieceTable: PieceTables.Hoe,
+                    overlayType: null, // should make a lower ground visualizer
+                    insertIndex: 2,
+                    raiseRadius: 1.5f,
+                    raisePower: 0.5f,
+                    raiseDelta: -0.5f
+                )
+            },
+
+            {
                 "path_v2_square",
                 new ToolDB(
                     name: "path_v2_square",
@@ -52,10 +69,10 @@ namespace TerrainTools.Configs
             },
 
             {
-                "paved_road_v2_square",
+    "paved_road_v2_square",
                 new ToolDB(
                     name: "Paved road (Square)",
-                    basePrefab:"paved_road_v2",
+                    basePrefab: "paved_road_v2",
                     pieceName: "Paved road (square)",
                     pieceDesc: "Creates a paved path according to the world grid and levels ground based on player position. Use shift+click to level ground based on where you are pointing (this will smooth the terrain).",
                     icon: IconCache.PavedRoadSquare,
@@ -64,10 +81,10 @@ namespace TerrainTools.Configs
                 )
             },
             {
-                "paved_road_v2_path",
+    "paved_road_v2_path",
                 new ToolDB(
                     name: "paved_road_v2_path",
-                    basePrefab:"paved_road_v2",
+                    basePrefab: "paved_road_v2",
                     pieceName: "Paved road (path)",
                     pieceDesc: "Creates a paved path without affecting ground height",
                     icon: IconCache.PavedRoadPath,
@@ -76,10 +93,10 @@ namespace TerrainTools.Configs
                 )
             },
             {
-                "paved_road_v2_path_square",
+    "paved_road_v2_path_square",
                 new ToolDB(
                     name: "paved_road_v2_path_square",
-                    basePrefab:"paved_road_v2",
+                    basePrefab: "paved_road_v2",
                     pieceName: "Paved road (path, square)",
                     pieceDesc: "Created a paved path according to the world grid without affecting ground height",
                     icon: IconCache.PavedRoadPathSquare,
@@ -89,10 +106,10 @@ namespace TerrainTools.Configs
                 )
             },
             {
-                "remove_terrain_mods",
+    "remove_terrain_mods",
                 new ToolDB(
                     name: "remove_terrain_mods",
-                    basePrefab:"mud_road_v2",
+                    basePrefab: "mud_road_v2",
                     pieceName: "Remove Terrain Modifications",
                     pieceDesc: "Resets ground height and paint",
                     icon: IconCache.Remove,
@@ -107,10 +124,10 @@ namespace TerrainTools.Configs
 
             // Cultivator Tools
             {
-                "cultivate_v2_square",
+    "cultivate_v2_square",
                 new ToolDB(
                     name: "cultivate_v2_square",
-                    basePrefab:"cultivate_v2",
+                    basePrefab: "cultivate_v2",
                     pieceName: "Cultivate (square)",
                     pieceDesc: "Cultivates ground according to the world grid and levels terrain based on player position. Use shift+click to level ground based on where you are pointing (this will smooth the terrain).",
                     icon: IconCache.CultivateSquare,
@@ -120,10 +137,10 @@ namespace TerrainTools.Configs
                 )
             },
             {
-                "cultivate_v2_path",
+    "cultivate_v2_path",
                 new ToolDB(
                     name: "cultivate_v2_path",
-                    basePrefab:"cultivate_v2",
+                    basePrefab: "cultivate_v2",
                     pieceName: "Cultivate (path)",
                     pieceDesc: "Cultivates ground without affecting ground height.",
                     icon: IconCache.CultivatePath,
@@ -133,10 +150,10 @@ namespace TerrainTools.Configs
                 )
             },
             {
-                "cultivate_v2_path_square",
+    "cultivate_v2_path_square",
                 new ToolDB(
                     name: "cultivate_v2_path_square",
-                    basePrefab:"cultivate_v2",
+                    basePrefab: "cultivate_v2",
                     pieceName: "Cultivate (path, square)",
                     pieceDesc: "Cultivates ground according to the world grid without affecting ground height.",
                     icon: IconCache.CultivatePathSquare,
@@ -147,10 +164,10 @@ namespace TerrainTools.Configs
                 )
             },
             {
-                "replant_v2_square",
+    "replant_v2_square",
                 new ToolDB(
                     name: "replant_v2_square",
-                    basePrefab:"replant_v2",
+                    basePrefab: "replant_v2",
                     pieceName: "Replant (square)",
                     pieceDesc: "Replants terrain according to world grid without affecting ground height.",
                     icon: IconCache.ReplantSquare,
