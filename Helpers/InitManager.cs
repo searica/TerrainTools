@@ -160,6 +160,16 @@ namespace TerrainTools.Helpers
             {
                 toolPrefab.AddComponent(toolDB.overlayType);
             }
+
+            if (toolDB.invertGhost)
+            {
+                var ghost = toolPrefab.transform.Find("_GhostOnly");
+                if (ghost != null)
+                {
+                    ghost.localRotation = Quaternion.Euler(270f, 0f, 0f);
+                    ghost.localPosition += new Vector3(0f, 2f, 0f);
+                }
+            }
             return toolPrefab;
         }
 

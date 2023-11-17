@@ -24,6 +24,7 @@ namespace TerrainTools.Configs
         public float? smoothPower;
         public bool? clearPaint;
         public float? paintRadius;
+        public bool invertGhost;
 
         public ToolDB(
             string name,
@@ -45,6 +46,7 @@ namespace TerrainTools.Configs
             float? smoothPower = null,
             bool? clearPaint = null,
             float? paintRadius = null
+            bool invertGhost = false
         )
         {
             this.name = name;
@@ -72,6 +74,7 @@ namespace TerrainTools.Configs
 
             this.clearPaint = clearPaint;
             this.paintRadius = paintRadius;
+            this.invertGhost = invertGhost;
         }
     }
 }
