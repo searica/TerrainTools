@@ -5,6 +5,17 @@
 			<th align="center">Notes</th>
 		</tr>
 		<tr>
+			<td align="center">1.2.0</td>
+			<td align="left">
+				<ul>
+					<li>Updated README with examples to explain "Hardness"</li>
+					<li>Changed hardness to display as a percentage and state whether the hardness is being changed for smoothing or for raising ground.</li>
+					<li>Fixed bug where the radius of the pathen tool would not visually update even though it was changed.</li>
+					<li>Fixed bug where radius of raise ground would visually reset after placing it.</li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
 			<td align="center">1.1.0</td>
 			<td align="left">
 				<ul>
