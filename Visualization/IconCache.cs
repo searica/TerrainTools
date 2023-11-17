@@ -23,6 +23,7 @@ namespace TerrainTools.Visualization
         private static Texture2D _cultivatePathSquare;
         private static Texture2D _raiseSquare;
         private static Texture2D _lower;
+        private static Texture2D _shovel;
 
         internal static Sprite LoadEmbeddedTextureAsSprite(string fileName)
         {
@@ -54,6 +55,18 @@ namespace TerrainTools.Visualization
                 var texture = new Texture2D(0, 0);
                 texture.LoadImage(buffer);
                 return texture;
+            }
+        }
+
+        internal static Texture2D Shovel
+        {
+            get
+            {
+                if (_shovel == null)
+                {
+                    _shovel = LoadTextureFromResources("ShovelIcon.png");
+                }
+                return _shovel;
             }
         }
 
