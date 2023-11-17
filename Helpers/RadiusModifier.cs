@@ -99,7 +99,7 @@ namespace TerrainTools.Helpers
 
         private static void SetRadius(Player player, float delta)
         {
-            var piece = player.GetSelectedPiece();
+            var piece = player?.GetSelectedPiece();
             if (piece is null || piece.gameObject is null || piece.gameObject.HasComponent<OverlayVisualizer>())
             {
                 return;
