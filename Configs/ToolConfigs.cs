@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Jotunn.Configs;
+using System;
 using System.Collections.Generic;
-using Jotunn.Configs;
 using TerrainTools.Helpers;
 using TerrainTools.Visualization;
 

@@ -1,20 +1,17 @@
 ﻿// Ignore Spelling: TerrainTools Jotunn
 
 using BepInEx;
+using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
-using TerrainTools.Configs;
-using System.Reflection;
-using System.Collections.Generic;
-using Jotunn.Utils;
-using System.IO;
-using UnityEngine;
 using Jotunn.Managers;
-using BepInEx.Configuration;
-using TerrainTools.Helpers;
+using Jotunn.Utils;
+using System.Collections.Generic;
+using System.Reflection;
+using TerrainTools.Configs;
 using TerrainTools.Extensions;
-using System.Drawing;
-using System.Drawing.Imaging;
+using TerrainTools.Helpers;
+using UnityEngine;
 
 namespace TerrainTools
 {
@@ -37,6 +34,8 @@ namespace TerrainTools
         private static readonly string ToolsSection = ConfigManager.SetStringPriority("Tools", 0);
 
         #endregion Section Names
+
+        // TODO: Add configs for Shovel!
 
         #region Tool Configs
 

@@ -1,10 +1,9 @@
 ﻿using HarmonyLib;
-using UnityEngine;
-using TerrainTools.Visualization;
-using TerrainTools.Extensions;
 using System.Collections.Generic;
 using System.Reflection.Emit;
+using TerrainTools.Extensions;
 using TerrainTools.Helpers;
+using TerrainTools.Visualization;
 
 namespace TerrainTools.Patches
 {

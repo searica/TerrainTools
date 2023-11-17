@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using Jotunn.Configs;
+﻿using Jotunn.Configs;
 using Jotunn.Entities;
 using Jotunn.Managers;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace TerrainTools.Helpers

@@ -3,10 +3,10 @@
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
-using TerrainTools.Extensions;
 using System;
 using System.IO;
 using System.Reflection;
+using TerrainTools.Extensions;
 using UnityEngine;
 using UnityEngine.Rendering;
 
