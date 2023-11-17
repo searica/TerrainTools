@@ -170,9 +170,14 @@ namespace TerrainTools.Helpers
             return toolPrefab;
         }
 
-        private static T UpdateValueIfNeeded<T>(T source, Nullable<T> newValue) where T : struct
+        private static T UpdateValueIfNeeded<T>(T source, T? newValue) where T : struct
         {
             return newValue != null ? newValue.Value : source;
+        }
+
+        private static T UpdateValueIfNeeded<T>(T source, T newValue)
+        {
+            return newValue != null ? newValue : source;
         }
 
         /// <summary>
