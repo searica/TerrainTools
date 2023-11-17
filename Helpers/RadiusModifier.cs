@@ -86,6 +86,9 @@ namespace TerrainTools.Helpers
                     __instance.m_settings.m_paintRadius = ModifyRadius(__instance.m_settings.m_paintRadius, lastTotalDelta);
                     Log.LogInfo($"Applying paint radius {__instance.m_settings.m_paintRadius}", LogLevel.Medium);
                 }
+
+                // fix resetting of particle system on raise ground
+                SetRadius(Player.m_localPlayer, 0);
             }
         }
 
