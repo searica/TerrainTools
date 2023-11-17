@@ -28,39 +28,6 @@ namespace TerrainTools
         public const string PluginGUID = $"{Author}.Valheim.TerrainTools";
         public const string PluginVersion = "1.1.0";
 
-        internal static Sprite LoadEmbeddedTextureAsSprite(string fileName)
-        {
-            var texture = LoadTextureFromResources(fileName);
-            if (texture == null) { return null; }
-
-            var pivot = new Vector2(0.5f, 0.5f);
-            var units = 100f;
-            return Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), pivot, units);
-        }
-
-        internal static Texture2D LoadTextureFromResources(string fileName)
-        {
-            var extension = Path.GetExtension(fileName).ToLower();
-            if (extension != ".png" && extension != ".jpg")
-            {
-                Log.LogWarning("LoadTextureFromResources can only load png or jpg textures");
-                return null;
-            }
-            fileName = Path.GetFileNameWithoutExtension(fileName);
-
-            Bitmap resource = Properties.Resources.ResourceManager.GetObject(fileName) as Bitmap;
-            using (var mStream = new MemoryStream())
-            {
-                resource.Save(mStream, ImageFormat.Png);
-                var buffer = new byte[mStream.Length];
-                mStream.Position = 0;
-                mStream.Read(buffer, 0, buffer.Length);
-                var texture = new Texture2D(0, 0);
-                texture.LoadImage(buffer);
-                return texture;
-            }
-        }
-
         #region Section Names
 
         private static readonly string MainSection = ConfigManager.SetStringPriority("Global", 3);
@@ -135,7 +102,9 @@ namespace TerrainTools
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), harmonyInstanceId: PluginGUID);
             Game.isModded = true;
 
+            PrefabManager.OnVanillaPrefabsAvailable += Shovel.CreateShovel;
             PieceManager.OnPiecesRegistered += InitManager.InitToolPieces;
+
             _ = GUIManager.Instance; // Fix rare NRE on shutdown
             ConfigManager.SetupWatcher();
             ConfigManager.CheckForConfigManager();
