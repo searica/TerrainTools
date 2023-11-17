@@ -9,9 +9,9 @@ namespace TerrainTools.Helpers
     internal class RadiusModifier
     {
         private static bool RadiusToolIsInUse = false;
-        internal static float lastOriginalRadius;
-        internal static float lastModdedRadius;
-        internal static float lastTotalDelta;
+        private static float lastOriginalRadius;
+        private static float lastModdedRadius;
+        private static float lastTotalDelta;
         private const float MinRadius = 0.5f;
 
         [HarmonyPatch(typeof(Player))]
