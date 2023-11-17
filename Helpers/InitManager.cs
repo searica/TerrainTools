@@ -21,11 +21,7 @@ namespace TerrainTools.Helpers
         ///     to manage the insertion position so that the insertion index is
         ///     not dependent on how many other pieces have been added.
         /// </summary>
-        private static readonly Dictionary<string, List<int>> InsertionIndexes = new()
-        {
-            {PieceTables.Hoe, new List<int>()},
-            {PieceTables.Cultivator, new List<int>()},
-        };
+        private static readonly Dictionary<string, List<int>> InsertionIndexes = new();
 
         internal static void InitToolPieces()
         {
@@ -221,19 +217,28 @@ namespace TerrainTools.Helpers
                 piece.m_category = PieceManager.Instance.AddPieceCategory(pieceTable, category);
             }
 
-            if (position < 0)
+            if (!InsertionIndexes.ContainsKey(pieceTable))
             {
-                table.m_pieces.Add(prefab);
-                InsertionIndexes[pieceTable].Add(table.m_pieces.Count - 1);
+                InsertionIndexes[pieceTable] = new List<int>();
             }
-            else
-            {
-                // Shift position to account for how many pieces have been added before it
-                var index = position + InsertionIndexes[pieceTable].Where(x => x <= position).Count();
 
+            // Shift position to account for how many pieces have been added before it and check if OOB
+            var index = position + InsertionIndexes[pieceTable].Where(x => x <= position).Count();
+            if (index >= table.m_pieces.Count)
+            {
+                Log.LogWarning("Piece insertion index is out of bounds");
+            }
+
+            if (position >= 0 && index < table.m_pieces.Count)
+            {
                 // Add piece at new insertion point
                 table.m_pieces.Insert(index, prefab);
                 InsertionIndexes[pieceTable].Add(position);
+            }
+            else
+            {
+                table.m_pieces.Add(prefab);
+                InsertionIndexes[pieceTable].Add(table.m_pieces.Count - 1);
             }
 
             Log.LogDebug($"Added piece {prefab.name} | Token: {piece.TokenName()}");
