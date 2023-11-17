@@ -130,7 +130,6 @@ namespace TerrainTools.Helpers
             if (RaiseToolIsInUse)
             {
                 var raiseHardness = GetRaisePowerDisplayValue(lastModdedRaisePwr);
-                Log.LogInfo($"Raise hardness: {raiseHardness}");
                 if (Mathf.Abs(raiseHardness - lastDisplayedRaiseHardness) > DisplayThreshold)
                 {
                     lastDisplayedRaiseHardness = Mathf.Round(raiseHardness);
