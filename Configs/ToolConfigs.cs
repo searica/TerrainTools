@@ -51,6 +51,7 @@ namespace TerrainTools.Configs
                     raiseRadius: 1.5f,
                     raisePower: 0.5f,
                     raiseDelta: -0.5f
+                    requirements: Array.Empty<Piece.Requirement>(),
                 )
             },
 

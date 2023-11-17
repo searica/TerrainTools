@@ -137,6 +137,10 @@ namespace TerrainTools.Helpers
             toolPiece.m_icon = Sprite.Create(toolDB.icon, new Rect(0, 0, toolDB.icon.width, toolDB.icon.height), Vector2.zero);
             toolPiece.m_name = toolDB.pieceName;
             toolPiece.m_description = toolDB.pieceDesc;
+            if (toolDB.requirements != null)
+            {
+                toolPiece.m_resources = toolDB.requirements;
+            }
 
             // customize terrain op component
             var settings = toolPrefab.GetComponent<TerrainOp>().m_settings;
