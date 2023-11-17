@@ -42,11 +42,7 @@ namespace TerrainTools.Helpers
 
         [HarmonyPrefix]
         [HarmonyPatch(nameof(TerrainComp.SmoothTerrain))]
-        private static bool SmoothTerrianPrefix(
-            TerrainComp __instance,
-            Vector3 worldPos,
-            float radius
-        )
+        private static bool SmoothTerrianPrefix(TerrainComp __instance, Vector3 worldPos, float radius)
         {
             if (IsGridModeEnabled(radius))
             {
@@ -68,12 +64,7 @@ namespace TerrainTools.Helpers
 
         [HarmonyPrefix]
         [HarmonyPatch(nameof(TerrainComp.RaiseTerrain))]
-        private static bool RaiseTerrainPrefix(
-           TerrainComp __instance,
-           Vector3 worldPos,
-           float radius,
-           float delta
-       )
+        private static bool RaiseTerrainPrefix(TerrainComp __instance, Vector3 worldPos, float radius, float delta)
         {
             if (IsGridModeEnabled(radius))
             {
