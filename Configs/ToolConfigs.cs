@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Jotunn.Configs;
+using TerrainTools.Helpers;
 using TerrainTools.Visualization;
 
 namespace TerrainTools.Configs
@@ -44,14 +46,14 @@ namespace TerrainTools.Configs
                     basePrefab:"raise_v2",
                     pieceName: "Lower ground",
                     pieceDesc: "Lowers ground.",
-                    icon: IconCache.RaiseSquare,
-                    pieceTable: PieceTables.Hoe,
+                    icon: IconCache.Lower,
+                    pieceTable: Shovel.ShovelPieceTable,
                     overlayType: null, // should make a lower ground visualizer
-                    insertIndex: 2,
                     raiseRadius: 1.5f,
                     raisePower: 0.5f,
-                    raiseDelta: -0.5f
+                    raiseDelta: -0.5f,
                     requirements: Array.Empty<Piece.Requirement>(),
+                    invertGhost: true
                 )
             },
 
