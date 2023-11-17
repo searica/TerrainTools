@@ -57,6 +57,7 @@
 		<None Remove="Resources\cultivate_v2_path.png" />
 		<None Remove="Resources\cultivate_v2_path_square.png" />
 		<None Remove="Resources\cultivate_v2_square.png" />
+		<None Remove="Resources\lower_v2.png" />
 		<None Remove="Resources\mud_road_v2_square.png" />
 		<None Remove="Resources\path_v2_square.png" />
 		<None Remove="Resources\paved_road_v2_path.png" />
@@ -79,6 +80,7 @@
 		<EmbeddedResource Include="Resources\cultivate_v2_path.png" />
 		<EmbeddedResource Include="Resources\cultivate_v2_path_square.png" />
 		<EmbeddedResource Include="Resources\cultivate_v2_square.png" />
+		<EmbeddedResource Include="Resources\lower_v2.png" />
 		<EmbeddedResource Include="Resources\mud_road_v2_square.png" />
 		<EmbeddedResource Include="Resources\path_v2_square.png" />
 		<EmbeddedResource Include="Resources\paved_road_v2_path.png" />
