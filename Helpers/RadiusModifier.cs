@@ -12,6 +12,7 @@ namespace TerrainTools.Helpers
         private static float lastOriginalRadius;
         private static float lastModdedRadius;
         private static float lastTotalDelta;
+        private static Vector3 lastGhostScale = Vector3.zero;
         private const float MinRadius = 0.5f;
 
         [HarmonyPatch(typeof(Player))]
@@ -21,11 +22,7 @@ namespace TerrainTools.Helpers
             [HarmonyPatch(nameof(Player.Update))]
             private static void UpdatePrefix(Player __instance)
             {
-                if (
-                    __instance == null
-                    || !__instance.InPlaceMode()
-                    || Hud.IsPieceSelectionVisible()
-                )
+                if (__instance == null || !__instance.InPlaceMode() || Hud.IsPieceSelectionVisible())
                 {
                     if (RadiusToolIsInUse)
                     {
@@ -33,6 +30,7 @@ namespace TerrainTools.Helpers
                         lastOriginalRadius = 0;
                         lastModdedRadius = 0;
                         lastTotalDelta = 0;
+                        lastGhostScale = Vector3.zero;
                         SetRadius(__instance, 0);
                     }
                     return;
@@ -42,6 +40,7 @@ namespace TerrainTools.Helpers
                 {
                     SetRadius(__instance, Input.mouseScrollDelta.y * TerrainTools.RadiusScrollScale);
                 }
+                RefreshGhostScale(__instance);
             }
         }
 
@@ -86,9 +85,6 @@ namespace TerrainTools.Helpers
                     __instance.m_settings.m_paintRadius = ModifyRadius(__instance.m_settings.m_paintRadius, lastTotalDelta);
                     Log.LogInfo($"Applying paint radius {__instance.m_settings.m_paintRadius}", LogLevel.Medium);
                 }
-
-                // fix resetting of particle system on raise ground
-                SetRadius(Player.m_localPlayer, 0);
             }
         }
 
@@ -108,7 +104,7 @@ namespace TerrainTools.Helpers
             var terrainOp = piece.gameObject.GetComponent<TerrainOp>();
             if (terrainOp == null) { return; }
 
-            Log.LogInfo($"Adjusting radius by {delta}", LogLevel.Medium);
+            Log.LogInfo($"Adjusting radius by {delta}", LogLevel.High);
 
             if (!RadiusToolIsInUse)
             {
@@ -125,24 +121,31 @@ namespace TerrainTools.Helpers
                 lastModdedRadius = ModifyRadius(lastModdedRadius, delta);
                 lastTotalDelta += delta;
             }
+            Log.LogInfo($"total delta {lastTotalDelta}", LogLevel.High);
 
+            lastGhostScale = new Vector3(
+                lastModdedRadius / lastOriginalRadius,
+                lastModdedRadius / lastOriginalRadius,
+                lastModdedRadius / lastOriginalRadius
+            );
+        }
+
+        private static void RefreshGhostScale(Player player)
+        {
             if (RadiusToolIsInUse)
             {
-                Log.LogInfo($"total delta {lastTotalDelta}", LogLevel.Medium);
-
-                var ghost = player.m_placementGhost?.transform.Find("_GhostOnly")?.gameObject;
+                var ghost = player?.m_placementGhost?.transform.Find("_GhostOnly")?.gameObject;
                 if (ghost == null) { return; }
 
                 // handle pieces like path_v2 that have the particle effect nested in a child of _GhostOnly
                 var particleEffect = ghost.GetComponentInChildren<ParticleSystem>()?.gameObject;
-                if (particleEffect != null)
+                if (particleEffect != null && lastGhostScale != Vector3.zero)
                 {
-                    Log.LogInfo($"Adjusting ghost scale to {lastModdedRadius / lastOriginalRadius}x", LogLevel.Medium);
-                    particleEffect.transform.localScale = new Vector3(
-                        lastModdedRadius / lastOriginalRadius,
-                        lastModdedRadius / lastOriginalRadius,
-                        lastModdedRadius / lastOriginalRadius
-                    );
+                    if (particleEffect.transform.localScale != lastGhostScale)
+                    {
+                        Log.LogInfo($"Adjusting ghost scale to {lastModdedRadius / lastOriginalRadius}x", LogLevel.High);
+                        particleEffect.transform.localScale = lastGhostScale;
+                    }
                 }
             }
         }
