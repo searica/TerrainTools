@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Jotunn;
-using Jotunn.Configs;
 using Jotunn.Managers;
 using TerrainTools.Configs;
 using System.Linq;
-using static UnityEngine.GridBrushBase;
-using System.Data.SqlTypes;
 
 namespace TerrainTools.Helpers
 {
