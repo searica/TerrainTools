@@ -3,6 +3,7 @@ using Jotunn.Entities;
 using Jotunn.Managers;
 using System.Collections.Generic;
 using UnityEngine;
+using TerrainTools.Visualization;
 
 namespace TerrainTools.Helpers
 {
@@ -57,7 +58,6 @@ namespace TerrainTools.Helpers
             var shovel = PrefabManager.Instance.CreateClonedPrefab("Shovel", "Hoe");
 
             // Get all the child objects I want to alter
-
             var handleCollider = shovel?.transform?.Find("collider")?.gameObject;
             var bladeCollider = shovel?.transform?.Find("collider (1)")?.gameObject;
             var attach = shovel?.transform?.Find("attach")?.gameObject;
@@ -121,13 +121,24 @@ namespace TerrainTools.Helpers
                 Log.LogWarning("Failed to modify shovel handle");
             }
 
-            //try
-            //{
-            //    if (shovel.TryGetComponent(out Piece piece))
-            //    {
-            //        piece.m_icon = IconCache.Lower;
-            //    }
-            //}
+            try
+            {
+                if (shovel.TryGetComponent(out ItemDrop itemDrop))
+                {
+                    var sharedData = itemDrop?.m_itemData?.m_shared;
+                    if (sharedData != null)
+                    {
+                        var icon = IconCache.Shovel;
+                        var sprite = Sprite.Create(icon, new Rect(0, 0, icon.width, icon.height), Vector2.zero);
+                        sharedData.m_icons = new Sprite[] { sprite };
+                    }
+                }
+            }
+            catch
+            {
+                Log.LogWarning("Failed to create shovel icon");
+            }
+
             return shovel;
         }
     }

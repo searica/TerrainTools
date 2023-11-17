@@ -68,6 +68,7 @@
 		<None Remove="Resources\redo.png" />
 		<None Remove="Resources\remove.png" />
 		<None Remove="Resources\replant_v2_square.png" />
+		<None Remove="Resources\ShovelIcon.png" />
 		<None Remove="Resources\smooth.png" />
 		<None Remove="Resources\undo.png" />
 	</ItemGroup>
@@ -91,6 +92,7 @@
 		<EmbeddedResource Include="Resources\redo.png" />
 		<EmbeddedResource Include="Resources\remove.png" />
 		<EmbeddedResource Include="Resources\replant_v2_square.png" />
+		<EmbeddedResource Include="Resources\ShovelIcon.png" />
 		<EmbeddedResource Include="Resources\smooth.png" />
 		<EmbeddedResource Include="Resources\undo.png" />
 	</ItemGroup>

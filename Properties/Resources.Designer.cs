@@ -223,6 +223,16 @@ namespace TerrainTools.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ShovelIcon {
+            get {
+                object obj = ResourceManager.GetObject("ShovelIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap smooth {
             get {
                 object obj = ResourceManager.GetObject("smooth", resourceCulture);
