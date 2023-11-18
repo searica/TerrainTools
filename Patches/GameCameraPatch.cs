@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using System.Collections.Generic;
 using System.Reflection.Emit;
-using TerrainTools.Extensions;
 using TerrainTools.Helpers;
 using TerrainTools.Visualization;
 
