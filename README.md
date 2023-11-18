@@ -37,16 +37,16 @@ Quality of life building mod that improves how terrain manipulation with the hoe
 <img src="https://raw.githubusercontent.com/searica/TerrainTools/main/Media/HoeTools.png"></img>
 
 ### New Cultivator Tools
-- Adds a version of each terrain tool that doesn't affect the terrain height when used.
-- Adds square versions of all terrain tools that modify terrain according to the world grid (so you can enjoy clean edges).
-- Adds a precision raise ground tool that lets you set the exact height you want to raise the terrain by using the scroll wheel on your mouse.
-- Adds a remove terrain modifications tool that lets you reset terrain.
+- Adds a version of the cultivate tool that doesn't affect the terrain height when used.
+- Adds square versions of each tools tool in the cultivator that modifies terrain according to the world grid (so you can enjoy clean edges).
 
 #### Cultivator
 <img src="https://raw.githubusercontent.com/searica/TerrainTools/main/Media/CultivatorTools.png"></img>
 
 ## Instructions
 If you are using a mod manager for Thunderstore simply install the mod from there. If you are not using a mod manager then, you need a modded instance of Valheim (BepInEx) and the Jotunn plugin installed.
+
+
 
 ## Configuration
 Changes made to the configuration settings will be reflected in-game immediately (no restart required) and they will also sync to clients if the mod is on the server. The mod also has a built in file watcher so you can edit settings via an in-game configuration manager (changes applied upon closing the in-game configuration manager) or by changing values in the file via a text editor or mod manager.
