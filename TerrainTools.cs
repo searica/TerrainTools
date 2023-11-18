@@ -167,6 +167,13 @@ namespace TerrainTools
                 synced: false
             );
 
+            hoverInfoEnabled = ConfigManager.BindConfig(
+                MainSection,
+                "HoverInfo",
+                true,
+                "Set to true/enabled to show terrain height when using square terrain tools."
+            );
+
             enableRadiusModifier = ConfigManager.BindConfig(
                 RadiusSection,
                 ConfigManager.SetStringPriority("RadiusModifier", 1),
@@ -220,13 +227,7 @@ namespace TerrainTools
                 0.1f,
                 "Scroll wheel change scale",
                 new AcceptableValueRange<float>(0.05f, 2f)
-            );
-
-            hoverInfoEnabled = ConfigManager.BindConfig(
-                HoeSection,
-                ConfigManager.SetStringPriority("HoverInfo", 1),
-                true,
-                "Set to true/enabled to show terrain height when using square terrain tools."
+                new AcceptableValueRange<float>(-1f, 1f)
             );
 
             enableShovel = ConfigManager.BindConfig(
