@@ -21,7 +21,7 @@ namespace TerrainTools.Helpers
         internal class PlayerPatch
         {
             [HarmonyPrefix]
-            [HarmonyPatch(nameof(Player.UpdatePlacement))]
+            [HarmonyPatch(nameof(Player.Update))]
             private static void UpdatePrefix(Player __instance)
             {
                 if (__instance == null || !__instance.InPlaceMode() || Hud.IsPieceSelectionVisible())
