@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace TerrainTools.Extensions
+namespace MVBP.Extensions
 {
     internal static class GameObjectExtensions
     {
@@ -24,60 +24,16 @@ namespace TerrainTools.Extensions
         }
 
         /// <summary>
-        ///     Extension method to check if GameObject has a component.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="gameObject"></param>
-        /// <returns></returns>
-        public static bool HasComponent<T>(this GameObject gameObject) where T : UnityEngine.Component
-        {
-            return gameObject.GetComponent<T>() != null;
-        }
-
-        /// <summary>
-        ///     Extension method to check if GameObject has a component.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="gameObject"></param>
-        /// <returns></returns>
-        public static bool HasComponent(this GameObject gameObject, string componentName)
-        {
-            return gameObject.GetComponent(componentName) != null;
-        }
-
-        /// <summary>
-        ///     Immediately destroys all instances of a component
-        ///     in the GameObject and all of it's children.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="gameObject"></param>
-        /// <returns></returns>
-        public static void DestroyComponentsInChildren<T>(
-            this GameObject gameObject,
-            bool includeInactive = false
-        ) where T : UnityEngine.Component
-        {
-            var components = gameObject.GetComponentsInChildren<T>(includeInactive);
-            foreach (var component in components)
-            {
-                UnityEngine.Object.DestroyImmediate(component);
-            }
-        }
-
-        /// <summary>
         ///     Check if GameObject has any of the specified components.
         /// </summary>
         /// <param name="gameObject"></param>
         /// <param name="components"></param>
         /// <returns></returns>
-        public static bool HasAnyComponent(
-            this GameObject gameObject,
-            params Type[] components
-        )
+        public static bool HasAnyComponent(this GameObject gameObject, params Type[] components)
         {
             foreach (var compo in components)
             {
-                if (gameObject.GetComponent(compo) != null)
+                if (gameObject.GetComponent(compo))
                 {
                     return true;
                 }
@@ -89,16 +45,13 @@ namespace TerrainTools.Extensions
         ///     Check if GameObject has any of the specified components.
         /// </summary>
         /// <param name="gameObject"></param>
-        /// <param name="components"></param>
+        /// <param name="componentNames"></param>
         /// <returns></returns>
-        public static bool HasAnyComponent(
-            this GameObject gameObject,
-            params string[] componentNames
-        )
+        public static bool HasAnyComponent(this GameObject gameObject, params string[] componentNames)
         {
             foreach (var name in componentNames)
             {
-                if (gameObject.GetComponent(name) != null)
+                if (gameObject.GetComponent(name))
                 {
                     return true;
                 }
@@ -110,16 +63,13 @@ namespace TerrainTools.Extensions
         ///     Check if GameObject has all of the specified components.
         /// </summary>
         /// <param name="gameObject"></param>
-        /// <param name="components"></param>
+        /// <param name="componentNames"></param>
         /// <returns></returns>
-        public static bool HasAllComponents(
-            this GameObject gameObject,
-            params string[] componentNames
-        )
+        public static bool HasAllComponents(this GameObject gameObject, params string[] componentNames)
         {
             foreach (var name in componentNames)
             {
-                if (gameObject.GetComponent(name) == null)
+                if (!gameObject.GetComponent(name))
                 {
                     return false;
                 }
@@ -133,14 +83,11 @@ namespace TerrainTools.Extensions
         /// <param name="gameObject"></param>
         /// <param name="components"></param>
         /// <returns></returns>
-        public static bool HasAllComponents(
-            this GameObject gameObject,
-            params Type[] components
-        )
+        public static bool HasAllComponents(this GameObject gameObject, params Type[] components)
         {
             foreach (var compo in components)
             {
-                if (gameObject.GetComponent(compo) == null)
+                if (!gameObject.GetComponent(compo))
                 {
                     return false;
                 }
@@ -153,6 +100,7 @@ namespace TerrainTools.Extensions
         ///     have any of the specified components.
         /// </summary>
         /// <param name="gameObject"></param>
+        /// <param name="includeInactive"></param>
         /// <param name="components"></param>
         /// <returns></returns>
         public static bool HasAnyComponentInChildren(
@@ -163,7 +111,7 @@ namespace TerrainTools.Extensions
         {
             foreach (var compo in components)
             {
-                if (gameObject.GetComponentInChildren(compo, includeInactive) != null)
+                if (gameObject.GetComponentInChildren(compo, includeInactive))
                 {
                     return true;
                 }
@@ -172,48 +120,38 @@ namespace TerrainTools.Extensions
         }
 
         /// <summary>
-        ///     Check if GameObject or any of it's children
-        ///     have the specific component.
+        ///     Extension method to find nested children by name using either
+        ///     a breadth-first or depth-first search. Default is breadth-first.
         /// </summary>
         /// <param name="gameObject"></param>
-        /// <param name="components"></param>
-        /// <returns></returns>
-        public static bool HasComponentInChildren<T>(
+        /// <param name="childName">Name of the child object to search for.</param>
+        /// <param name="searchType">Whether to preform a breadth first or depth first search. Default is breadth first.</param>
+        public static Transform FindDeepChild(
             this GameObject gameObject,
-            bool includeInactive = false
-        ) where T : UnityEngine.Component
+            string childName,
+            global::Utils.IterativeSearchType searchType = global::Utils.IterativeSearchType.BreadthFirst
+        )
         {
-            return gameObject.GetComponentInChildren<T>(includeInactive) != null;
+            return gameObject.transform.FindDeepChild(childName, searchType);
         }
 
         /// <summary>
-        ///     Extension method to get the first component in the GameObject
-        ///     or it's children that has the specified name.
+        ///     Immediately destroys all instances of a component
+        ///     in the GameObject and all of it's children.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="gameObject"></param>
-        /// <param name="name"></param>
-        /// <param name="includeInactive"></param>
         /// <returns></returns>
-        internal static T GetComponentInChildrenByName<T>(
+        public static void DestroyComponentsInChildren<T>(
             this GameObject gameObject,
-            string name,
             bool includeInactive = false
-        ) where T : UnityEngine.Component
+        ) where T : Component
         {
-            foreach (
-                var compo in gameObject.GetComponentsInChildren<T>(includeInactive)
-            )
+            var components = gameObject.GetComponentsInChildren<T>(includeInactive);
+            foreach (var component in components)
             {
-                if (compo.name == name)
-                {
-                    return compo;
-                }
+                UnityEngine.Object.DestroyImmediate(component);
             }
-            Log.LogWarning(
-                $"No {nameof(T)} with name {name} found for GameObject: {gameObject.name}"
-            );
-            return null;
         }
 
         internal static Mesh GetMesh(this GameObject gameObject, string meshName)

@@ -1,6 +1,6 @@
 ﻿// Ignore Spelling: MVBP
 
-namespace TerrainTools.Extensions
+namespace MVBP.Extensions
 {
     internal static class StringExtensions
     {
@@ -67,15 +67,6 @@ namespace TerrainTools.Extensions
                 return $"{char.ToUpper(s[0])}";
             else
                 return char.ToUpper(s[0]) + s.Substring(1);
-        }
-
-        internal static string EmptyIfNull(this object value)
-        {
-            if (value == null)
-            {
-                return string.Empty;
-            }
-            return value.ToString();
         }
     }
 }
