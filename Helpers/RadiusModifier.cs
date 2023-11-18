@@ -42,7 +42,10 @@ namespace TerrainTools.Helpers
                 {
                     SetRadius(__instance, Input.mouseScrollDelta.y * TerrainTools.RadiusScrollScale);
                 }
-                RefreshGhostScale(__instance); // this is constantly refreshing if FastTools is in use
+
+                // this is constantly refreshing if FastTools is in use but turns out that bug
+                // occurs when using FastTools even without TerrainTools
+                RefreshGhostScale(__instance);
             }
         }
 
