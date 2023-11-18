@@ -10,6 +10,7 @@ namespace TerrainTools.Helpers
     internal class Shovel
     {
         private static bool HasBeenCreated = false;
+        internal const string ShovelPrefabName = "ATM_Shovel";
         internal const string ShovelPieceTable = "_ShovelPieceTable";
         internal static CustomItem shovel;
 
@@ -55,7 +56,7 @@ namespace TerrainTools.Helpers
 
         private static GameObject CreateShovelPrefab()
         {
-            var shovel = PrefabManager.Instance.CreateClonedPrefab("Shovel", "Hoe");
+            var shovel = PrefabManager.Instance.CreateClonedPrefab(ShovelPrefabName, "Hoe");
 
             // Get all the child objects I want to alter
             var handleCollider = shovel?.transform?.Find("collider")?.gameObject;
