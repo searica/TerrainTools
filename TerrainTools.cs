@@ -4,6 +4,7 @@ using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
+using Jotunn.Configs;
 using Jotunn.Managers;
 using Jotunn.Utils;
 using System;
@@ -28,20 +29,26 @@ namespace TerrainTools
 
         #region Section Names
 
-        private static readonly string MainSection = ConfigManager.SetStringPriority("Global", 4);
+        private static readonly string MainSection = ConfigManager.SetStringPriority("Global", 10);
+        private static readonly string RadiusSection = ConfigManager.SetStringPriority("Radius", 8);
+        private static readonly string HardnessSection = ConfigManager.SetStringPriority("Hardness", 6);
+        private static readonly string ShovelSection = ConfigManager.SetStringPriority("Shovel", 4);
+        private static readonly string HoeSection = ConfigManager.SetStringPriority("Hoe", 2);
+        private static readonly string CultivatorSection = ConfigManager.SetStringPriority("Cultivator", 0);
 
-        private static readonly string RadiusSection = ConfigManager.SetStringPriority("Radius", 3);
-        private static readonly string HardnessSection = ConfigManager.SetStringPriority("Hardness", 2);
-        private static readonly string ShovelSection = ConfigManager.SetStringPriority("Shovel", 1);
-        private static readonly string HoeSection = ConfigManager.SetStringPriority("Hoe", 0);
+        internal static bool UpdatePlugin = false;
 
+        /// <summary>
+        ///     Get the appropriate configuratin section based on PieceTable and fall back to MainSection if needed.
+        /// </summary>
+        /// <param name="pieceTable"></param>
+        /// <returns></returns>
         private static string GetSectionName(string pieceTable)
         {
-            if (pieceTable == Shovel.ShovelPieceTable)
-            {
-                return ShovelSection;
-            }
-            return HoeSection;
+            if (pieceTable == PieceTables.Hoe) { return HoeSection; }
+            if (pieceTable == PieceTables.Cultivator) { return CultivatorSection; }
+            if (pieceTable == Shovel.ShovelPieceTable) { return ShovelSection; }
+            return MainSection;
         }
 
         #endregion Section Names
