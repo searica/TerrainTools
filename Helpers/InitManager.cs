@@ -1,4 +1,5 @@
 ﻿using Jotunn;
+using Jotunn.Entities;
 using Jotunn.Managers;
 using System;
 using System.Collections.Generic;
@@ -92,7 +93,7 @@ namespace TerrainTools.Helpers
         /// <summary>
         ///     Updates which tools are enabled/disabled to add/remove them from piece tables.
         /// </summary>
-        internal static void UpdatePlugin()
+        internal static void UpdateTools()
         {
             if (!HasInitialized) return;
 
@@ -102,6 +103,17 @@ namespace TerrainTools.Helpers
             {
                 var toolPrefabPiece = ToolRefs[key].GetComponent<Piece>();
                 toolPrefabPiece.m_enabled = TerrainTools.IsToolEnabled(key);
+            }
+        }
+
+        /// <summary>
+        ///     Updates the shovel recipe to be enabled/disabled based on corresponding config entry.
+        /// </summary>
+        internal static void UpdateShovelRecipe()
+        {
+            if (Shovel.TryGetShovel(out CustomItem shovel))
+            {
+                shovel.Recipe.Recipe.m_enabled = TerrainTools.IsShovelEnabled;
             }
         }
 

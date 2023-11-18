@@ -14,6 +14,12 @@ namespace TerrainTools.Helpers
         internal const string ShovelPieceTable = "_ShovelPieceTable";
         internal static CustomItem shovel;
 
+        internal static bool TryGetShovel(out CustomItem shovel)
+        {
+            shovel = ItemManager.Instance.GetItem(ShovelPrefabName);
+            return shovel != null;
+        }
+
         internal static void CreateShovel()
         {
             if (HasBeenCreated) return;
@@ -38,6 +44,7 @@ namespace TerrainTools.Helpers
             };
 
             shovel = new CustomItem(shovelPrefab, true, shovelConfig);
+            shovel.Recipe.Recipe.m_enabled = TerrainTools.IsShovelEnabled;
             ItemManager.Instance.AddItem(shovel);
             HasBeenCreated = true;
         }
