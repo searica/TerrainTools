@@ -135,13 +135,13 @@ namespace TerrainTools.Helpers
         {
             if (Player.m_localPlayer?.GetRightItem()?.m_shared.m_name == "$item_cultivator")
             {
-                Log.LogWarning("Terrain Tools updated through config change, unequipping cultivator");
+                Log.LogWarning($"{TerrainTools.PluginName} updated through config change, unequipping cultivator");
                 Player.m_localPlayer.HideHandItems();
             }
 
             if (Player.m_localPlayer?.GetRightItem()?.m_shared.m_name == "$item_hoe")
             {
-                Log.LogWarning("Terrain Tools updated through config change, unequipping hoe");
+                Log.LogWarning($"{TerrainTools.PluginName} updated through config change, unequipping hoe");
                 Player.m_localPlayer.HideHandItems();
             }
         }
