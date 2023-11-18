@@ -193,8 +193,9 @@ namespace TerrainTools
                 RadiusSection,
                 "RadiusScrollScale",
                 0.1f,
-                "Scroll wheel change scale",
-                new AcceptableValueRange<float>(0.05f, 2f)
+                "Scroll wheel change scale, larger magnitude means the radius will change " +
+                "faster and negative sign will reverse the direction you need to scroll to increase the radius.",
+                new AcceptableValueRange<float>(-1f, 1f)
             );
 
             maxRadius = ConfigManager.BindConfig(
@@ -225,8 +226,8 @@ namespace TerrainTools
                 HardnessSection,
                 "HardnessScrollScale",
                 0.1f,
-                "Scroll wheel change scale",
-                new AcceptableValueRange<float>(0.05f, 2f)
+                "Scroll wheel change scale, larger magnitude means the hardness will change " +
+                "faster and negative sign will reverse the direction you need to scroll to increase the hardness.",
                 new AcceptableValueRange<float>(-1f, 1f)
             );
 
