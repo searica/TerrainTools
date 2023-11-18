@@ -15,6 +15,8 @@ namespace TerrainTools.Helpers
         private static Vector3 lastGhostScale = Vector3.zero;
         private const float MinRadius = 0.5f;
 
+        private const float Tolerance = 0.01f;
+
         [HarmonyPatch(typeof(Player))]
         internal class PlayerPatch
         {
@@ -141,7 +143,7 @@ namespace TerrainTools.Helpers
                 var particleEffect = ghost.GetComponentInChildren<ParticleSystem>()?.gameObject;
                 if (particleEffect != null && lastGhostScale != Vector3.zero)
                 {
-                    if (particleEffect.transform.localScale != lastGhostScale)
+                    if (Vector3.Distance(particleEffect.transform.localScale, lastGhostScale) > Tolerance)
                     {
                         Log.LogInfo($"Adjusting ghost scale to {lastModdedRadius / lastOriginalRadius}x", LogLevel.High);
                         particleEffect.transform.localScale = lastGhostScale;
