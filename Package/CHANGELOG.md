@@ -7,10 +7,19 @@
 		<tr>
 			<td align="center">1.2.0</td>
 			<td align="left">
+				<b>Update Info</b>
+				<ul>
+					<li>Changed configuration file format to handle the new tool. <b>You need to regenerate your config file.</b></li>
+					<li>Updated README with visual examples to better explain "Hardness".</li>
+				</ul>
+				<b>Features</b>
 				<ul>
 					<li>Added a new tool that lets you lower the ground. You'll need to delve into some crypts and find some metal to make it though.</li>
-					<li>Updated README with examples to explain "Hardness"</li>
 					<li>Changed hardness to display as a percentage and state whether the hardness is being changed for smoothing or for raising ground.</li>
+					<li>Updated all tool descriptions to explain how to smooth terrain instead of leveling it (this is actually a Vanilla feature but the game never tells you it exists).</li>
+				</ul>
+				<b>Bug Fixes</b>
+				<ul>
 					<li>Fixed bug where the radius of the pathen tool would not visually update even though it was changed.</li>
 					<li>Fixed bug where radius of raise ground would visually reset after placing it.</li>
 				</ul>
