@@ -62,7 +62,7 @@ namespace TerrainTools.Helpers
             [HarmonyPatch(nameof(TerrainOp.Awake))]
             private static void AwakePrefix(TerrainOp __instance)
             {
-                if (__instance is null || __instance.gameObject is null || __instance.gameObject.HasComponent<OverlayVisualizer>())
+                if (__instance is null || __instance.gameObject is null || __instance.gameObject.GetComponent<OverlayVisualizer>())
                 {
                     return;
                 }
@@ -101,7 +101,7 @@ namespace TerrainTools.Helpers
         private static void SetRadius(Player player, float delta)
         {
             var piece = player?.GetSelectedPiece();
-            if (piece is null || piece.gameObject is null || piece.gameObject.HasComponent<OverlayVisualizer>())
+            if (piece is null || piece.gameObject is null || piece.gameObject.GetComponent<OverlayVisualizer>())
             {
                 return;
             }

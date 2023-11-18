@@ -153,24 +153,5 @@ namespace MVBP.Extensions
                 UnityEngine.Object.DestroyImmediate(component);
             }
         }
-
-        internal static Mesh GetMesh(this GameObject gameObject, string meshName)
-        {
-            foreach (var meshFilter in gameObject.GetComponentsInChildren<MeshFilter>())
-            {
-                var mesh = meshFilter.mesh;
-                if (mesh == null)
-                {
-                    continue;
-                }
-
-                if (mesh.name.RemoveSuffix("Instance").Trim() == meshName)
-                {
-                    return mesh;
-                }
-            }
-            Log.LogWarning($"Could not find Mesh: {meshName} for GameObject: {gameObject.name}");
-            return null;
-        }
     }
 }

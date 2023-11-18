@@ -21,11 +21,13 @@ Quality of life building mod that improves how terrain manipulation with the hoe
 - Camera zoom is blocked while modifying tool radius.
 
 ### Modifiable Tool Hardness
-- Lets you change the "hardness" of terrain tools using the scroll wheel. "Hardness" refers to how uniformly the effect is applied over the radius of the tool, so increasing the hardness will apply the effect more uniformly.
+- Lets you change the "hardness" of terrain tools using the scroll wheel. "Hardness" refers to how uniformly the effect is applied over the radius of the tool, so increasing the hardness will apply the effect more uniformly (see image for example of changing hardness for the Raise Ground tool).
 - Configurable hotkey to enable changing hardness.
 - Camera zoom is blocked while modifying tool hardness.
 
-### New Terrain Tools
+<img src="https://raw.githubusercontent.com/searica/TerrainTools/main/Media/HardnessDemo.png"></img>
+
+### New Hoe Tools
 - Adds a version of each terrain tool that doesn't affect the terrain height when used.
 - Adds square versions of all terrain tools that modify terrain according to the world grid (so you can enjoy clean edges).
 - Adds a precision raise ground tool that lets you set the exact height you want to raise the terrain by using the scroll wheel on your mouse.
@@ -34,12 +36,17 @@ Quality of life building mod that improves how terrain manipulation with the hoe
 #### Hoe
 <img src="https://raw.githubusercontent.com/searica/TerrainTools/main/Media/HoeTools.png"></img>
 
+### New Cultivator Tools
+- Adds a version of each terrain tool that doesn't affect the terrain height when used.
+- Adds square versions of all terrain tools that modify terrain according to the world grid (so you can enjoy clean edges).
+- Adds a precision raise ground tool that lets you set the exact height you want to raise the terrain by using the scroll wheel on your mouse.
+- Adds a remove terrain modifications tool that lets you reset terrain.
+
 #### Cultivator
 <img src="https://raw.githubusercontent.com/searica/TerrainTools/main/Media/CultivatorTools.png"></img>
 
 ## Instructions
 If you are using a mod manager for Thunderstore simply install the mod from there. If you are not using a mod manager then, you need a modded instance of Valheim (BepInEx) and the Jotunn plugin installed.
-
 
 ## Configuration
 Changes made to the configuration settings will be reflected in-game immediately (no restart required) and they will also sync to clients if the mod is on the server. The mod also has a built in file watcher so you can edit settings via an in-game configuration manager (changes applied upon closing the in-game configuration manager) or by changing values in the file via a text editor or mod manager.
@@ -67,7 +74,7 @@ Changes made to the configuration settings will be reflected in-game immediately
 - Scroll wheel change scale.
     - Acceptable values: (0.05, 2)
     - Default value: 0.1
-    
+
 **MaxRadius** [Synced with Server]
 - Maximum value that terrain tool radius can be increased to.
     - Acceptable values: (4, 20)
@@ -89,7 +96,7 @@ Changes made to the configuration settings will be reflected in-game immediately
 - Scroll wheel change scale.
     - Acceptable values: (0.05, 2)
     - Default value: 0.1
-    
+
 ### Tools Section:
 
 **HoverInfo**  [Synced with Server]

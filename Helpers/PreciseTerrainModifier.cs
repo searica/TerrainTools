@@ -120,7 +120,7 @@ namespace TerrainTools.Helpers
         {
             if (modifier?.gameObject == null) { return; }
 
-            if (modifier.gameObject.HasComponentInChildren<OverlayVisualizer>())
+            if (modifier.gameObject.GetComponentInChildren<OverlayVisualizer>())
             {
                 if (modifier.m_settings.m_smooth)
                 {

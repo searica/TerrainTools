@@ -40,7 +40,7 @@ namespace TerrainTools.Patches
             var selectedPiece = localPlayer?.GetSelectedPiece();
             if (selectedPiece?.gameObject != null)
             {
-                if (selectedPiece.gameObject.HasComponentInChildren<RaiseGroundOverlayVisualizer>() ||
+                if (selectedPiece.gameObject.GetComponentInChildren<RaiseGroundOverlayVisualizer>() ||
                     RadiusModifier.ShouldModifyRadius() ||
                     HardnessModifier.ShouldModifyHardness())
                 {
