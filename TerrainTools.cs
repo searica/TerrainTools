@@ -63,8 +63,6 @@ namespace TerrainTools
         /// </summary>
         private static readonly Dictionary<string, ConfigEntry<bool>> ToolConfigEntries = new();
 
-        private static bool UpdatePlugin = false;
-
         internal static bool IsToolEnabled(string toolName)
         {
             if (ToolConfigEntries.TryGetValue(toolName, out ConfigEntry<bool> configEntry))
@@ -126,8 +124,7 @@ namespace TerrainTools
             {
                 if (UpdatePlugin)
                 {
-                    InitManager.UpdateTools();
-                    InitManager.UpdateShovelRecipe();
+                    InitManager.UpdatePlugin();
                     UpdatePlugin = false;
                 }
             };
@@ -137,10 +134,7 @@ namespace TerrainTools
             {
                 if (UpdatePlugin)
                 {
-                    InitManager.UpdateTools();
-                    InitManager.UpdateShovelRecipe();
-                    ConfigManager.Save();
-                    UpdatePlugin = false;
+                    InitManager.UpdatePlugin();
                 }
             };
 
@@ -149,9 +143,7 @@ namespace TerrainTools
             {
                 if (UpdatePlugin)
                 {
-                    InitManager.UpdateTools();
-                    InitManager.UpdateShovelRecipe();
-                    ConfigManager.Save();
+                    InitManager.UpdatePlugin();
                     UpdatePlugin = false;
                 }
             };

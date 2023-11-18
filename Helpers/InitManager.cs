@@ -91,9 +91,20 @@ namespace TerrainTools.Helpers
         }
 
         /// <summary>
+        ///     Updates which tools are enabled/disabled and which items are enabled/disabled.
+        /// </summary>
+        internal static void UpdatePlugin()
+        {
+            UpdateTools();
+            UpdateShovelRecipe();
+            ConfigManager.Save();
+            TerrainTools.UpdatePlugin = false;
+        }
+
+        /// <summary>
         ///     Updates which tools are enabled/disabled to add/remove them from piece tables.
         /// </summary>
-        internal static void UpdateTools()
+        private static void UpdateTools()
         {
             if (!HasInitialized) return;
 
@@ -109,7 +120,7 @@ namespace TerrainTools.Helpers
         /// <summary>
         ///     Updates the shovel recipe to be enabled/disabled based on corresponding config entry.
         /// </summary>
-        internal static void UpdateShovelRecipe()
+        private static void UpdateShovelRecipe()
         {
             if (Shovel.TryGetShovel(out CustomItem shovel))
             {
