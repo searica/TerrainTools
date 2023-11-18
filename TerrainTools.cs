@@ -6,6 +6,7 @@ using BepInEx.Logging;
 using HarmonyLib;
 using Jotunn.Managers;
 using Jotunn.Utils;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using TerrainTools.Configs;
@@ -27,15 +28,23 @@ namespace TerrainTools
 
         #region Section Names
 
-        private static readonly string MainSection = ConfigManager.SetStringPriority("Global", 3);
+        private static readonly string MainSection = ConfigManager.SetStringPriority("Global", 4);
 
-        private static readonly string RadiusSection = ConfigManager.SetStringPriority("Radius", 2);
-        private static readonly string HardnessSection = ConfigManager.SetStringPriority("Hardness", 1);
-        private static readonly string ToolsSection = ConfigManager.SetStringPriority("Tools", 0);
+        private static readonly string RadiusSection = ConfigManager.SetStringPriority("Radius", 3);
+        private static readonly string HardnessSection = ConfigManager.SetStringPriority("Hardness", 2);
+        private static readonly string ShovelSection = ConfigManager.SetStringPriority("Shovel", 1);
+        private static readonly string HoeSection = ConfigManager.SetStringPriority("Hoe", 0);
+
+        private static string GetSectionName(string pieceTable)
+        {
+            if (pieceTable == Shovel.ShovelPieceTable)
+            {
+                return ShovelSection;
+            }
+            return HoeSection;
+        }
 
         #endregion Section Names
-
-        // TODO: Add configs for Shovel!
 
         #region Tool Configs
 
@@ -47,7 +56,7 @@ namespace TerrainTools
         /// </summary>
         private static readonly Dictionary<string, ConfigEntry<bool>> ToolConfigEntries = new();
 
-        private static bool UpdateTools = false;
+        private static bool UpdatePlugin = false;
 
         internal static bool IsToolEnabled(string toolName)
         {
@@ -83,13 +92,10 @@ namespace TerrainTools
         internal static KeyCode HardnessKey => hardnessModKey.Value;
         internal static float HardnessScrollScale => hardnessScrollScale.Value;
 
-        //private static ConfigEntry<MessageHud.MessageType> hardnessMsgType;
-        //internal static MessageHud.MessageType HardnessMsgType => hardnessMsgType.Value;
-
         #endregion Hardness Configs
 
-        // Stretch Goal:
-        // - Add a shovel tool that lets you lower terrain
+        private static ConfigEntry<bool> enableShovel;
+        internal static bool IsShovelEnabled => enableShovel.Value;
 
         public void Awake()
         {
@@ -111,32 +117,35 @@ namespace TerrainTools
             // Update tools if config file reloaded
             ConfigManager.OnConfigFileReloaded += () =>
             {
-                if (UpdateTools)
+                if (UpdatePlugin)
                 {
-                    InitManager.UpdatePlugin();
-                    UpdateTools = false;
+                    InitManager.UpdateTools();
+                    InitManager.UpdateShovelRecipe();
+                    UpdatePlugin = false;
                 }
             };
 
             // Update tools if in-game config manager window is closed
             ConfigManager.OnConfigWindowClosed += () =>
             {
-                if (UpdateTools)
+                if (UpdatePlugin)
                 {
-                    InitManager.UpdatePlugin();
+                    InitManager.UpdateTools();
+                    InitManager.UpdateShovelRecipe();
                     ConfigManager.Save();
-                    UpdateTools = false;
+                    UpdatePlugin = false;
                 }
             };
 
             // Update tools if in-game config manager window is closed
             SynchronizationManager.OnConfigurationSynchronized += (obj, args) =>
             {
-                if (UpdateTools)
+                if (UpdatePlugin)
                 {
-                    InitManager.UpdatePlugin();
+                    InitManager.UpdateTools();
+                    InitManager.UpdateShovelRecipe();
                     ConfigManager.Save();
-                    UpdateTools = false;
+                    UpdatePlugin = false;
                 }
             };
         }
@@ -214,24 +223,46 @@ namespace TerrainTools
             );
 
             hoverInfoEnabled = ConfigManager.BindConfig(
-                ToolsSection,
+                HoeSection,
                 ConfigManager.SetStringPriority("HoverInfo", 1),
                 true,
                 "Set to true/enabled to show terrain height when using square terrain tools."
             );
 
+            enableShovel = ConfigManager.BindConfig(
+                ShovelSection,
+                ConfigManager.SetStringPriority("Shovel", 1),
+                true,
+                "Set to true/enabled to allow crafting the shovel. Setting to false/disabled " +
+                "will prevent crafting new shovels but will not affect existing shovels in the world."
+            );
+            enableShovel.SettingChanged += SetUpdatePlugin;
+
             foreach (var key in ToolConfigs.ToolConfigsMap.Keys)
             {
+                ToolDB toolDB = ToolConfigs.ToolConfigsMap[key];
+
                 var configEntry = ConfigManager.BindConfig(
-                    ToolsSection,
+                    GetSectionName(toolDB.pieceTable),
                     key,
                     true,
                     "Set to true/enabled to add this terrain tool. Set to false/disabled to remove it."
                 );
-                configEntry.SettingChanged += delegate { UpdateTools = !UpdateTools || UpdateTools; };
+                configEntry.SettingChanged += SetUpdatePlugin;
                 ToolConfigEntries.Add(key, configEntry);
             }
             ConfigManager.Save();
+        }
+
+        /// <summary>
+        ///     Event delegate to set flag that settings have been changed
+        ///     that require updating plugin.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="e"></param>
+        private static void SetUpdatePlugin(object obj, EventArgs e)
+        {
+            UpdatePlugin = !UpdatePlugin || UpdatePlugin;
         }
     }
 
