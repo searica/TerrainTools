@@ -51,7 +51,7 @@ Changes made to the configuration settings will be reflected in-game immediately
 
 <div class="header">
 	<h3>Global Section</h3>
-    These settings control the main features of the mod and how verbose it's output to the log is.
+    These settings control the global settings and how verbose the output to the log is.
 </div>
 <table>
 	<tbody>

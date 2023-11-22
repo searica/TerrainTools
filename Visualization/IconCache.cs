@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace TerrainTools.Visualization
 {
-    internal class IconCache
+    internal static class IconCache
     {
         private static Texture2D _remove;
         private static Texture2D _cross;

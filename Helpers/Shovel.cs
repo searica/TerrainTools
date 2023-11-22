@@ -7,7 +7,7 @@ using TerrainTools.Visualization;
 
 namespace TerrainTools.Helpers
 {
-    internal class Shovel
+    internal static class Shovel
     {
         private static bool HasBeenCreated = false;
         internal const string ShovelPrefabName = "ATM_Shovel";

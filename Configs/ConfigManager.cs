@@ -12,7 +12,7 @@ using UnityEngine.Rendering;
 
 namespace TerrainTools.Configs
 {
-    internal class ConfigManager
+    internal static class ConfigManager
     {
         private static string ConfigFileName;
         private static string ConfigFileFullPath;

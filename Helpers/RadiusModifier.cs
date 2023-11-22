@@ -6,7 +6,7 @@ using UnityEngine;
 namespace TerrainTools.Helpers
 {
     [HarmonyPatch]
-    internal class RadiusModifier
+    internal static class RadiusModifier
     {
         private static bool RadiusToolIsInUse = false;
         private static float lastOriginalRadius;

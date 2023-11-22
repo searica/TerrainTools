@@ -7,7 +7,7 @@ using TerrainTools.Visualization;
 namespace TerrainTools.Patches
 {
     [HarmonyPatch(typeof(GameCamera))]
-    internal class GameCameraPatch
+    internal static class GameCameraPatch
     {
         /// <summary>
         ///     Transpiler to allow blocking camera zoom based on selected piece

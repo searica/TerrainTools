@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace TerrainTools.Helpers
 {
-    internal class InitManager
+    internal static class InitManager
     {
         private static bool HasInitialized = false;
         internal static readonly Dictionary<string, GameObject> ToolRefs = new();

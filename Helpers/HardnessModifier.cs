@@ -7,7 +7,7 @@ using UnityEngine;
 namespace TerrainTools.Helpers
 {
     [HarmonyPatch]
-    internal class HardnessModifier
+    internal static class HardnessModifier
     {
         /* For Raise Power the effect over the tool radius is calculated as:
          * y = (1 - x/radius)^p where x is distance from center.
@@ -36,7 +36,7 @@ namespace TerrainTools.Helpers
         private static float lastDisplayedRaiseHardness;
 
         [HarmonyPatch(typeof(Player))]
-        internal class PlayerPatch
+        internal static class PlayerPatch
         {
             [HarmonyPrefix]
             [HarmonyPriority(Priority.LowerThanNormal)]
@@ -77,7 +77,7 @@ namespace TerrainTools.Helpers
         }
 
         [HarmonyPatch(typeof(TerrainOp))]
-        internal class TerrainOpPatch
+        internal static class TerrainOpPatch
         {
             [HarmonyPrefix]
             [HarmonyPriority(Priority.High)]
