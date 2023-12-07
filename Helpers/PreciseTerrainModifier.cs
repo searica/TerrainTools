@@ -1,14 +1,28 @@
 ﻿using HarmonyLib;
-using TerrainTools.Extensions;
 using TerrainTools.Visualization;
 using UnityEngine;
 
-namespace TerrainTools.Helpers
-{
+namespace TerrainTools.Helpers {
     [HarmonyPatch(typeof(TerrainComp))]
-    public static class PreciseTerrainModifier
-    {
+    public static class PreciseTerrainModifier {
         public const int SizeInTiles = 1;
+
+        /// <summary>
+        ///     Claim ownership before sending RPC to do terrain operation to
+        ///     ensure that custom terrain ops run on a PC with the mod.
+        /// </summary>
+        /// <param name="__instance"></param>
+        [HarmonyPrefix]
+        [HarmonyPatch(nameof(TerrainComp.RPC_ApplyOperation))]
+        private static void RPC_ApplyOperationPrefix(TerrainComp __instance) {
+            if (!__instance || !__instance.m_nview) {
+                return;
+            }
+
+            if (!__instance.m_nview.IsOwner()) {
+                __instance.m_nview.ClaimOwnership();
+            }
+        }
 
         [HarmonyPrefix]
         [HarmonyPatch(nameof(TerrainComp.InternalDoOperation))]
@@ -16,10 +30,8 @@ namespace TerrainTools.Helpers
             TerrainComp __instance,
             Vector3 pos,
             TerrainOp.Settings modifier
-        )
-        {
-            if (!modifier.m_level && !modifier.m_raise && !modifier.m_smooth && !modifier.m_paintCleared)
-            {
+        ) {
+            if (!modifier.m_level && !modifier.m_raise && !modifier.m_smooth && !modifier.m_paintCleared) {
                 RemoveTerrainModifications(
                     pos,
                     __instance.m_hmap,
@@ -42,10 +54,8 @@ namespace TerrainTools.Helpers
 
         [HarmonyPrefix]
         [HarmonyPatch(nameof(TerrainComp.SmoothTerrain))]
-        private static bool SmoothTerrianPrefix(TerrainComp __instance, Vector3 worldPos, float radius)
-        {
-            if (IsGridModeEnabled(radius))
-            {
+        private static bool SmoothTerrianPrefix(TerrainComp __instance, Vector3 worldPos, float radius) {
+            if (IsPrecisionModifier(radius)) {
                 SmoothenTerrain(
                     __instance,
                     worldPos,
@@ -56,18 +66,15 @@ namespace TerrainTools.Helpers
                 );
                 return false;
             }
-            else
-            {
+            else {
                 return true;
             }
         }
 
         [HarmonyPrefix]
         [HarmonyPatch(nameof(TerrainComp.RaiseTerrain))]
-        private static bool RaiseTerrainPrefix(TerrainComp __instance, Vector3 worldPos, float radius, float delta)
-        {
-            if (IsGridModeEnabled(radius))
-            {
+        private static bool RaiseTerrainPrefix(TerrainComp __instance, Vector3 worldPos, float radius, float delta) {
+            if (IsPrecisionModifier(radius)) {
                 RaiseTerrain(
                     __instance,
                     worldPos,
@@ -80,8 +87,7 @@ namespace TerrainTools.Helpers
                 );
                 return false;
             }
-            else
-            {
+            else {
                 return true;
             }
         }
@@ -93,10 +99,8 @@ namespace TerrainTools.Helpers
             Vector3 worldPos,
             float radius,
             TerrainModifier.PaintType paintType
-        )
-        {
-            if (IsGridModeEnabled(radius))
-            {
+        ) {
+            if (IsPrecisionModifier(radius)) {
                 RecolorTerrain(
                     worldPos,
                     paintType,
@@ -107,8 +111,7 @@ namespace TerrainTools.Helpers
                 );
                 return false;
             }
-            else
-            {
+            else {
                 return true;
             }
         }
@@ -116,31 +119,25 @@ namespace TerrainTools.Helpers
         // DIRTY HACK: bend the flow to our will with a hijacked "unused" variable. Thus is the life of the modder ;)
         [HarmonyPrefix]
         [HarmonyPatch(nameof(TerrainComp.ApplyOperation))]
-        private static void ClientSideGridModeOverride(TerrainOp modifier)
-        {
-            if (modifier?.gameObject == null) { return; }
+        private static void ClientSideGridModeOverride(TerrainOp terrainOp) {
+            if (!terrainOp || !terrainOp.gameObject) { return; }
 
-            if (modifier.gameObject.GetComponentInChildren<OverlayVisualizer>())
-            {
-                if (modifier.m_settings.m_smooth)
-                {
-                    modifier.m_settings.m_smoothRadius = float.NegativeInfinity;
+            if (terrainOp.gameObject.GetComponentInChildren<OverlayVisualizer>()) {
+                if (terrainOp.m_settings.m_smooth) {
+                    terrainOp.m_settings.m_smoothRadius = float.NegativeInfinity;
                 }
-                if (modifier.m_settings.m_raise && modifier.m_settings.m_raiseDelta >= 0)
-                {
-                    modifier.m_settings.m_raiseRadius = float.NegativeInfinity;
-                    modifier.m_settings.m_raiseDelta = GroundLevelSpinner.Value;
+                if (terrainOp.m_settings.m_raise && terrainOp.m_settings.m_raiseDelta >= 0) {
+                    terrainOp.m_settings.m_raiseRadius = float.NegativeInfinity;
+                    terrainOp.m_settings.m_raiseDelta = GroundLevelSpinner.Value;
                 }
-                if (modifier.m_settings.m_paintCleared)
-                {
-                    modifier.m_settings.m_paintRadius = float.NegativeInfinity;
+                if (terrainOp.m_settings.m_paintCleared) {
+                    terrainOp.m_settings.m_paintRadius = float.NegativeInfinity;
                 }
             }
         }
 
         // DIRTY HACK: This is surely how I will be remembered ;)
-        public static bool IsGridModeEnabled(float radius)
-        {
+        public static bool IsPrecisionModifier(float radius) {
             return radius == float.NegativeInfinity;
         }
 
@@ -151,8 +148,7 @@ namespace TerrainTools.Helpers
             int worldWidth,
             ref float[] smoothDelta,
             ref bool[] modifiedHeight
-        )
-        {
+        ) {
             Log.LogInfo("[INIT] Smooth Terrain Modification", LogLevel.Medium);
             var worldSize = worldWidth + 1;
             hMap.WorldToVertex(worldPos, out var xPos, out var yPos);
@@ -161,10 +157,8 @@ namespace TerrainTools.Helpers
 
             FindExtrema(xPos, worldSize, out var xMin, out var xMax);
             FindExtrema(yPos, worldSize, out var yMin, out var yMax);
-            for (var x = xMin; x <= xMax; x++)
-            {
-                for (var y = yMin; y <= yMax; y++)
-                {
+            for (var x = xMin; x <= xMax; x++) {
+                for (var y = yMin; y <= yMax; y++) {
                     var tileIndex = y * worldSize + x;
                     var tileH = hMap.GetHeight(x, y);
                     var deltaH = referenceH - tileH;
@@ -190,8 +184,7 @@ namespace TerrainTools.Helpers
             ref float[] levelDelta,
             ref float[] smoothDelta,
             ref bool[] modifiedHeight
-        )
-        {
+        ) {
             Log.LogInfo("[INIT] Raise Terrain Modification", LogLevel.Medium);
             var worldSize = worldWidth + 1;
             hMap.WorldToVertex(worldPos, out var xPos, out var yPos);
@@ -202,15 +195,12 @@ namespace TerrainTools.Helpers
             );
             FindExtrema(xPos, worldSize, out var xMin, out var xMax);
             FindExtrema(yPos, worldSize, out var yMin, out var yMax);
-            for (var x = xMin; x <= xMax; x++)
-            {
-                for (var y = yMin; y <= yMax; y++)
-                {
+            for (var x = xMin; x <= xMax; x++) {
+                for (var y = yMin; y <= yMax; y++) {
                     var tileIndex = y * worldSize + x;
                     var tileH = hMap.GetHeight(x, y);
                     var deltaH = referenceH - tileH;
-                    if (deltaH >= 0)
-                    {
+                    if (deltaH >= 0) {
                         var oldLevelDelta = levelDelta[tileIndex];
                         var oldSmoothDelta = smoothDelta[tileIndex];
                         var newLevelDelta = oldLevelDelta + oldSmoothDelta + deltaH;
@@ -230,8 +220,7 @@ namespace TerrainTools.Helpers
                             LogLevel.Medium
                         );
                     }
-                    else
-                    {
+                    else {
                         Log.LogInfo("Declined to process tile: deltaH < 0!", LogLevel.Medium);
                         Log.LogInfo($"tilePos: ({x}, {y}), tileH: {tileH}, deltaH: {deltaH}", LogLevel.Medium);
                     }
@@ -247,8 +236,7 @@ namespace TerrainTools.Helpers
             ref float[] levelDelta,
             ref float[] smoothDelta,
             ref bool[] modifiedHeight
-        )
-        {
+        ) {
             Log.LogInfo("[INIT] Remove Terrain Modifications", LogLevel.Medium);
 
             var worldSize = worldWidth + 1;
@@ -257,10 +245,8 @@ namespace TerrainTools.Helpers
 
             FindExtrema(xPos, worldSize, out var xMin, out var xMax);
             FindExtrema(yPos, worldSize, out var yMin, out var yMax);
-            for (var x = xMin; x <= xMax; x++)
-            {
-                for (var y = yMin; y <= yMax; y++)
-                {
+            for (var x = xMin; x <= xMax; x++) {
+                for (var y = yMin; y <= yMax; y++) {
                     var tileIndex = y * worldSize + x;
                     levelDelta[tileIndex] = 0;
                     smoothDelta[tileIndex] = 0;
@@ -278,8 +264,7 @@ namespace TerrainTools.Helpers
             int worldWidth,
             ref Color[] paintMask,
             ref bool[] modifiedPaint
-        )
-        {
+        ) {
             Log.LogInfo("[INIT] Color Terrain Modification", LogLevel.Medium);
             hMap.WorldToVertex(worldPos, out var xPos, out var yPos);
             Log.LogInfo($"worldPos: {worldPos}, vertexPos: ({xPos}, {yPos})", LogLevel.Medium);
@@ -288,10 +273,8 @@ namespace TerrainTools.Helpers
             var removeColor = tileColor == Color.black;
             FindExtrema(xPos, worldWidth, out var xMin, out var xMax);
             FindExtrema(yPos, worldWidth, out var yMin, out var yMax);
-            for (var x = xMin; x <= xMax; x++)
-            {
-                for (var y = yMin; y <= yMax; y++)
-                {
+            for (var x = xMin; x <= xMax; x++) {
+                for (var y = yMin; y <= yMax; y++) {
                     var tileIndex = y * worldWidth + x;
                     paintMask[tileIndex] = tileColor;
                     modifiedPaint[tileIndex] = !removeColor;
@@ -301,22 +284,19 @@ namespace TerrainTools.Helpers
             Log.LogInfo("[SUCCESS] Color Terrain Modification", LogLevel.Medium);
         }
 
-        public static Color ResolveColor(TerrainModifier.PaintType paintType)
-        {
+        public static Color ResolveColor(TerrainModifier.PaintType paintType) {
             if (paintType == TerrainModifier.PaintType.Dirt) { return Color.red; }
             if (paintType == TerrainModifier.PaintType.Paved) { return Color.blue; }
             if (paintType == TerrainModifier.PaintType.Cultivate) { return Color.green; }
             return Color.black;
         }
 
-        public static void FindExtrema(int x, int worldSize, out int xMin, out int xMax)
-        {
+        public static void FindExtrema(int x, int worldSize, out int xMin, out int xMax) {
             xMin = Mathf.Max(0, x - SizeInTiles);
             xMax = Mathf.Min(x + SizeInTiles, worldSize - 1);
         }
 
-        public static float RoundToTwoDecimals(float oldH, float oldDeltaH, float newDeltaH)
-        {
+        public static float RoundToTwoDecimals(float oldH, float oldDeltaH, float newDeltaH) {
             var newH = oldH - oldDeltaH + newDeltaH;
             var roundedNewH = Mathf.Round(newH * 100) / 100;
             var roundedNewDeltaH = roundedNewH - oldH + oldDeltaH;
