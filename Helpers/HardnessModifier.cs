@@ -63,7 +63,7 @@ namespace TerrainTools.Helpers {
             }
 
             if (ShouldModifyHardness()) {
-                SetPower(__instance, Input.mouseScrollDelta.y * TerrainTools.RadiusScrollScale);
+                SetPower(__instance, Input.mouseScrollDelta.y * TerrainTools.HardnessScrollScale);
             }
         }
 
