@@ -15,17 +15,15 @@ using TerrainTools.Extensions;
 using TerrainTools.Helpers;
 using UnityEngine;
 
-namespace TerrainTools
-{
+namespace TerrainTools {
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
     [BepInDependency(Jotunn.Main.ModGuid, Jotunn.Main.Version)]
     [NetworkCompatibility(CompatibilityLevel.VersionCheckOnly, VersionStrictness.Patch)]
-    internal sealed class TerrainTools : BaseUnityPlugin
-    {
+    internal sealed class TerrainTools : BaseUnityPlugin {
         internal const string Author = "Searica";
         public const string PluginName = "AdvancedTerrainModifiers";
         public const string PluginGUID = $"{Author}.Valheim.TerrainTools";
-        public const string PluginVersion = "1.2.0";
+        public const string PluginVersion = "1.2.1";
 
         #region Section Names
 
@@ -43,8 +41,7 @@ namespace TerrainTools
         /// </summary>
         /// <param name="pieceTable"></param>
         /// <returns></returns>
-        private static string GetSectionName(string pieceTable)
-        {
+        private static string GetSectionName(string pieceTable) {
             if (pieceTable == PieceTables.Hoe) { return HoeSection; }
             if (pieceTable == PieceTables.Cultivator) { return CultivatorSection; }
             if (pieceTable == Shovel.ShovelPieceTable) { return ShovelSection; }
@@ -63,10 +60,8 @@ namespace TerrainTools
         /// </summary>
         private static readonly Dictionary<string, ConfigEntry<bool>> ToolConfigEntries = new();
 
-        internal static bool IsToolEnabled(string toolName)
-        {
-            if (ToolConfigEntries.TryGetValue(toolName, out ConfigEntry<bool> configEntry))
-            {
+        internal static bool IsToolEnabled(string toolName) {
+            if (ToolConfigEntries.TryGetValue(toolName, out ConfigEntry<bool> configEntry)) {
                 if (configEntry != null) return configEntry.Value;
             }
             return false;
@@ -102,8 +97,7 @@ namespace TerrainTools
         private static ConfigEntry<bool> enableShovel;
         internal static bool IsShovelEnabled => enableShovel.Value;
 
-        public void Awake()
-        {
+        public void Awake() {
             Log.Init(Logger);
 
             ConfigManager.Init(PluginGUID, Config);
@@ -120,42 +114,34 @@ namespace TerrainTools
             ConfigManager.CheckForConfigManager();
 
             // Update tools if config file reloaded
-            ConfigManager.OnConfigFileReloaded += () =>
-            {
-                if (UpdatePlugin)
-                {
+            ConfigManager.OnConfigFileReloaded += () => {
+                if (UpdatePlugin) {
                     InitManager.UpdatePlugin();
                     UpdatePlugin = false;
                 }
             };
 
             // Update tools if in-game config manager window is closed
-            ConfigManager.OnConfigWindowClosed += () =>
-            {
-                if (UpdatePlugin)
-                {
+            ConfigManager.OnConfigWindowClosed += () => {
+                if (UpdatePlugin) {
                     InitManager.UpdatePlugin();
                 }
             };
 
             // Update tools if in-game config manager window is closed
-            SynchronizationManager.OnConfigurationSynchronized += (obj, args) =>
-            {
-                if (UpdatePlugin)
-                {
+            SynchronizationManager.OnConfigurationSynchronized += (obj, args) => {
+                if (UpdatePlugin) {
                     InitManager.UpdatePlugin();
                     UpdatePlugin = false;
                 }
             };
         }
 
-        public void OnDestroy()
-        {
+        public void OnDestroy() {
             ConfigManager.Save();
         }
 
-        internal static void SetUpConfigEntries()
-        {
+        internal static void SetUpConfigEntries() {
             Log.Verbosity = ConfigManager.BindConfig(
                 MainSection,
                 "Verbosity",
@@ -239,8 +225,7 @@ namespace TerrainTools
             );
             enableShovel.SettingChanged += SetUpdatePlugin;
 
-            foreach (var key in ToolConfigs.ToolConfigsMap.Keys)
-            {
+            foreach (var key in ToolConfigs.ToolConfigsMap.Keys) {
                 ToolDB toolDB = ToolConfigs.ToolConfigsMap[key];
 
                 var configEntry = ConfigManager.BindConfig(
@@ -261,8 +246,7 @@ namespace TerrainTools
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="e"></param>
-        private static void SetUpdatePlugin(object obj, EventArgs e)
-        {
+        private static void SetUpdatePlugin(object obj, EventArgs e) {
             UpdatePlugin = !UpdatePlugin || UpdatePlugin;
         }
     }
@@ -270,8 +254,7 @@ namespace TerrainTools
     /// <summary>
     ///     Log level to control output to BepInEx log
     /// </summary>
-    internal enum LogLevel
-    {
+    internal enum LogLevel {
         Low = 0,
         Medium = 1,
         High = 2,
@@ -280,8 +263,7 @@ namespace TerrainTools
     /// <summary>
     ///     Helper class for properly logging from static contexts.
     /// </summary>
-    internal static class Log
-    {
+    internal static class Log {
         #region Verbosity
 
         internal static ConfigEntry<LogLevel> Verbosity { get; set; }
@@ -291,8 +273,7 @@ namespace TerrainTools
 
         private static ManualLogSource logSource;
 
-        internal static void Init(ManualLogSource logSource)
-        {
+        internal static void Init(ManualLogSource logSource) {
             Log.logSource = logSource;
         }
 
@@ -306,48 +287,39 @@ namespace TerrainTools
 
         internal static void LogWarning(object data) => logSource.LogWarning(data);
 
-        internal static void LogInfo(object data, LogLevel level = LogLevel.Low)
-        {
-            if (Verbosity is null || VerbosityLevel >= level)
-            {
+        internal static void LogInfo(object data, LogLevel level = LogLevel.Low) {
+            if (Verbosity is null || VerbosityLevel >= level) {
                 logSource.LogInfo(data);
             }
         }
 
-        internal static void LogGameObject(GameObject prefab, bool includeChildren = false)
-        {
+        internal static void LogGameObject(GameObject prefab, bool includeChildren = false) {
             LogInfo("***** " + prefab.name + " *****");
-            foreach (Component compo in prefab.GetComponents<Component>())
-            {
+            foreach (Component compo in prefab.GetComponents<Component>()) {
                 LogComponent(compo);
             }
 
             if (!includeChildren) { return; }
 
             LogInfo("***** " + prefab.name + " (children) *****");
-            foreach (Transform child in prefab.transform)
-            {
+            foreach (Transform child in prefab.transform) {
                 LogInfo($" - {child.gameObject.name}");
-                foreach (Component compo in child.gameObject.GetComponents<Component>())
-                {
+                foreach (Component compo in child.gameObject.GetComponents<Component>()) {
                     LogComponent(compo);
                 }
             }
         }
 
-        internal static void LogComponent(Component compo)
-        {
+        internal static void LogComponent(Component compo) {
             LogInfo($"--- {compo.GetType().Name}: {compo.name} ---");
 
             PropertyInfo[] properties = compo.GetType().GetProperties(ReflectionUtils.AllBindings);
-            foreach (var property in properties)
-            {
+            foreach (var property in properties) {
                 LogInfo($" - {property.Name} = {property.GetValue(compo)}");
             }
 
             FieldInfo[] fields = compo.GetType().GetFields(ReflectionUtils.AllBindings);
-            foreach (var field in fields)
-            {
+            foreach (var field in fields) {
                 LogInfo($" - {field.Name} = {field.GetValue(compo)}");
             }
         }
