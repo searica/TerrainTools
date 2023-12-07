@@ -7,6 +7,28 @@ namespace TerrainTools.Helpers {
     public static class PreciseTerrainModifier {
         public const int SizeInTiles = 1;
 
+        [HarmonyPrefix]
+        [HarmonyPatch(nameof(TerrainComp.ApplyOperation))]
+        private static void ApplyOperationPrefix(TerrainOp modifier) {
+            if (!modifier || !modifier.gameObject) { return; }
+
+            // Set radius to -inf so I can check if custom overlay in later methods
+            if (modifier.gameObject.GetComponentInChildren<OverlayVisualizer>()) {
+                if (modifier.m_settings.m_smooth) {
+                    modifier.m_settings.m_smoothRadius = float.NegativeInfinity;
+                }
+                if (modifier.m_settings.m_raise && modifier.m_settings.m_raiseDelta >= 0) {
+                    modifier.m_settings.m_raiseRadius = float.NegativeInfinity;
+                    modifier.m_settings.m_raiseDelta = GroundLevelSpinner.Value;
+                }
+                if (modifier.m_settings.m_paintCleared) {
+                    modifier.m_settings.m_paintRadius = float.NegativeInfinity;
+                }
+
+                // could maybe claim ownership here?
+            }
+        }
+
         /// <summary>
         ///     Claim ownership before sending RPC to do terrain operation to
         ///     ensure that custom terrain ops run on a PC with the mod.
@@ -23,6 +45,16 @@ namespace TerrainTools.Helpers {
                 __instance.m_nview.ClaimOwnership();
             }
         }
+
+        /// <summary>
+        ///     Checks if radius is set as flag for precision modifier.
+        /// </summary>
+        /// <param name="radius"></param>
+        /// <returns></returns>
+        public static bool IsPrecisionModifier(float radius) {
+            return radius == float.NegativeInfinity;
+        }
+
 
         [HarmonyPrefix]
         [HarmonyPatch(nameof(TerrainComp.InternalDoOperation))]
@@ -114,31 +146,6 @@ namespace TerrainTools.Helpers {
             else {
                 return true;
             }
-        }
-
-        // DIRTY HACK: bend the flow to our will with a hijacked "unused" variable. Thus is the life of the modder ;)
-        [HarmonyPrefix]
-        [HarmonyPatch(nameof(TerrainComp.ApplyOperation))]
-        private static void ClientSideGridModeOverride(TerrainOp terrainOp) {
-            if (!terrainOp || !terrainOp.gameObject) { return; }
-
-            if (terrainOp.gameObject.GetComponentInChildren<OverlayVisualizer>()) {
-                if (terrainOp.m_settings.m_smooth) {
-                    terrainOp.m_settings.m_smoothRadius = float.NegativeInfinity;
-                }
-                if (terrainOp.m_settings.m_raise && terrainOp.m_settings.m_raiseDelta >= 0) {
-                    terrainOp.m_settings.m_raiseRadius = float.NegativeInfinity;
-                    terrainOp.m_settings.m_raiseDelta = GroundLevelSpinner.Value;
-                }
-                if (terrainOp.m_settings.m_paintCleared) {
-                    terrainOp.m_settings.m_paintRadius = float.NegativeInfinity;
-                }
-            }
-        }
-
-        // DIRTY HACK: This is surely how I will be remembered ;)
-        public static bool IsPrecisionModifier(float radius) {
-            return radius == float.NegativeInfinity;
         }
 
         public static void SmoothenTerrain(
