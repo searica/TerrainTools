@@ -22,12 +22,13 @@ namespace TerrainTools.Helpers
         {
             [HarmonyPrefix]
             [HarmonyPatch(nameof(Player.Update))]
-            private static void UpdatePrefix(Player __instance)
-            {
-                if (__instance == null || !__instance.InPlaceMode() || Hud.IsPieceSelectionVisible())
-                {
-                    if (RadiusToolIsInUse)
-                    {
+        private static void UpdatePrefix(Player __instance) {
+            if (!__instance || __instance != Player.m_localPlayer) {
+                return;
+            }
+
+            if (!__instance.InPlaceMode() || Hud.IsPieceSelectionVisible()) {
+                if (RadiusToolIsInUse) {
                         RadiusToolIsInUse = false;
                         lastOriginalRadius = 0;
                         lastModdedRadius = 0;

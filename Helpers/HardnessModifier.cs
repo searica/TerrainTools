@@ -42,11 +42,12 @@ namespace TerrainTools.Helpers
             [HarmonyPriority(Priority.LowerThanNormal)]
             [HarmonyPatch(nameof(Player.Update))]
             private static void UpdatePrefix(Player __instance)
-            {
-                if (__instance == null || !__instance.InPlaceMode() || Hud.IsPieceSelectionVisible())
-                {
-                    if (SmoothToolIsInUse)
-                    {
+            if (!__instance || __instance != Player.m_localPlayer) {
+                return;
+            }
+
+            if (!__instance.InPlaceMode() || Hud.IsPieceSelectionVisible()) {
+                if (SmoothToolIsInUse) {
                         SmoothToolIsInUse = false;
                         lastModdedSmoothPwr = 0;
                         lastTotalSmoothDelta = 0;
