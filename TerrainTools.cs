@@ -62,7 +62,7 @@ namespace TerrainTools {
 
         internal static bool IsToolEnabled(string toolName) {
             if (ToolConfigEntries.TryGetValue(toolName, out ConfigEntry<bool> configEntry)) {
-                if (configEntry != null) return configEntry.Value;
+                return configEntry != null && configEntry.Value;
             }
             return false;
         }
