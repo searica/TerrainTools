@@ -77,7 +77,9 @@ namespace TerrainTools.Helpers {
         [HarmonyPriority(Priority.High)]
         [HarmonyPatch(typeof(TerrainOp), nameof(TerrainOp.Awake))]
         private static void AwakePrefix(TerrainOp __instance) {
-            if (__instance is null || __instance.gameObject is null || __instance.gameObject.GetComponent<OverlayVisualizer>()) {
+            if (!__instance ||
+                !__instance.gameObject ||
+                __instance.gameObject.GetComponent<OverlayVisualizer>()) {
                 return;
             }
 
@@ -94,12 +96,12 @@ namespace TerrainTools.Helpers {
 
         private static void SetPower(Player player, float delta) {
             var piece = player.GetSelectedPiece();
-            if (piece is null || piece.gameObject is null || piece.gameObject.GetComponent<OverlayVisualizer>()) {
+            if (!piece || !piece.gameObject || piece.gameObject.GetComponent<OverlayVisualizer>()) {
                 return;
             }
 
             var terrainOp = piece.gameObject.GetComponent<TerrainOp>();
-            if (terrainOp == null) { return; }
+            if (!terrainOp) { return; }
 
             SetSmoothPower(terrainOp, delta);
             SetRaisePower(terrainOp, delta);
@@ -120,7 +122,7 @@ namespace TerrainTools.Helpers {
                 }
             }
             if (SmoothToolIsInUse || RaiseToolIsInUse) {
-                var toolIcon = player.m_placementGhost?.GetComponent<Piece>()?.m_icon;
+                var toolIcon = player.m_placementGhost.GetComponent<Piece>().m_icon;
                 if (toolIcon != null && updateMsg.Count > 0) {
                     player.Message(MessageHud.MessageType.Center, string.Join("\n", updateMsg.ToArray()), icon: toolIcon);
                 }

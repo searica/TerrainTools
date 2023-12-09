@@ -54,7 +54,9 @@ namespace TerrainTools.Helpers {
         [HarmonyPriority(Priority.VeryHigh)]
         [HarmonyPatch(typeof(TerrainOp), nameof(TerrainOp.Awake))]
         private static void AwakePrefix(TerrainOp __instance) {
-            if (__instance is null || __instance.gameObject is null || __instance.gameObject.GetComponent<OverlayVisualizer>()) {
+            if (!__instance ||
+                !__instance.gameObject ||
+                __instance.gameObject.GetComponent<OverlayVisualizer>()) {
                 return;
             }
 
@@ -84,13 +86,13 @@ namespace TerrainTools.Helpers {
         }
 
         private static void SetRadius(Player player, float delta) {
-            var piece = player?.GetSelectedPiece();
-            if (piece is null || piece.gameObject is null || piece.gameObject.GetComponent<OverlayVisualizer>()) {
+            var piece = player.GetSelectedPiece();
+            if (!piece || !piece.gameObject || piece.gameObject.GetComponent<OverlayVisualizer>()) {
                 return;
             }
 
             var terrainOp = piece.gameObject.GetComponent<TerrainOp>();
-            if (terrainOp == null) { return; }
+            if (!terrainOp) { return; }
 
             Log.LogInfo($"Adjusting radius by {delta}", LogLevel.High);
 
@@ -117,17 +119,18 @@ namespace TerrainTools.Helpers {
 
         private static void RefreshGhostScale(Player player) {
             if (RadiusToolIsInUse) {
-                var ghost = player?.m_placementGhost?.transform.Find("_GhostOnly")?.gameObject;
-                if (ghost == null) { return; }
+                var ghost = player.m_placementGhost.transform.Find("_GhostOnly").gameObject;
+                if (!ghost) { return; }
 
                 // handle pieces like path_v2 that have the particle effect nested in a child of _GhostOnly
-                var particleEffect = ghost.GetComponentInChildren<ParticleSystem>()?.gameObject;
-                if (particleEffect != null && lastGhostScale != Vector3.zero) {
-                    if (Vector3.Distance(particleEffect.transform.localScale, lastGhostScale) > Tolerance) {
-                        Log.LogInfo($"Adjusting ghost scale to {lastModdedRadius / lastOriginalRadius}x", LogLevel.High);
-                        particleEffect.transform.localScale = lastGhostScale;
-                    }
+                var particleEffect = ghost.GetComponentInChildren<ParticleSystem>();
+                if (particleEffect &&
+                    lastGhostScale != Vector3.zero &&
+                    Vector3.Distance(particleEffect.transform.localScale, lastGhostScale) > Tolerance) {
+                    Log.LogInfo($"Adjusting ghost scale to {lastGhostScale}x", LogLevel.High);
+                    particleEffect.transform.localScale = lastGhostScale;
                 }
+
             }
         }
 
