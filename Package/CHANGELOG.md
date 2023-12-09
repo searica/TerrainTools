@@ -7,6 +7,17 @@
 		<tr>
 			<td align="center">1.2.0</td>
 			<td align="left">
+				<ul>
+					<li>Minor performance optimizations.</li>
+					<li>Fixed bug where radius couldn't be changed under specific conditions in multiplayer.</li>
+					<li>Fixed bug where hardness scroll rate was being ignored.</li>
+					<li>Hopefully fixed bug where the reset terrain tool would sometimes not work in multiplayer if not all players had the mod.</li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td align="center">1.2.0</td>
+			<td align="left">
 				<b>Update Info</b>
 				<ul>
 					<li>Changed configuration file format to handle the new tool. <b>You need to regenerate your config file.</b></li>

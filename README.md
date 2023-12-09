@@ -308,6 +308,7 @@ If you like this mod you might like some of my other ones.
 #### Building Mods
 - [More Vanilla Build Prefabs](https://valheim.thunderstore.io/package/Searica/More_Vanilla_Build_Prefabs/)
 - [Extra Snap Points Made Easy](https://valheim.thunderstore.io/package/Searica/Extra_Snap_Points_Made_Easy/)
+- [ToolTweaks](https://valheim.thunderstore.io/package/Searica/ToolTweaks/)
 - [BuildRestrictionTweaksSync](https://valheim.thunderstore.io/package/Searica/BuildRestrictionTweaksSync/)
 
 #### Gameplay Mods
