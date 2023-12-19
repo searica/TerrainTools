@@ -107,7 +107,7 @@ Changes made to the configuration settings will be reflected in-game immediately
 		</tr>
         </tr>
 			<td align="center"><b>RadiusModKey</b></td>
-            <td align="center">Yes</td>
+            <td align="center">No</td>
 			<td align="left">
                 Modifier key that must be held down when using scroll wheel to change the radius of terrain tools.
 				<ul>
@@ -118,7 +118,7 @@ Changes made to the configuration settings will be reflected in-game immediately
 		</tr>
         </tr>
 			<td align="center"><b>RadiusScrollScale</b></td>
-            <td align="center">Yes</td>
+            <td align="center">No</td>
 			<td align="left">
                 Scroll wheel change scale, larger magnitude means the radius will change faster and negative sign will reverse the direction you need to scroll to increase the radius.
 				<ul>
@@ -165,7 +165,7 @@ Changes made to the configuration settings will be reflected in-game immediately
 		</tr>
         </tr>
 			<td align="center"><b>HardnessModKey</b></td>
-            <td align="center">Yes</td>
+            <td align="center">No</td>
 			<td align="left">
                 Modifier key that must be held down when using scroll wheel to change the hardness of terrain tools.
 				<ul>
@@ -176,7 +176,7 @@ Changes made to the configuration settings will be reflected in-game immediately
 		</tr>
         </tr>
 			<td align="center"><b>HardnessScrollScale</b></td>
-            <td align="center">Yes</td>
+            <td align="center">No</td>
 			<td align="left">
                 Scroll wheel change scale, larger magnitude means the hardness will change faster and negative sign will reverse the direction you need to scroll to increase the hardness.
 				<ul>
