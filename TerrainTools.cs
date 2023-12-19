@@ -23,7 +23,7 @@ namespace TerrainTools {
         internal const string Author = "Searica";
         public const string PluginName = "AdvancedTerrainModifiers";
         public const string PluginGUID = $"{Author}.Valheim.TerrainTools";
-        public const string PluginVersion = "1.2.1";
+        public const string PluginVersion = "1.2.2";
 
         #region Section Names
 
@@ -171,7 +171,8 @@ namespace TerrainTools {
                 RadiusSection,
                 "RadiusModKey",
                 KeyCode.LeftAlt,
-                "Modifier key that must be held down when using scroll wheel to change the radius of terrain tools."
+                "Modifier key that must be held down when using scroll wheel to change the radius of terrain tools.",
+                synced: false
             );
 
             radiusScrollScale = ConfigManager.BindConfig(
@@ -180,7 +181,8 @@ namespace TerrainTools {
                 0.1f,
                 "Scroll wheel change scale, larger magnitude means the radius will change " +
                 "faster and negative sign will reverse the direction you need to scroll to increase the radius.",
-                new AcceptableValueRange<float>(-1f, 1f)
+                new AcceptableValueRange<float>(-1f, 1f),
+                synced: false
             );
 
             maxRadius = ConfigManager.BindConfig(
@@ -204,7 +206,8 @@ namespace TerrainTools {
                 HardnessSection,
                 "HardnessModKey",
                 KeyCode.LeftControl,
-                "Modifier key that must be held down when using scroll wheel to change the hardness of terrain tools."
+                "Modifier key that must be held down when using scroll wheel to change the hardness of terrain tools.",
+                synced: false
             );
 
             hardnessScrollScale = ConfigManager.BindConfig(
@@ -213,7 +216,8 @@ namespace TerrainTools {
                 0.1f,
                 "Scroll wheel change scale, larger magnitude means the hardness will change " +
                 "faster and negative sign will reverse the direction you need to scroll to increase the hardness.",
-                new AcceptableValueRange<float>(-1f, 1f)
+                new AcceptableValueRange<float>(-1f, 1f),
+                synced: false
             );
 
             enableShovel = ConfigManager.BindConfig(
