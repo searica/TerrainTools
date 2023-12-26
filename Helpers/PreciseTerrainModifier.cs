@@ -62,22 +62,8 @@ namespace TerrainTools.Helpers {
             TerrainOp.Settings modifier
         ) {
             if (!modifier.m_level && !modifier.m_raise && !modifier.m_smooth && !modifier.m_paintCleared) {
-                RemoveTerrainModifications(
-                    pos,
-                    __instance.m_hmap,
-                    __instance.m_width,
-                    ref __instance.m_levelDelta,
-                    ref __instance.m_smoothDelta,
-                    ref __instance.m_modifiedHeight
-                );
-                RecolorTerrain(
-                    pos,
-                    TerrainModifier.PaintType.Reset,
-                    __instance.m_hmap,
-                    __instance.m_width,
-                    ref __instance.m_paintMask,
-                    ref __instance.m_modifiedPaint
-                );
+                RemoveTerrainModifications(__instance, pos);
+                PreciseRecolorTerrain(__instance, pos, TerrainModifier.PaintType.Reset);
             }
             return true;
         }
