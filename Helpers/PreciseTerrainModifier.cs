@@ -131,18 +131,18 @@ namespace TerrainTools.Helpers {
                     if (delta >= 0f) {
                         if (targetHeight < tileHeight) {
                             continue;
-                    }
+                        }
                         if (targetHeight > tileHeight + delta) {
                             targetHeight = tileHeight + delta;
+                        }
                     }
-                }
 
                     var tileIndex = j * worldSize + i;
                     __instance.m_levelDelta[tileIndex] += targetHeight - tileHeight + __instance.m_smoothDelta[tileIndex];
                     __instance.m_smoothDelta[tileIndex] = 0f;
                     __instance.m_levelDelta[tileIndex] = Mathf.Clamp(__instance.m_levelDelta[tileIndex], -8f, 8f);
                     __instance.m_modifiedHeight[tileIndex] = true;
-            }
+                }
             }
             Log.LogInfo("[SUCCESS] Raise Terrain Modification", LogLevel.Medium);
 
