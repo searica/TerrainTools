@@ -5,7 +5,7 @@ using UnityEngine;
 namespace TerrainTools.Helpers {
     [HarmonyPatch(typeof(TerrainComp))]
     public static class PreciseTerrainModifier {
-        public const int SizeInTiles = 1;
+        public const int FixedRadius = 1;
 
         [HarmonyPrefix]
         [HarmonyPatch(nameof(TerrainComp.ApplyOperation))]
@@ -308,20 +308,8 @@ namespace TerrainTools.Helpers {
         }
 
         public static void FindExtrema(int x, int worldSize, out int xMin, out int xMax) {
-            xMin = Mathf.Max(0, x - SizeInTiles);
-            xMax = Mathf.Min(x + SizeInTiles, worldSize - 1);
-        }
-
-        public static float RoundToTwoDecimals(float oldH, float oldDeltaH, float newDeltaH) {
-            var newH = oldH - oldDeltaH + newDeltaH;
-            var roundedNewH = Mathf.Round(newH * 100) / 100;
-            var roundedNewDeltaH = roundedNewH - oldH + oldDeltaH;
-            Log.LogInfo(
-                $"oldH: {oldH}, oldDeltaH: {oldDeltaH}, newDeltaH: {newDeltaH}, newH: {newH}, roundedNewH: {roundedNewH}, roundedNewDeltaH: {roundedNewDeltaH}",
-                LogLevel.Medium
-            );
-
-            return roundedNewDeltaH;
+            xMin = Mathf.Max(0, x - FixedRadius);
+            xMax = Mathf.Min(x + FixedRadius, worldSize - 1);
         }
     }
 }
