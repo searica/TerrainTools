@@ -24,8 +24,6 @@ namespace TerrainTools.Helpers {
                 if (modifier.m_settings.m_paintCleared) {
                     modifier.m_settings.m_paintRadius = float.NegativeInfinity;
                 }
-
-                // could maybe claim ownership here?
             }
         }
 
