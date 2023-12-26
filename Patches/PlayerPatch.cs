@@ -13,7 +13,7 @@ namespace TerrainTools.Patches {
     internal class PlayerPatch {
 
         [HarmonyFinalizer]
-        [HarmonyPatch(nameof(Player.UpdatePlacementGhost))]
+        [HarmonyPatch(typeof(Player), nameof(Player.UpdatePlacementGhost))]
         private static void UpdatePlacementGhostPostfix(Player __instance) {
             if (!__instance || !__instance.InPlaceMode() || __instance.IsDead()) {
                 return;
@@ -23,17 +23,9 @@ namespace TerrainTools.Patches {
                 return;
             }
 
-
             var position = __instance.m_placementGhost.transform.position;
-            position.x = RoundToNearest(position.x, 0.5f);
-            position.z = RoundToNearest(position.z, 0.5f);
-            // Snaps center of piece to the ground, which is not what I want
-            //Log.LogInfo($"Pre ground snap {position}");
-            //var groundHeight = GetGroundHeight(position);
-            //if (position.y != groundHeight) { position.y = groundHeight; }
-            //Log.LogInfo($"Post ground snap {position}");
-            //if (Mathf.Abs(position.y - groundHeight) < 0.25f) { position.y = groundHeight; }
-
+            position.x = RoundToNearest(position.x, 1.0f);
+            position.z = RoundToNearest(position.z, 1.0f);
             __instance.m_placementGhost.transform.position = position;
         }
 
