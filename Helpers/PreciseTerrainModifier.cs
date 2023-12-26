@@ -291,11 +291,20 @@ namespace TerrainTools.Helpers {
             Log.LogInfo("[SUCCESS] Color Terrain Modification", LogLevel.Medium);
         }
 
-        public static Color ResolveColor(TerrainModifier.PaintType paintType) {
-            if (paintType == TerrainModifier.PaintType.Dirt) { return Color.red; }
-            if (paintType == TerrainModifier.PaintType.Paved) { return Color.blue; }
-            if (paintType == TerrainModifier.PaintType.Cultivate) { return Color.green; }
-            return Color.black;
+        public static UnityEngine.Color ResolveColor(TerrainModifier.PaintType paintType) {
+            switch (paintType) {
+                case TerrainModifier.PaintType.Dirt:
+                    return Heightmap.m_paintMaskDirt;
+                case TerrainModifier.PaintType.Cultivate:
+                    return Heightmap.m_paintMaskCultivated;
+                case TerrainModifier.PaintType.Paved:
+                    return Heightmap.m_paintMaskPaved;
+                case TerrainModifier.PaintType.Reset:
+                    return Heightmap.m_paintMaskNothing;
+                default:
+                    break;
+            }
+            return Heightmap.m_paintMaskNothing;
         }
 
         public static void FindExtrema(int x, int worldSize, out int xMin, out int xMax) {
