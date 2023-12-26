@@ -70,154 +70,83 @@ namespace TerrainTools.Helpers {
 
         [HarmonyPrefix]
         [HarmonyPatch(nameof(TerrainComp.SmoothTerrain))]
-        private static bool SmoothTerrianPrefix(TerrainComp __instance, Vector3 worldPos, float radius) {
-            if (IsPrecisionModifier(radius)) {
-                SmoothenTerrain(
-                    __instance,
-                    worldPos,
-                    __instance.m_hmap,
-                    __instance.m_width,
-                    ref __instance.m_smoothDelta,
-                    ref __instance.m_modifiedHeight
-                );
-                return false;
-            }
-            else {
+        private static bool PreciseSmoothTerrian(TerrainComp __instance, Vector3 worldPos, float radius) {
+            if (!IsPrecisionModifier(radius)) {
                 return true;
             }
+
+            Log.LogInfo("PreciseSmoothTerrain", LogLevel.Medium);
+            var worldSize = __instance.m_hmap.m_width + 1;
+            __instance.m_hmap.WorldToVertex(worldPos, out var xPos, out var yPos);
+            var refHeight = worldPos.y - __instance.transform.position.y;
+            Log.LogInfo($"worldPos: {worldPos}, xPos: {xPos}, yPos: {yPos}, referenceH: {refHeight}", LogLevel.Medium);
+
+            FindExtrema(xPos, worldSize, out var xMin, out var xMax);
+            FindExtrema(yPos, worldSize, out var yMin, out var yMax);
+
+            for (var i = xMin; i <= xMax; i++) {
+                for (var j = yMin; j <= yMax; j++) {
+                    var tileIndex = j * worldSize + i;
+                    var tileHeight = __instance.m_hmap.GetHeight(i, j);
+                    var deltaHeight = refHeight - tileHeight;
+                    var oldSmoothDelta = __instance.m_smoothDelta[tileIndex];
+                    __instance.m_smoothDelta[tileIndex] = Mathf.Clamp(oldSmoothDelta + deltaHeight, -1.0f, 1.0f);
+                    __instance.m_modifiedHeight[tileIndex] = true;
+
+                    Log.LogInfo($"tilePos: ({i}, {j}), tileH: {tileHeight}, deltaH: {deltaHeight}, oldSmoothDelta: {oldSmoothDelta}, newSmoothDelta {__instance.m_smoothDelta[tileIndex]}", LogLevel.Medium);
+                }
+            }
+            Log.LogInfo("[SUCCESS] Smooth Terrain Modification", LogLevel.Medium);
+
+            return false;
         }
 
         [HarmonyPrefix]
         [HarmonyPatch(nameof(TerrainComp.RaiseTerrain))]
         private static bool RaiseTerrainPrefix(TerrainComp __instance, Vector3 worldPos, float radius, float delta) {
-            if (IsPrecisionModifier(radius)) {
-                RaiseTerrain(
-                    __instance,
-                    worldPos,
-                    __instance.m_hmap,
-                    __instance.m_width,
-                    delta,
-                    ref __instance.m_levelDelta,
-                    ref __instance.m_smoothDelta,
-                    ref __instance.m_modifiedHeight
-                );
-                return false;
-            }
-            else {
+            if (!IsPrecisionModifier(radius)) {
                 return true;
             }
-        }
-
-        [HarmonyPrefix]
-        [HarmonyPatch(nameof(TerrainComp.PaintCleared))]
-        private static bool PreciseColorModificaton(
-            TerrainComp __instance,
-            Vector3 worldPos,
-            float radius,
-            TerrainModifier.PaintType paintType
-        ) {
-            if (IsPrecisionModifier(radius)) {
-                RecolorTerrain(
-                    worldPos,
-                    paintType,
-                    __instance.m_hmap,
-                    __instance.m_width,
-                    ref __instance.m_paintMask,
-                    ref __instance.m_modifiedPaint
-                );
-                return false;
-            }
-            else {
-                return true;
-            }
-        }
-
-        public static void SmoothenTerrain(
-            TerrainComp compiler,
-            Vector3 worldPos,
-            Heightmap hMap,
-            int worldWidth,
-            ref float[] smoothDelta,
-            ref bool[] modifiedHeight
-        ) {
-            Log.LogInfo("[INIT] Smooth Terrain Modification", LogLevel.Medium);
-            var worldSize = worldWidth + 1;
-            hMap.WorldToVertex(worldPos, out var xPos, out var yPos);
-            var referenceH = worldPos.y - compiler.transform.position.y;
-            Log.LogInfo($"worldPos: {worldPos}, xPos: {xPos}, yPos: {yPos}, referenceH: {referenceH}", LogLevel.Medium);
-
-            FindExtrema(xPos, worldSize, out var xMin, out var xMax);
-            FindExtrema(yPos, worldSize, out var yMin, out var yMax);
-            for (var x = xMin; x <= xMax; x++) {
-                for (var y = yMin; y <= yMax; y++) {
-                    var tileIndex = y * worldSize + x;
-                    var tileH = hMap.GetHeight(x, y);
-                    var deltaH = referenceH - tileH;
-                    var oldDeltaH = smoothDelta[tileIndex];
-                    var newDeltaH = oldDeltaH + deltaH;
-                    var roundedNewDeltaH = RoundToTwoDecimals(tileH, oldDeltaH, newDeltaH);
-                    var limDeltaH = Mathf.Clamp(roundedNewDeltaH, -1.0f, 1.0f);
-                    smoothDelta[tileIndex] = limDeltaH;
-                    modifiedHeight[tileIndex] = true;
-
-                    Log.LogInfo($"tilePos: ({x}, {y}), tileH: {tileH}, deltaH: {deltaH}, oldDeltaH: {oldDeltaH}, newDeltaH: {newDeltaH}, roundedNewDeltaH: {roundedNewDeltaH}, limDeltaH: {limDeltaH}", LogLevel.Medium);
-                }
-            }
-            Log.LogInfo("[SUCCESS] Smooth Terrain Modification", LogLevel.Medium);
-        }
-
-        public static void RaiseTerrain(
-            TerrainComp compiler,
-            Vector3 worldPos,
-            Heightmap hMap,
-            int worldWidth,
-            float power,
-            ref float[] levelDelta,
-            ref float[] smoothDelta,
-            ref bool[] modifiedHeight
-        ) {
             Log.LogInfo("[INIT] Raise Terrain Modification", LogLevel.Medium);
-            var worldSize = worldWidth + 1;
-            hMap.WorldToVertex(worldPos, out var xPos, out var yPos);
-            var referenceH = worldPos.y - compiler.transform.position.y + power;
+            var worldSize = __instance.m_width + 1;
+            __instance.m_hmap.WorldToVertex(worldPos, out var xPos, out var yPos);
+            var refHeight = worldPos.y - __instance.transform.position.y;
             Log.LogInfo(
-                $"worldPos: {worldPos}, xPos: {xPos}, yPos: {yPos}, power: {power}, referenceH: {referenceH}",
+                $"worldPos: {worldPos}, xPos: {xPos}, yPos: {yPos}, delta: {delta}, refHeight: {refHeight}",
                 LogLevel.Medium
             );
+
             FindExtrema(xPos, worldSize, out var xMin, out var xMax);
             FindExtrema(yPos, worldSize, out var yMin, out var yMax);
-            for (var x = xMin; x <= xMax; x++) {
-                for (var y = yMin; y <= yMax; y++) {
-                    var tileIndex = y * worldSize + x;
-                    var tileH = hMap.GetHeight(x, y);
-                    var deltaH = referenceH - tileH;
-                    if (deltaH >= 0) {
-                        var oldLevelDelta = levelDelta[tileIndex];
-                        var oldSmoothDelta = smoothDelta[tileIndex];
-                        var newLevelDelta = oldLevelDelta + oldSmoothDelta + deltaH;
-                        var newSmoothDelta = 0f;
-                        var roundedNewLevelDelta = RoundToTwoDecimals(
-                            tileH,
-                            oldLevelDelta + oldSmoothDelta,
-                            newLevelDelta + newSmoothDelta
-                        );
-                        var limitedNewLevelDelta = Mathf.Clamp(roundedNewLevelDelta, -16.0f, 16.0f);
-                        levelDelta[tileIndex] = limitedNewLevelDelta;
-                        smoothDelta[tileIndex] = newSmoothDelta;
-                        modifiedHeight[tileIndex] = true;
 
-                        Log.LogInfo(
-                            $"tilePos: ({x}, {y}), tileH: {tileH}, deltaH: {deltaH}, oldLevelDelta: {oldLevelDelta}, oldSmoothDelta: {oldSmoothDelta}, newLevelDelta: {newLevelDelta}, newSmoothDelta: {newSmoothDelta}, roundedNewLevelDelta: {roundedNewLevelDelta}, limitedNewLevelDelta: {limitedNewLevelDelta}",
-                            LogLevel.Medium
-                        );
+            for (var i = xMin; i <= xMax; i++) {
+                for (var j = yMin; j <= yMax; j++) {
+                    var tileHeight = __instance.m_hmap.GetHeight(i, j);
+                    var targetHeight = refHeight + delta;
+
+                    if (delta < 0f && targetHeight > tileHeight) {
+                        continue;
                     }
-                    else {
-                        Log.LogInfo("Declined to process tile: deltaH < 0!", LogLevel.Medium);
-                        Log.LogInfo($"tilePos: ({x}, {y}), tileH: {tileH}, deltaH: {deltaH}", LogLevel.Medium);
+
+                    if (delta >= 0f) {
+                        if (targetHeight < tileHeight) {
+                            continue;
+                    }
+                        if (targetHeight > tileHeight + delta) {
+                            targetHeight = tileHeight + delta;
                     }
                 }
+
+                    var tileIndex = j * worldSize + i;
+                    __instance.m_levelDelta[tileIndex] += targetHeight - tileHeight + __instance.m_smoothDelta[tileIndex];
+                    __instance.m_smoothDelta[tileIndex] = 0f;
+                    __instance.m_levelDelta[tileIndex] = Mathf.Clamp(__instance.m_levelDelta[tileIndex], -8f, 8f);
+                    __instance.m_modifiedHeight[tileIndex] = true;
+            }
             }
             Log.LogInfo("[SUCCESS] Raise Terrain Modification", LogLevel.Medium);
+
+            return false;
         }
 
         public static void RemoveTerrainModifications(
