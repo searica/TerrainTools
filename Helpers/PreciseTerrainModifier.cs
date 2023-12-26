@@ -264,28 +264,28 @@ namespace TerrainTools.Helpers {
             Log.LogInfo("[SUCCESS] Remove Terrain Modifications", LogLevel.Medium);
         }
 
-        public static void RecolorTerrain(
+        public static void PreciseRecolorTerrain(
+            TerrainComp comp,
             Vector3 worldPos,
-            TerrainModifier.PaintType paintType,
-            Heightmap hMap,
-            int worldWidth,
-            ref Color[] paintMask,
-            ref bool[] modifiedPaint
+            TerrainModifier.PaintType paintType
         ) {
-            Log.LogInfo("[INIT] Color Terrain Modification", LogLevel.Medium);
-            hMap.WorldToVertex(worldPos, out var xPos, out var yPos);
-            Log.LogInfo($"worldPos: {worldPos}, vertexPos: ({xPos}, {yPos})", LogLevel.Medium);
+            Log.LogInfo("[INIT] PreciseRecolorTerrain", LogLevel.Medium);
+            //worldPos.x -= 0.5f;
+            //worldPos.z -= 0.5f;
+            comp.m_hmap.WorldToVertex(worldPos, out var xPos, out var yPos);
 
             var tileColor = ResolveColor(paintType);
-            var removeColor = tileColor == Color.black;
-            FindExtrema(xPos, worldWidth, out var xMin, out var xMax);
-            FindExtrema(yPos, worldWidth, out var yMin, out var yMax);
-            for (var x = xMin; x <= xMax; x++) {
-                for (var y = yMin; y <= yMax; y++) {
-                    var tileIndex = y * worldWidth + x;
-                    paintMask[tileIndex] = tileColor;
-                    modifiedPaint[tileIndex] = !removeColor;
-                    Log.LogInfo($"tilePos: ({x}, {y}), tileIndex: {tileIndex}, tileColor: {tileColor}", LogLevel.Medium);
+            var removeColor = paintType == TerrainModifier.PaintType.Reset;
+
+            FindExtrema(xPos, comp.m_width + 1, out var xMin, out var xMax);
+            FindExtrema(yPos, comp.m_width + 1, out var yMin, out var yMax);
+
+            for (var i = xMin; i < xMax; i++) {
+                for (var j = yMin; j < yMax; j++) {
+                    var tileIndex = j * comp.m_width + i;
+                    comp.m_paintMask[tileIndex] = tileColor;
+                    comp.m_modifiedPaint[tileIndex] = !removeColor;
+                    Log.LogInfo($"tilePos: ({i}, {j}), tileIndex: {tileIndex}, tileColor: {tileColor}", LogLevel.Medium);
                 }
             }
             Log.LogInfo("[SUCCESS] Color Terrain Modification", LogLevel.Medium);
