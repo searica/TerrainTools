@@ -149,18 +149,28 @@ namespace TerrainTools.Helpers {
             return false;
         }
 
-        public static void RemoveTerrainModifications(
+        [HarmonyPrefix]
+        [HarmonyPatch(nameof(TerrainComp.PaintCleared))]
+        private static bool PaintClearedPrefix(
+            TerrainComp __instance,
             Vector3 worldPos,
-            Heightmap hMap,
-            int worldWidth,
-            ref float[] levelDelta,
-            ref float[] smoothDelta,
-            ref bool[] modifiedHeight
+            float radius,
+            TerrainModifier.PaintType paintType
         ) {
+            if (!IsPrecisionModifier(radius)) {
+                return true;
+            }
+
+            PreciseRecolorTerrain(__instance, worldPos, paintType);
+            return false;
+        }
+
+
+        public static void RemoveTerrainModifications(TerrainComp comp, Vector3 worldPos) {
             Log.LogInfo("[INIT] Remove Terrain Modifications", LogLevel.Medium);
 
-            var worldSize = worldWidth + 1;
-            hMap.WorldToVertex(worldPos, out var xPos, out var yPos);
+            var worldSize = comp.m_width + 1;
+            comp.m_hmap.WorldToVertex(worldPos, out var xPos, out var yPos);
             Log.LogInfo($"worldPos: {worldPos}, vertexPos: ({xPos}, {yPos})", LogLevel.Medium);
 
             FindExtrema(xPos, worldSize, out var xMin, out var xMax);
@@ -168,9 +178,9 @@ namespace TerrainTools.Helpers {
             for (var x = xMin; x <= xMax; x++) {
                 for (var y = yMin; y <= yMax; y++) {
                     var tileIndex = y * worldSize + x;
-                    levelDelta[tileIndex] = 0;
-                    smoothDelta[tileIndex] = 0;
-                    modifiedHeight[tileIndex] = false;
+                    comp.m_levelDelta[tileIndex] = 0;
+                    comp.m_smoothDelta[tileIndex] = 0;
+                    comp.m_modifiedHeight[tileIndex] = false;
                     Log.LogInfo($"tilePos: ({x}, {y}), tileIndex: {tileIndex}", LogLevel.Medium);
                 }
             }
