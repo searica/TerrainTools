@@ -5,6 +5,15 @@
 			<th align="center">Notes</th>
 		</tr>
 		<tr>
+			<td align="center">1.2.3</td>
+			<td align="left">
+				<ul>
+					<li>Square terrain tools now automatically snap to the world grid.</li>
+					<li>Bugfix for visual artifact that caused placement ghosts to persist after placement when placed on zone borders.</li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
 			<td align="center">1.2.2</td>
 			<td align="left">
 				<ul>
