@@ -2,9 +2,11 @@
 using TerrainTools.Visualization;
 using UnityEngine;
 
-namespace TerrainTools.Helpers {
+namespace TerrainTools.Helpers
+{
     [HarmonyPatch]
-    internal static class RadiusModifier {
+    internal static class RadiusModifier
+    {
         private static bool RadiusToolIsInUse = false;
         private static float lastOriginalRadius;
         private static float lastModdedRadius;
@@ -17,13 +19,17 @@ namespace TerrainTools.Helpers {
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(Player), nameof(Player.Update))]
-        private static void UpdatePrefix(Player __instance) {
-            if (!__instance || __instance != Player.m_localPlayer) {
+        private static void UpdatePrefix(Player __instance)
+        {
+            if (!__instance || __instance != Player.m_localPlayer)
+            {
                 return;
             }
 
-            if (!__instance.InPlaceMode() || Hud.IsPieceSelectionVisible()) {
-                if (RadiusToolIsInUse) {
+            if (!__instance.InPlaceMode() || Hud.IsPieceSelectionVisible())
+            {
+                if (RadiusToolIsInUse)
+                {
                     RadiusToolIsInUse = false;
                     lastOriginalRadius = 0;
                     lastModdedRadius = 0;
@@ -35,7 +41,8 @@ namespace TerrainTools.Helpers {
                 return;
             }
 
-            if (ShouldModifyRadius()) {
+            if (ShouldModifyRadius())
+            {
                 SetRadius(__instance, Input.mouseScrollDelta.y * TerrainTools.RadiusScrollScale);
             }
 
@@ -45,7 +52,8 @@ namespace TerrainTools.Helpers {
         }
 
 
-        internal static bool ShouldModifyRadius() {
+        internal static bool ShouldModifyRadius()
+        {
             return TerrainTools.IsEnableRadiusModifier && Input.GetKey(TerrainTools.RadiusKey) && Input.mouseScrollDelta.y != 0;
         }
 
@@ -53,41 +61,50 @@ namespace TerrainTools.Helpers {
         [HarmonyPrefix]
         [HarmonyPriority(Priority.VeryHigh)]
         [HarmonyPatch(typeof(TerrainOp), nameof(TerrainOp.Awake))]
-        private static void AwakePrefix(TerrainOp __instance) {
+        private static void AwakePrefix(TerrainOp __instance)
+        {
             if (!__instance ||
                 !__instance.gameObject ||
-                __instance.gameObject.GetComponent<OverlayVisualizer>()) {
+                __instance.gameObject.GetComponent<OverlayVisualizer>())
+            {
                 return;
             }
 
-            if (__instance.m_settings.m_level) {
+            if (__instance.m_settings.m_level)
+            {
                 __instance.m_settings.m_levelRadius = ModifyRadius(__instance.m_settings.m_levelRadius, lastTotalDelta);
                 Log.LogInfo($"Applying level radius {__instance.m_settings.m_levelRadius}", LogLevel.Medium);
             }
 
-            if (__instance.m_settings.m_raise) {
+            if (__instance.m_settings.m_raise)
+            {
                 __instance.m_settings.m_raiseRadius = ModifyRadius(__instance.m_settings.m_raiseRadius, lastTotalDelta);
                 Log.LogInfo($"Applying raise radius {__instance.m_settings.m_raiseRadius}", LogLevel.Medium);
             }
 
-            if (__instance.m_settings.m_smooth) {
+            if (__instance.m_settings.m_smooth)
+            {
                 __instance.m_settings.m_smoothRadius = ModifyRadius(__instance.m_settings.m_smoothRadius, lastTotalDelta);
                 Log.LogInfo($"Applying smooth radius {__instance.m_settings.m_smoothRadius}", LogLevel.Medium);
             }
 
-            if (__instance.m_settings.m_paintCleared) {
+            if (__instance.m_settings.m_paintCleared)
+            {
                 __instance.m_settings.m_paintRadius = ModifyRadius(__instance.m_settings.m_paintRadius, lastTotalDelta);
                 Log.LogInfo($"Applying paint radius {__instance.m_settings.m_paintRadius}", LogLevel.Medium);
             }
         }
 
-        private static float ModifyRadius(float radius, float delta) {
+        private static float ModifyRadius(float radius, float delta)
+        {
             return Mathf.Clamp(radius + delta, MinRadius, TerrainTools.MaxRadius);
         }
 
-        private static void SetRadius(Player player, float delta) {
+        private static void SetRadius(Player player, float delta)
+        {
             var piece = player.GetSelectedPiece();
-            if (!piece || !piece.gameObject || piece.gameObject.GetComponent<OverlayVisualizer>()) {
+            if (!piece || !piece.gameObject || piece.gameObject.GetComponent<OverlayVisualizer>())
+            {
                 return;
             }
 
@@ -96,15 +113,18 @@ namespace TerrainTools.Helpers {
 
             Log.LogInfo($"Adjusting radius by {delta}", LogLevel.High);
 
-            if (!RadiusToolIsInUse) {
-                if (TryGetMaximumRadius(terrainOp, out var radius)) {
+            if (!RadiusToolIsInUse)
+            {
+                if (TryGetMaximumRadius(terrainOp, out var radius))
+                {
                     RadiusToolIsInUse = true;
                     lastOriginalRadius = radius;
                     lastModdedRadius = ModifyRadius(radius, delta);
                     lastTotalDelta += delta;
                 }
             }
-            else {
+            else
+            {
                 lastModdedRadius = ModifyRadius(lastModdedRadius, delta);
                 lastTotalDelta += delta;
             }
@@ -117,8 +137,10 @@ namespace TerrainTools.Helpers {
             );
         }
 
-        private static void RefreshGhostScale(Player player) {
-            if (RadiusToolIsInUse) {
+        private static void RefreshGhostScale(Player player)
+        {
+            if (RadiusToolIsInUse && player.m_placementGhost)
+            {
                 var ghost = player.m_placementGhost.transform.Find("_GhostOnly").gameObject;
                 if (!ghost) { return; }
 
@@ -126,7 +148,8 @@ namespace TerrainTools.Helpers {
                 var particleEffect = ghost.GetComponentInChildren<ParticleSystem>();
                 if (particleEffect &&
                     lastGhostScale != Vector3.zero &&
-                    Vector3.Distance(particleEffect.transform.localScale, lastGhostScale) > Tolerance) {
+                    Vector3.Distance(particleEffect.transform.localScale, lastGhostScale) > Tolerance)
+                {
                     Log.LogInfo($"Adjusting ghost scale to {lastGhostScale}x", LogLevel.High);
                     particleEffect.transform.localScale = lastGhostScale;
                 }
@@ -139,18 +162,23 @@ namespace TerrainTools.Helpers {
         /// </summary>
         /// <param name="terrainOp"></param>
         /// <returns></returns>
-        private static bool TryGetMaximumRadius(TerrainOp terrainOp, out float maxRadius) {
+        private static bool TryGetMaximumRadius(TerrainOp terrainOp, out float maxRadius)
+        {
             maxRadius = 0f;
-            if (terrainOp.m_settings.m_level && maxRadius < terrainOp.m_settings.m_levelRadius) {
+            if (terrainOp.m_settings.m_level && maxRadius < terrainOp.m_settings.m_levelRadius)
+            {
                 maxRadius = terrainOp.m_settings.m_levelRadius;
             }
-            if (terrainOp.m_settings.m_raise && maxRadius < terrainOp.m_settings.m_raiseRadius) {
+            if (terrainOp.m_settings.m_raise && maxRadius < terrainOp.m_settings.m_raiseRadius)
+            {
                 maxRadius = terrainOp.m_settings.m_raiseRadius;
             }
-            if (terrainOp.m_settings.m_smooth && maxRadius < terrainOp.m_settings.m_smoothRadius) {
+            if (terrainOp.m_settings.m_smooth && maxRadius < terrainOp.m_settings.m_smoothRadius)
+            {
                 maxRadius = terrainOp.m_settings.m_smoothRadius;
             }
-            if (terrainOp.m_settings.m_paintCleared && maxRadius < terrainOp.m_settings.m_paintRadius) {
+            if (terrainOp.m_settings.m_paintCleared && maxRadius < terrainOp.m_settings.m_paintRadius)
+            {
                 maxRadius = terrainOp.m_settings.m_paintRadius;
             }
             return maxRadius != 0f;
