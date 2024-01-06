@@ -101,7 +101,9 @@ namespace TerrainTools.Helpers {
             }
 
             var terrainOp = piece.gameObject.GetComponent<TerrainOp>();
-            if (!terrainOp) { return; }
+            if (!terrainOp) {
+                return;
+            }
 
             SetSmoothPower(terrainOp, delta);
             SetRaisePower(terrainOp, delta);
@@ -130,7 +132,9 @@ namespace TerrainTools.Helpers {
         }
 
         private static void SetSmoothPower(TerrainOp terrainOp, float delta) {
-            if (!terrainOp.m_settings.m_smooth) { return; }
+            if (!terrainOp.m_settings.m_smooth) {
+                return;
+            }
 
             Log.LogInfo($"Adjusting Smooth Power by {delta}", LogLevel.High);
 
@@ -147,7 +151,9 @@ namespace TerrainTools.Helpers {
         }
 
         private static void SetRaisePower(TerrainOp terrainOp, float delta) {
-            if (!terrainOp.m_settings.m_raise) { return; }
+            if (!terrainOp.m_settings.m_raise) {
+                return;
+            }
 
             delta = ConvertSmoothDeltaToRaiseDelta(delta);
 
