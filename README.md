@@ -280,7 +280,7 @@ Should usually be compatible with everything except other mods that let you chan
 ### Partial Incompatibility
 **ValheimPlus** While TerrainTools does work with ValheimPlus there are some UI glitches. ValheimPlus freezes the animations for the terrain tools so you can't visualize the effect size properly and the hover info on square tools does not update correctly. It may be possible to fix this via changing something in ValheimPlus's configuration.
 
-**FastTools** While the two mods are fully compatible and you can modify the stamina cost of the Shovel using FastTools, there is currently a visual bug in FastTools that breaks the animations on the placement ghost for all terrain tools and prevents AdvancedTerrainModifiers from being able to show the change in radius.You can use [ToolTweaks](https://valheim.thunderstore.io/package/Searica/ToolTweaks/) as a compatible alternative.
+**FastTools** While the two mods are fully compatible and you can modify the stamina cost of the Shovel using FastTools, there is currently a visual bug in FastTools that breaks the animations on the placement ghost for all terrain tools and prevents AdvancedTerrainModifiers from being able to show the change in radius. You can use [ToolTweaks](https://valheim.thunderstore.io/package/Searica/ToolTweaks/) as a compatible alternative.
 
 ## Donations/Tips
 My mods will always be free to use but if you feel like saying thanks you can tip/donate.
