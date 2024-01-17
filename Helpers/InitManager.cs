@@ -289,18 +289,28 @@ namespace TerrainTools.Helpers {
                 throw new Exception($"Could not find PieceTable {toolDB.pieceTable}");
             }
 
-            // Update and fix indexes
+            // Check if prefab exists in list and get index
             var pos = table.m_pieces.IndexOf(prefab);
             if (pos < 0) {
                 return;
             }
 
-            if (InsertionIndexes[toolDB.pieceTable].Contains(pos)) {
-                InsertionIndexes[toolDB.pieceTable].Remove(pos);
-            }
-
             table.m_pieces.Remove(prefab);
             Log.LogDebug($"Removed piece {prefab.name}");
+
+            // Update insertion indexes
+            var insertIds = InsertionIndexes[toolDB.pieceTable];
+            if (insertIds.Contains(pos)) {
+                insertIds.Remove(pos); // remove insertion index
+
+                // update insertion indexes of pieces that were inserted after
+                // the one that was removed
+                for (int i = 0; i < table.m_pieces.Count; i++) {
+                    if (insertIds[i] > pos) {
+                        insertIds[i] -= 1;
+                    }
+                }
+            }
         }
     }
 }
