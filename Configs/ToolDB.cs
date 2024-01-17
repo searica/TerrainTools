@@ -1,10 +1,8 @@
 ﻿using System;
 using UnityEngine;
 
-namespace TerrainTools.Configs
-{
-    internal class ToolDB
-    {
+namespace TerrainTools.Configs {
+    internal class ToolDB {
         public string name;
         public string basePrefab;
         public string pieceName;
@@ -26,6 +24,7 @@ namespace TerrainTools.Configs
         public float? paintRadius;
         public Piece.Requirement[] requirements;
         public bool invertGhost;
+        public GameObject prefab;
 
         public ToolDB(
             string name,
@@ -49,8 +48,7 @@ namespace TerrainTools.Configs
             float? paintRadius = null,
             Piece.Requirement[] requirements = null,
             bool invertGhost = false
-        )
-        {
+        ) {
             this.name = name;
             this.basePrefab = basePrefab;
             this.pieceName = pieceName;
@@ -58,8 +56,7 @@ namespace TerrainTools.Configs
             this.icon = icon;
             this.pieceTable = pieceTable;
             this.insertIndex = insertIndex;
-            if (overlayType != null)
-            {
+            if (overlayType != null) {
                 this.overlayType = overlayType;
             }
             this.level = level;

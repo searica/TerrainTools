@@ -6,11 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using TerrainTools.Configs;
 using UnityEngine;
+using static UnityEngine.GridBrushBase;
 
-namespace TerrainTools.Helpers
-{
-    internal static class InitManager
-    {
+namespace TerrainTools.Helpers {
+    internal static class InitManager {
         private static bool HasInitialized = false;
         internal static readonly Dictionary<string, GameObject> ToolRefs = new();
 
@@ -21,31 +20,26 @@ namespace TerrainTools.Helpers
         /// </summary>
         private static readonly Dictionary<string, List<int>> InsertionIndexes = new();
 
-        internal static void InitToolPieces()
-        {
+        internal static void InitToolPieces() {
             if (HasInitialized) return;
             FixVanillaToolDescriptions();
 
-            foreach (var key in ToolConfigs.ToolConfigsMap.Keys)
-            {
-                try
-                {
+            foreach (var key in ToolConfigs.ToolConfigsMap.Keys) {
+                try {
                     var toolDB = ToolConfigs.ToolConfigsMap[key];
-                    var piecePrefab = MakeToolPiece(toolDB);
-                    RegisterPieceInPieceTable(piecePrefab, toolDB.pieceTable, null, toolDB.insertIndex);
-                    ToolRefs.Add(key, piecePrefab);
+                    toolDB.prefab = MakeToolPiece(toolDB);
                 }
-                catch
-                {
+                catch {
                     Log.LogWarning($"Failed to create: {key}");
                 }
             }
 
             HasInitialized = true;
+
+            UpdateTools();
         }
 
-        internal static void FixVanillaToolDescriptions()
-        {
+        internal static void FixVanillaToolDescriptions() {
             SetDescription(
                "mud_road_v2",
                "Levels ground based on player position. Use shift + click to level ground based on where you are pointing (this will smooth the terrain)."
@@ -77,15 +71,12 @@ namespace TerrainTools.Helpers
             );
         }
 
-        private static void SetDescription(string prefabName, string description)
-        {
+        private static void SetDescription(string prefabName, string description) {
             var prefabPiece = PrefabManager.Instance.GetPrefab(prefabName)?.GetComponent<Piece>();
-            if (prefabPiece != null)
-            {
+            if (prefabPiece != null) {
                 prefabPiece.m_description = description;
             }
-            else
-            {
+            else {
                 Log.LogWarning($"Could not set description for: {prefabName}");
             }
         }
@@ -93,8 +84,7 @@ namespace TerrainTools.Helpers
         /// <summary>
         ///     Updates which tools are enabled/disabled and which items are enabled/disabled.
         /// </summary>
-        internal static void UpdatePlugin()
-        {
+        internal static void UpdatePlugin() {
             UpdateTools();
             UpdateShovelRecipe();
             ConfigManager.Save();
@@ -104,26 +94,42 @@ namespace TerrainTools.Helpers
         /// <summary>
         ///     Updates which tools are enabled/disabled to add/remove them from piece tables.
         /// </summary>
-        private static void UpdateTools()
-        {
-            if (!HasInitialized) return;
-
+        private static void UpdateTools() {
+            if (!HasInitialized) {
+                return;
+            }
             ForceUnequipTerrainTools();
 
-            foreach (var key in ToolRefs.Keys)
-            {
-                var toolPrefabPiece = ToolRefs[key].GetComponent<Piece>();
-                toolPrefabPiece.m_enabled = TerrainTools.IsToolEnabled(key);
+            foreach (var toolDB in ToolConfigs.ToolConfigsMap.Values) {
+                RemovePieceInPieceTable(toolDB);
+            }
+
+            foreach (var key in ToolConfigs.ToolConfigsMap.Keys) {
+                if (TerrainTools.IsToolEnabled(key)) {
+                    var toolDB = ToolConfigs.ToolConfigsMap[key];
+                    RegisterPieceInPieceTable(toolDB.prefab, toolDB.pieceTable, null, toolDB.insertIndex);
+                }
+            }
+        }
+
+        internal static void UpdatePieceTables() {
+            foreach (var key in ToolConfigs.ToolConfigsMap.Keys) {
+                try {
+                    var toolDB = ToolConfigs.ToolConfigsMap[key];
+                    toolDB.prefab = MakeToolPiece(toolDB);
+                    RegisterPieceInPieceTable(toolDB.prefab, toolDB.pieceTable, null, toolDB.insertIndex);
+                }
+                catch {
+                    Log.LogWarning($"Failed to create: {key}");
+                }
             }
         }
 
         /// <summary>
         ///     Updates the shovel recipe to be enabled/disabled based on corresponding config entry.
         /// </summary>
-        private static void UpdateShovelRecipe()
-        {
-            if (Shovel.TryGetShovel(out CustomItem shovel))
-            {
+        private static void UpdateShovelRecipe() {
+            if (Shovel.TryGetShovel(out CustomItem shovel)) {
                 shovel.Recipe.Recipe.m_enabled = TerrainTools.IsShovelEnabled;
             }
         }
@@ -131,37 +137,41 @@ namespace TerrainTools.Helpers
         /// <summary>
         ///     Forces hammer to be unequipped if it is currently equipped.
         /// </summary>
-        private static void ForceUnequipTerrainTools()
-        {
-            if (Player.m_localPlayer?.GetRightItem()?.m_shared.m_name == "$item_cultivator")
-            {
+        private static void ForceUnequipTerrainTools() {
+            if (!Player.m_localPlayer) {
+                return;
+            }
+
+            var rightItem = Player.m_localPlayer.GetRightItem();
+            if (rightItem == null) {
+                return;
+            }
+
+            if (rightItem.m_shared.m_name == "$item_cultivator") {
                 Log.LogWarning($"{TerrainTools.PluginName} updated through config change, unequipping cultivator");
                 Player.m_localPlayer.HideHandItems();
             }
 
-            if (Player.m_localPlayer?.GetRightItem()?.m_shared.m_name == "$item_hoe")
-            {
+            if (rightItem.m_shared.m_name == "$item_hoe") {
                 Log.LogWarning($"{TerrainTools.PluginName} updated through config change, unequipping hoe");
                 Player.m_localPlayer.HideHandItems();
             }
         }
 
-        internal static GameObject MakeToolPiece(ToolDB toolDB)
-        {
+        internal static GameObject MakeToolPiece(ToolDB toolDB) {
             // prevent duplicates
             if (PieceManager.Instance.GetPiece(toolDB.pieceName) != null) { return null; }
 
             // clone base prefab and set name
             var toolPrefab = PrefabManager.Instance.CreateClonedPrefab(toolDB.name, toolDB.basePrefab);
-            if (toolDB == null) { return null; }
+            if (toolPrefab == null) { return null; }
 
             // customize piece component
             var toolPiece = toolPrefab.GetComponent<Piece>();
             toolPiece.m_icon = Sprite.Create(toolDB.icon, new Rect(0, 0, toolDB.icon.width, toolDB.icon.height), Vector2.zero);
             toolPiece.m_name = toolDB.pieceName;
             toolPiece.m_description = toolDB.pieceDesc;
-            if (toolDB.requirements != null)
-            {
+            if (toolDB.requirements != null) {
                 toolPiece.m_resources = toolDB.requirements;
             }
 
@@ -183,16 +193,13 @@ namespace TerrainTools.Helpers
             settings.m_paintRadius = UpdateValueIfNeeded(settings.m_paintRadius, toolDB.paintRadius);
 
             // apply custom visualization overlay if desired
-            if (toolDB.overlayType != null)
-            {
+            if (toolDB.overlayType != null) {
                 toolPrefab.AddComponent(toolDB.overlayType);
             }
 
-            if (toolDB.invertGhost)
-            {
+            if (toolDB.invertGhost) {
                 var ghost = toolPrefab.transform.Find("_GhostOnly");
-                if (ghost != null)
-                {
+                if (ghost != null) {
                     ghost.localRotation = Quaternion.Euler(270f, 0f, 0f);
                     ghost.localPosition += new Vector3(0f, 2f, 0f);
                 }
@@ -200,13 +207,11 @@ namespace TerrainTools.Helpers
             return toolPrefab;
         }
 
-        private static T UpdateValueIfNeeded<T>(T source, T? newValue) where T : struct
-        {
+        private static T UpdateValueIfNeeded<T>(T source, T? newValue) where T : struct {
             return newValue != null ? newValue.Value : source;
         }
 
-        private static T UpdateValueIfNeeded<T>(T source, T newValue)
-        {
+        private static T UpdateValueIfNeeded<T>(T source, T newValue) {
             return newValue != null ? newValue : source;
         }
 
@@ -219,63 +224,83 @@ namespace TerrainTools.Helpers
         /// <param name="prefab"><see cref="GameObject"/> with a <see cref="Piece"/> component to add to the table</param>
         /// <param name="pieceTable">Prefab or item name of the PieceTable</param>
         /// <param name="category">Optional category string, does not create new custom categories</param>
-        private static void RegisterPieceInPieceTable(GameObject prefab, string pieceTable, string category, int position = -1)
-        {
+        private static void RegisterPieceInPieceTable(GameObject prefab, string pieceTable, string category, int position = -1) {
             var piece = prefab.GetComponent<Piece>();
-            if (piece == null)
-            {
+            if (piece == null) {
                 throw new Exception($"Prefab {prefab.name} has no Piece component attached");
             }
 
             var table = PieceManager.Instance.GetPieceTable(pieceTable);
-            if (table == null)
-            {
+            if (table == null) {
                 throw new Exception($"Could not find PieceTable {pieceTable}");
             }
 
-            if (table.m_pieces.Contains(prefab))
-            {
+            if (table.m_pieces.Contains(prefab)) {
                 Log.LogDebug($"Already added piece {prefab.name}");
                 return;
             }
 
             var name = prefab.name;
             var hash = name.GetStableHashCode();
-            if (ZNetScene.instance != null && !ZNetScene.instance.m_namedPrefabs.ContainsKey(hash))
-            {
+            if (ZNetScene.instance != null && !ZNetScene.instance.m_namedPrefabs.ContainsKey(hash)) {
                 PrefabManager.Instance.RegisterToZNetScene(prefab);
             }
 
-            if (!string.IsNullOrEmpty(category))
-            {
+            if (!string.IsNullOrEmpty(category)) {
                 piece.m_category = PieceManager.Instance.AddPieceCategory(pieceTable, category);
             }
 
-            if (!InsertionIndexes.ContainsKey(pieceTable))
-            {
+            if (!InsertionIndexes.ContainsKey(pieceTable)) {
                 InsertionIndexes[pieceTable] = new List<int>();
             }
 
             // Shift position to account for how many pieces have been added before it and check if OOB
             var index = position + InsertionIndexes[pieceTable].Where(x => x <= position).Count();
-            if (index >= table.m_pieces.Count)
-            {
+            if (index >= table.m_pieces.Count) {
                 Log.LogWarning("Piece insertion index is out of bounds");
             }
 
-            if (position >= 0 && index < table.m_pieces.Count)
-            {
+            if (position >= 0 && index < table.m_pieces.Count) {
                 // Add piece at new insertion point
                 table.m_pieces.Insert(index, prefab);
                 InsertionIndexes[pieceTable].Add(position);
             }
-            else
-            {
+            else {
                 table.m_pieces.Add(prefab);
                 InsertionIndexes[pieceTable].Add(table.m_pieces.Count - 1);
             }
 
             Log.LogDebug($"Added piece {prefab.name} | Token: {piece.TokenName()}");
+        }
+
+
+        /// <summary>
+        ///     Removes prefab from piece table and updates insertion indexes
+        /// </summary>
+        /// <param name="toolDB"><see cref="ToolDB"/></param>
+        private static void RemovePieceInPieceTable(ToolDB toolDB) {
+            var prefab = toolDB.prefab;
+            if (!prefab) {
+                return;
+            }
+
+            var table = PieceManager.Instance.GetPieceTable(toolDB.pieceTable);
+            if (table == null) {
+                throw new Exception($"Could not find PieceTable {toolDB.pieceTable}");
+            }
+
+            // Update and fix indexes
+            var pos = table.m_pieces.IndexOf(prefab);
+            if (pos < 0) {
+                return;
+            }
+
+            if (InsertionIndexes[toolDB.pieceTable].Contains(pos)) {
+                InsertionIndexes[toolDB.pieceTable].Remove(pos);
+            }
+
+            table.m_pieces.Remove(prefab);
+            Log.LogDebug($"Removed piece {prefab.name}");
         }
     }
 }
