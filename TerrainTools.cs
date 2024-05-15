@@ -23,7 +23,7 @@ namespace TerrainTools {
         internal const string Author = "Searica";
         public const string PluginName = "AdvancedTerrainModifiers";
         public const string PluginGUID = $"{Author}.Valheim.TerrainTools";
-        public const string PluginVersion = "1.2.6";
+        public const string PluginVersion = "1.3.0";
 
         #region Section Names
 

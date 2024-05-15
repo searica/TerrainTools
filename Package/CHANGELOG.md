@@ -5,6 +5,16 @@
 			<th align="center">Notes</th>
 		</tr>
 		<tr>
+			<td align="center">1.3.0</td>
+			<td align="left">
+				<ul>
+					<li>Updated for Ashlands release.</li>
+					<li>Note: Ashlands has some bugs with terrain paint (grass, dirt, etc) which cause visual errors.</li>
+					<li>Note: This version loads without errors but may have some issues given the bugs in Vanilla terrain right now, except fixes once Vanilla is patched.</li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
 			<td align="center">1.2.6</td>
 			<td align="left">
 				<ul>
