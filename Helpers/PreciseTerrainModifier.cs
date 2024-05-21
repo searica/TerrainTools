@@ -95,7 +95,12 @@ namespace TerrainTools.Helpers {
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.SmoothTerrain))]
-        private static bool PreciseSmoothTerrian(TerrainComp __instance, Vector3 worldPos, float radius) {
+        private static bool PreciseSmoothTerrian(
+            TerrainComp __instance,
+            Vector3 worldPos,
+            float radius
+        )
+        {
             if (!IsPrecisionModifier(radius)) {
                 return true;
             }
