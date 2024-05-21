@@ -93,6 +93,24 @@ namespace TerrainTools.Helpers {
             }
         }
 
+        /// <summary>
+        ///     Correct m_lastOpRadius to be FixedRadius instead of -Infinity
+        ///     if a Precision Modifier was the last operation applied. This
+        ///     avoids issues caused by saving an invalid radius.
+        /// </summary>
+        /// <param name="__instance"></param>
+        /// <param name="pos"></param>
+        /// <param name="modifier"></param>
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.InternalDoOperation))]
+        private static void InternalDoOperationPostfix(TerrainComp __instance)
+        {
+            if (IsPrecisionModifier(__instance.m_lastOpRadius))
+            {
+                __instance.m_lastOpRadius = FixedRadius;
+            }
+        }
+
         [HarmonyPrefix]
         [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.SmoothTerrain))]
         private static bool PreciseSmoothTerrian(
