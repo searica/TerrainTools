@@ -5,6 +5,14 @@
 			<th align="center">Notes</th>
 		</tr>
 		<tr>
+			<td align="center">1.3.1</td>
+			<td align="left">
+				<ul>
+					<li>Bugfix for issues with lava in Ashlands when using precision raise ground.</li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
 			<td align="center">1.3.0</td>
 			<td align="left">
 				<ul>
