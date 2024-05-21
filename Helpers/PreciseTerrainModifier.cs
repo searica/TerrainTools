@@ -109,12 +109,12 @@ namespace TerrainTools.Helpers {
                 for (var j = yMin; j <= yMax; j++) {
                     var tileIndex = j * worldSize + i;
                     var tileHeight = __instance.m_hmap.GetHeight(i, j);
-                    var deltaHeight = refHeight - tileHeight;
-                    var oldSmoothDelta = __instance.m_smoothDelta[tileIndex];
-                    __instance.m_smoothDelta[tileIndex] = Mathf.Clamp(oldSmoothDelta + deltaHeight, -1.0f, 1.0f);
+                    var deltaH = refHeight - tileHeight;
+                    var prevSmoothDelta = __instance.m_smoothDelta[tileIndex];
+                    __instance.m_smoothDelta[tileIndex] = Mathf.Clamp(prevSmoothDelta + deltaH, -1f, 1f);
                     __instance.m_modifiedHeight[tileIndex] = true;
 
-                    Log.LogInfo($"tilePos: ({i}, {j}), tileH: {tileHeight}, deltaH: {deltaHeight}, oldSmoothDelta: {oldSmoothDelta}, newSmoothDelta {__instance.m_smoothDelta[tileIndex]}", LogLevel.Medium);
+                    Log.LogInfo($"tilePos: ({i}, {j}), tileH: {tileHeight}, deltaH: {deltaH}, prevSmoothDelta: {prevSmoothDelta}, newSmoothDelta {__instance.m_smoothDelta[tileIndex]}", LogLevel.Medium);
                 }
             }
             Log.LogInfo("[SUCCESS] Smooth Terrain Modification", LogLevel.Medium);
