@@ -98,7 +98,7 @@ namespace TerrainTools.Helpers {
 
             Log.LogInfo("PreciseSmoothTerrain", LogLevel.Medium);
             var worldSize = __instance.m_hmap.m_width + 1;
-            __instance.m_hmap.WorldToVertex(worldPos, out var xPos, out var yPos);
+            __instance.m_hmap.WorldToVertex(worldPos, out int xPos, out int yPos);
             var refHeight = worldPos.y - __instance.transform.position.y;
             Log.LogInfo($"worldPos: {worldPos}, xPos: {xPos}, yPos: {yPos}, referenceH: {refHeight}", LogLevel.Medium);
 
