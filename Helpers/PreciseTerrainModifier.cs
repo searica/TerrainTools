@@ -74,10 +74,15 @@ namespace TerrainTools.Helpers {
             }
         }
 
-
+        /// <summary>
+        ///     Apply TerrainReset operation if valid
+        /// </summary>
+        /// <param name="__instance"></param>
+        /// <param name="pos"></param>
+        /// <param name="modifier"></param>
         [HarmonyPrefix]
         [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.InternalDoOperation))]
-        private static bool InternalDoOperationPrefix(
+        private static void InternalDoOperationPrefix(
             TerrainComp __instance,
             Vector3 pos,
             TerrainOp.Settings modifier
@@ -86,7 +91,6 @@ namespace TerrainTools.Helpers {
                 RemoveTerrainModifications(__instance, pos);
                 PreciseRecolorTerrain(__instance, pos, TerrainModifier.PaintType.Reset);
             }
-            return true;
         }
 
         [HarmonyPrefix]
