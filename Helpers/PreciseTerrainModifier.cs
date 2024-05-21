@@ -1,14 +1,44 @@
 ﻿using HarmonyLib;
+using System;
+using System.Collections.Generic;
 using TerrainTools.Visualization;
 using UnityEngine;
+using static ClutterSystem;
 
 namespace TerrainTools.Helpers {
-    [HarmonyPatch(typeof(TerrainComp))]
+    [HarmonyPatch(typeof(PreciseTerrainModifier))]
     public static class PreciseTerrainModifier {
         public const int FixedRadius = 1;
 
+        /// <summary>
+        ///     Checks if radius is set as flag for precision modifier.
+        /// </summary>
+        /// <param name="radius"></param>
+        /// <returns></returns>
+        public static bool IsPrecisionModifier(float radius)
+        {
+            return radius == float.NegativeInfinity;
+        }
+
+        /// <summary>
+        ///     Catches invalid radius from precise terrain modifications and modifies it
+        ///     to match the fixed radius before executing the ClutterSytem.ResetGrass method.
+        /// </summary>
+        /// <param name="__instance"></param>
+        /// <param name="center"></param>
+        /// <param name="radius"></param>
         [HarmonyPrefix]
-        [HarmonyPatch(nameof(TerrainComp.ApplyOperation))]
+        [HarmonyPatch(typeof(ClutterSystem), nameof(ClutterSystem.ResetGrass))]
+        private static void ResetGrassPrefix(ClutterSystem __instance, Vector3 center, ref float radius)
+        {
+            if (IsPrecisionModifier(radius))
+            {
+                radius = FixedRadius;
+            }
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.ApplyOperation))]
         private static void ApplyOperationPrefix(TerrainOp modifier) {
             if (!modifier || !modifier.gameObject) { return; }
 
@@ -33,7 +63,7 @@ namespace TerrainTools.Helpers {
         /// </summary>
         /// <param name="__instance"></param>
         [HarmonyPrefix]
-        [HarmonyPatch(nameof(TerrainComp.RPC_ApplyOperation))]
+        [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.RPC_ApplyOperation))]
         private static void RPC_ApplyOperationPrefix(TerrainComp __instance) {
             if (!__instance || !__instance.m_nview) {
                 return;
@@ -44,18 +74,9 @@ namespace TerrainTools.Helpers {
             }
         }
 
-        /// <summary>
-        ///     Checks if radius is set as flag for precision modifier.
-        /// </summary>
-        /// <param name="radius"></param>
-        /// <returns></returns>
-        public static bool IsPrecisionModifier(float radius) {
-            return radius == float.NegativeInfinity;
-        }
-
 
         [HarmonyPrefix]
-        [HarmonyPatch(nameof(TerrainComp.InternalDoOperation))]
+        [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.InternalDoOperation))]
         private static bool InternalDoOperationPrefix(
             TerrainComp __instance,
             Vector3 pos,
@@ -69,7 +90,7 @@ namespace TerrainTools.Helpers {
         }
 
         [HarmonyPrefix]
-        [HarmonyPatch(nameof(TerrainComp.SmoothTerrain))]
+        [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.SmoothTerrain))]
         private static bool PreciseSmoothTerrian(TerrainComp __instance, Vector3 worldPos, float radius) {
             if (!IsPrecisionModifier(radius)) {
                 return true;
@@ -102,7 +123,7 @@ namespace TerrainTools.Helpers {
         }
 
         [HarmonyPrefix]
-        [HarmonyPatch(nameof(TerrainComp.RaiseTerrain))]
+        [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.RaiseTerrain))]
         private static bool RaiseTerrainPrefix(TerrainComp __instance, Vector3 worldPos, float radius, float delta) {
             if (!IsPrecisionModifier(radius)) {
                 return true;
@@ -138,8 +159,9 @@ namespace TerrainTools.Helpers {
                     }
 
                     var tileIndex = j * worldSize + i;
-                    __instance.m_levelDelta[tileIndex] += targetHeight - tileHeight + __instance.m_smoothDelta[tileIndex];
+                    var deltaH = targetHeight - tileHeight + __instance.m_smoothDelta[tileIndex];
                     __instance.m_smoothDelta[tileIndex] = 0f;
+                    __instance.m_levelDelta[tileIndex] += deltaH;
                     __instance.m_levelDelta[tileIndex] = Mathf.Clamp(__instance.m_levelDelta[tileIndex], -8f, 8f);
                     __instance.m_modifiedHeight[tileIndex] = true;
                 }
@@ -150,7 +172,7 @@ namespace TerrainTools.Helpers {
         }
 
         [HarmonyPrefix]
-        [HarmonyPatch(nameof(TerrainComp.PaintCleared))]
+        [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.PaintCleared))]
         private static bool PaintClearedPrefix(
             TerrainComp __instance,
             Vector3 worldPos,
@@ -230,6 +252,13 @@ namespace TerrainTools.Helpers {
             return Heightmap.m_paintMaskNothing;
         }
 
+        /// <summary>
+        ///     Finds the bounds to loop over for square tools
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="worldSize"></param>
+        /// <param name="xMin"></param>
+        /// <param name="xMax"></param>
         public static void FindExtrema(int x, int worldSize, out int xMin, out int xMax) {
             xMin = Mathf.Max(0, x - FixedRadius);
             xMax = Mathf.Min(x + FixedRadius, worldSize - 1);
