@@ -5,6 +5,15 @@
 			<th align="center">Notes</th>
 		</tr>
 		<tr>
+			<td align="center">1.3.2</td>
+			<td align="left">
+				<ul>
+					<li>Bugfix for another issue with lava in Ashlands when using precision terrain tools.</li>
+					<li>I swear stuff related to lava is fixed now and if it isn't I'll have to figure out why.</li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
 			<td align="center">1.3.1</td>
 			<td align="left">
 				<ul>
