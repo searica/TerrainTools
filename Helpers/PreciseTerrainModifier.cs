@@ -204,13 +204,14 @@ namespace TerrainTools.Helpers {
             TerrainComp __instance,
             Vector3 worldPos,
             float radius,
-            TerrainModifier.PaintType paintType
+            TerrainModifier.PaintType paintType,
+            bool heightCheck
         ) {
             if (!IsPrecisionModifier(radius)) {
                 return true;
             }
 
-            PreciseRecolorTerrain(__instance, worldPos, paintType);
+            PreciseRecolorTerrain(__instance, worldPos, paintType, heightCheck);
             return false;
         }
 
@@ -239,24 +240,33 @@ namespace TerrainTools.Helpers {
         public static void PreciseRecolorTerrain(
             TerrainComp comp,
             Vector3 worldPos,
-            TerrainModifier.PaintType paintType
+            TerrainModifier.PaintType paintType,
+            bool heightCheck = false
         ) {
             Log.LogInfo("[INIT] PreciseRecolorTerrain", LogLevel.Medium);
-            //worldPos.x -= 0.5f;
-            //worldPos.z -= 0.5f;
-            comp.m_hmap.WorldToVertex(worldPos, out var xPos, out var yPos);
+            worldPos.x -= 0.5f;
+            worldPos.z -= 0.5f;
+            var worldSize = comp.m_width + 1;
 
+            comp.m_hmap.WorldToVertexMask(worldPos, out int xPos, out int yPos);
+            var center = new Vector2(xPos, yPos);
+            
             var tileColor = ResolveColor(paintType);
-            var removeColor = paintType == TerrainModifier.PaintType.Reset;
+            var resetColor = paintType == TerrainModifier.PaintType.Reset;
 
-            FindExtrema(xPos, comp.m_width + 1, out var xMin, out var xMax);
-            FindExtrema(yPos, comp.m_width + 1, out var yMin, out var yMax);
+            FindExtrema(xPos, worldSize, out var xMin, out var xMax);
+            FindExtrema(yPos, worldSize, out var yMin, out var yMax);
 
-            for (var i = xMin; i < xMax; i++) {
-                for (var j = yMin; j < yMax; j++) {
-                    var tileIndex = j * comp.m_width + i;
+            for (var i = xMin+1; i <= xMax; i++) {
+                for (var j = yMin+1; j <= yMax; j++)
+                {
+                    //Log.LogInfo($"X: {i}, {xMin}, {xMax}");
+                    //Log.LogInfo($"Y: {j}, {yMin}, {yMax}");
+                    //Try logging values of xMin and xMax along with i?
+                    tileColor.a = comp.m_hmap.GetPaintMask(i, j).a;  // avoids lava
+                    var tileIndex = (j * worldSize) + i;
                     comp.m_paintMask[tileIndex] = tileColor;
-                    comp.m_modifiedPaint[tileIndex] = !removeColor;
+                    comp.m_modifiedPaint[tileIndex] = !resetColor;
                     Log.LogInfo($"tilePos: ({i}, {j}), tileIndex: {tileIndex}, tileColor: {tileColor}", LogLevel.Medium);
                 }
             }
@@ -278,6 +288,7 @@ namespace TerrainTools.Helpers {
             }
             return Heightmap.m_paintMaskNothing;
         }
+
 
         /// <summary>
         ///     Finds the bounds to loop over for square tools
