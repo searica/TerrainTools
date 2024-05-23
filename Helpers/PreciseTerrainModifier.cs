@@ -125,6 +125,8 @@ namespace TerrainTools.Helpers {
 
             Log.LogInfo("PreciseSmoothTerrain", LogLevel.Medium);
             var worldSize = __instance.m_hmap.m_width + 1;
+            //var worldSize = __instance.m_hmap.m_width + 1;
+            var worldSize = __instance.m_width + 1;
             __instance.m_hmap.WorldToVertex(worldPos, out int xPos, out int yPos);
             var refHeight = worldPos.y - __instance.transform.position.y;
             Log.LogInfo($"worldPos: {worldPos}, xPos: {xPos}, yPos: {yPos}, referenceH: {refHeight}", LogLevel.Medium);
@@ -134,6 +136,9 @@ namespace TerrainTools.Helpers {
 
             for (var i = xMin; i <= xMax; i++) {
                 for (var j = yMin; j <= yMax; j++) {
+                    //Log.LogInfo("SmoothTerrain");
+                    //Log.LogInfo($"X: {i}, {xMin}, {xMax}");
+                    //Log.LogInfo($"Y: {j}, {yMin}, {yMax}");
                     var tileIndex = j * worldSize + i;
                     var tileHeight = __instance.m_hmap.GetHeight(i, j);
                     var deltaH = refHeight - tileHeight;
@@ -260,6 +265,7 @@ namespace TerrainTools.Helpers {
             for (var i = xMin+1; i <= xMax; i++) {
                 for (var j = yMin+1; j <= yMax; j++)
                 {
+                    //Log.LogInfo("EditPaint");
                     //Log.LogInfo($"X: {i}, {xMin}, {xMax}");
                     //Log.LogInfo($"Y: {j}, {yMin}, {yMax}");
                     //Try logging values of xMin and xMax along with i?
