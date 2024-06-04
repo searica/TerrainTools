@@ -124,7 +124,6 @@ namespace TerrainTools.Helpers {
             }
 
             Log.LogInfo("PreciseSmoothTerrain", LogLevel.Medium);
-            var worldSize = __instance.m_hmap.m_width + 1;
             //var worldSize = __instance.m_hmap.m_width + 1;
             var worldSize = __instance.m_width + 1;
             __instance.m_hmap.WorldToVertex(worldPos, out int xPos, out int yPos);
