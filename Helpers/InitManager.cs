@@ -305,7 +305,7 @@ namespace TerrainTools.Helpers {
 
                 // update insertion indexes of pieces that were inserted after
                 // the one that was removed
-                for (int i = 0; i < table.m_pieces.Count; i++) {
+                for (int i = 0; i < insertIds.Count; i++) {
                     if (insertIds[i] > pos) {
                         insertIds[i] -= 1;
                     }
