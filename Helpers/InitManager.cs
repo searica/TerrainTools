@@ -255,8 +255,14 @@ namespace TerrainTools.Helpers {
             }
 
             // Shift position to account for how many pieces have been added before it and check if OOB
-            var index = position + InsertionIndexes[pieceTable].Where(x => x <= position).Count();
-            if (index >= table.m_pieces.Count) {
+            var index = 0;
+            if (position >= 0) // only adjust position if not given position of -1 as -1 should always go at the front.
+            {
+                index = position + InsertionIndexes[pieceTable].Where(x => x <= position).Count();
+            }
+            else
+
+            if (index >= table.m_pieces.Count && table.m_pieces.Count != 0) {
                 Log.LogWarning("Piece insertion index is out of bounds");
             }
 
