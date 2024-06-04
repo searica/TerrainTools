@@ -5,6 +5,15 @@
 			<th align="center">Notes</th>
 		</tr>
 		<tr>
+			<td align="center">1.3.3</td>
+			<td align="left">
+				<ul>
+					<li>Minor bugfix for changing config while in-game. Warning should no longer be triggered and piece ordering should remain correct.</li>
+					<li>Updated Jotunn.</li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
 			<td align="center">1.3.2</td>
 			<td align="left">
 				<ul>
