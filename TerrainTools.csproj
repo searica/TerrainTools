@@ -97,7 +97,7 @@
 		<EmbeddedResource Include="Resources\undo.png" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="JotunnLib" Version="2.20.1" />
+		<PackageReference Include="JotunnLib" Version="2.21.3" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 	</ItemGroup>
 	<ItemGroup>

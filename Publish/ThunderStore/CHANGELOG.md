@@ -5,6 +5,14 @@
 			<th align="center">Notes</th>
 		</tr>
 		<tr>
+			<td align="center">1.4.0</td>
+			<td align="left">
+				<ul>
+					<li>Quick update to get things working with the Bog Witch update. Game breaking bugs are fixed but still need to do more testing to check for any new edge cases.</li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
 			<td align="center">1.3.3</td>
 			<td align="left">
 				<ul>
