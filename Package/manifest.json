@@ -1,10 +1,10 @@
 ﻿{
   "name": "AdvancedTerrainModifiers",
   "description": "Quality of life building mod that improves how terrain manipulation with the hoe and cultivator works and adds new terrain manipulation tools.",
-  "version_number": "1.4.0",
+  "version_number": "1.4.1",
   "website_url": "https://discord.gg/sFmGTBYN6n",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.2202",
-    "ValheimModding-Jotunn-2.21.3"
+    "ValheimModding-Jotunn-2.22.0"
   ]
 }
