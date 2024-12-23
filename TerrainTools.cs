@@ -30,7 +30,7 @@ namespace TerrainTools {
 
         private static readonly string MainSection = ConfigManager.SetStringPriority("Global", 10);
         private static readonly string RadiusSection = ConfigManager.SetStringPriority("Radius", 8);
-        private static readonly string HardnessSection = ConfigManager.SetStringPriority("Hardness", 6);
+        private static readonly string SharpnessSection = ConfigManager.SetStringPriority("Sharpness", 6);
         private static readonly string ShovelSection = ConfigManager.SetStringPriority("Shovel", 4);
         private static readonly string HoeSection = ConfigManager.SetStringPriority("Hoe", 2);
         private static readonly string CultivatorSection = ConfigManager.SetStringPriority("Cultivator", 0);
@@ -83,17 +83,17 @@ namespace TerrainTools {
 
         #endregion Radius Configs
 
-        #region Hardness Configs
+        #region Sharpness Configs
 
-        private static ConfigEntry<bool> enableHardnessModifier;
+        private static ConfigEntry<bool> enableSharpnessModifier;
         private static ConfigEntry<KeyCode> hardnessModKey;
         private static ConfigEntry<float> hardnessScrollScale;
 
-        internal static bool IsEnableHardnessModifier => enableHardnessModifier.Value;
-        internal static KeyCode HardnessKey => hardnessModKey.Value;
-        internal static float HardnessScrollScale => hardnessScrollScale.Value;
+        internal static bool IsEnableSharpnessModifier => enableSharpnessModifier.Value;
+        internal static KeyCode SharpnessKey => hardnessModKey.Value;
+        internal static float SharpnessScrollScale => hardnessScrollScale.Value;
 
-        #endregion Hardness Configs
+        #endregion Sharpness Configs
 
         private static ConfigEntry<bool> enableShovel;
         internal static bool IsShovelEnabled => enableShovel.Value;
@@ -194,26 +194,26 @@ namespace TerrainTools {
                 new AcceptableValueRange<float>(4f, 20f)
             );
 
-            enableHardnessModifier = ConfigManager.BindConfig(
-                HardnessSection,
-                ConfigManager.SetStringPriority("HardnessModifier", 1),
+            enableSharpnessModifier = ConfigManager.BindConfig(
+                SharpnessSection,
+                ConfigManager.SetStringPriority("SharpnessModifier", 1),
                 true,
                 "Set to true/enabled to allow modifying the hardness of terrain tools using the scroll wheel. " +
-                "Note: Hardness cannot be changed on square terraforming tools and tools that do not alter " +
+                "Note: Sharpness cannot be changed on square terraforming tools and tools that do not alter " +
                 "ground height do not have a hardness."
             );
 
             hardnessModKey = ConfigManager.BindConfig(
-                HardnessSection,
-                "HardnessModKey",
+                SharpnessSection,
+                "SharpnessModKey",
                 KeyCode.LeftControl,
                 "Modifier key that must be held down when using scroll wheel to change the hardness of terrain tools.",
                 synced: false
             );
 
             hardnessScrollScale = ConfigManager.BindConfig(
-                HardnessSection,
-                "HardnessScrollScale",
+                SharpnessSection,
+                "SharpnessScrollScale",
                 0.1f,
                 "Scroll wheel change scale, larger magnitude means the hardness will change " +
                 "faster and negative sign will reverse the direction you need to scroll to increase the hardness.",

@@ -41,7 +41,7 @@ namespace TerrainTools.Patches
             {
                 if (selectedPiece.gameObject.GetComponentInChildren<RaiseGroundOverlayVisualizer>() ||
                     RadiusModifier.ShouldModifyRadius() ||
-                    HardnessModifier.ShouldModifyHardness())
+                    SharpnessModifier.ShouldModifySharpness())
                 {
                     return true;
                 }

@@ -116,7 +116,7 @@
 				<b>Update Info</b>
 				<ul>
 					<li>Changed configuration file format to handle the new tool. <b>You need to regenerate your config file.</b></li>
-					<li>Updated README with visual examples to better explain "Hardness".</li>
+					<li>Updated README with visual examples to better explain "Sharpness".</li>
 				</ul>
 				<b>Features</b>
 				<ul>

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace TerrainTools.Helpers {
     [HarmonyPatch]
-    internal static class HardnessModifier {
+    internal static class SharpnessModifier {
         /* For Raise Power the effect over the tool radius is calculated as:
          * y = (1 - x/radius)^p where x is distance from center.
          *
@@ -30,8 +30,8 @@ namespace TerrainTools.Helpers {
         private const float MaxRaisePwr = 1f;
 
         private const float DisplayThreshold = 0.9f; // percentage
-        private static float lastDisplayedSmoothHardness;
-        private static float lastDisplayedRaiseHardness;
+        private static float lastDisplayedSmoothSharpness;
+        private static float lastDisplayedRaiseSharpness;
 
 
         [HarmonyPrefix]
@@ -47,7 +47,7 @@ namespace TerrainTools.Helpers {
                     SmoothToolIsInUse = false;
                     lastModdedSmoothPwr = 0;
                     lastTotalSmoothDelta = 0;
-                    lastDisplayedSmoothHardness = -1;
+                    lastDisplayedSmoothSharpness = -1;
                     SetPower(__instance, 0);
                 }
 
@@ -55,21 +55,21 @@ namespace TerrainTools.Helpers {
                     RaiseToolIsInUse = false;
                     lastModdedRaisePwr = 0;
                     lastTotalRaiseDelta = 0;
-                    lastDisplayedRaiseHardness = -1;
+                    lastDisplayedRaiseSharpness = -1;
                     SetPower(__instance, 0);
                 }
 
                 return;
             }
 
-            if (ShouldModifyHardness()) {
-                SetPower(__instance, Input.mouseScrollDelta.y * TerrainTools.HardnessScrollScale);
+            if (ShouldModifySharpness()) {
+                SetPower(__instance, Input.mouseScrollDelta.y * TerrainTools.SharpnessScrollScale);
             }
         }
 
 
-        internal static bool ShouldModifyHardness() {
-            return TerrainTools.IsEnableHardnessModifier && Input.GetKey(TerrainTools.HardnessKey) && Input.mouseScrollDelta.y != 0;
+        internal static bool ShouldModifySharpness() {
+            return TerrainTools.IsEnableSharpnessModifier && Input.GetKey(TerrainTools.SharpnessKey) && Input.mouseScrollDelta.y != 0;
         }
 
 
@@ -110,17 +110,17 @@ namespace TerrainTools.Helpers {
 
             var updateMsg = new List<string>();
             if (SmoothToolIsInUse) {
-                var smoothHardness = GetSmoothPowerDisplayValue(lastModdedSmoothPwr);
-                if (Mathf.Abs(smoothHardness - lastDisplayedSmoothHardness) > DisplayThreshold) {
-                    lastDisplayedSmoothHardness = Mathf.Round(smoothHardness);
-                    updateMsg.Add($"Terrain tool smoothing hardness: {smoothHardness:0}%");
+                var smoothSharpness = GetSmoothPowerDisplayValue(lastModdedSmoothPwr);
+                if (Mathf.Abs(smoothSharpness - lastDisplayedSmoothSharpness) > DisplayThreshold) {
+                    lastDisplayedSmoothSharpness = Mathf.Round(smoothSharpness);
+                    updateMsg.Add($"Terrain tool smoothing hardness: {smoothSharpness:0}%");
                 }
             }
             if (RaiseToolIsInUse) {
-                var raiseHardness = GetRaisePowerDisplayValue(lastModdedRaisePwr);
-                if (Mathf.Abs(raiseHardness - lastDisplayedRaiseHardness) > DisplayThreshold) {
-                    lastDisplayedRaiseHardness = Mathf.Round(raiseHardness);
-                    updateMsg.Add($"Terrain tool raise hardness: {raiseHardness:0}%");
+                var raiseSharpness = GetRaisePowerDisplayValue(lastModdedRaisePwr);
+                if (Mathf.Abs(raiseSharpness - lastDisplayedRaiseSharpness) > DisplayThreshold) {
+                    lastDisplayedRaiseSharpness = Mathf.Round(raiseSharpness);
+                    updateMsg.Add($"Terrain tool raise hardness: {raiseSharpness:0}%");
                 }
             }
             if (SmoothToolIsInUse || RaiseToolIsInUse) {
