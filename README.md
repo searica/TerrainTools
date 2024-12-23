@@ -20,11 +20,11 @@ Quality of life building mod that improves how terrain manipulation with the hoe
 - Configurable maximum tool radius.
 - Camera zoom is blocked while modifying tool radius.
 
-### Modifiable Tool Hardness
-- Lets you change the "hardness" of terrain tools using the scroll wheel. "Hardness" refers to how uniformly the effect is applied over the radius of the tool, so increasing the hardness will apply the effect more uniformly (see image for example of changing hardness for the Raise Ground tool).
+### Modifiable Tool Sharpness
+- Lets you change the "hardness" of terrain tools using the scroll wheel. "Sharpness" refers to how uniformly the effect is applied over the radius of the tool, so increasing the hardness will apply the effect more uniformly (see image for example of changing hardness for the Raise Ground tool).
 - Configurable hotkey to enable changing hardness.
 - Camera zoom is blocked while modifying tool hardness.
-<img src="https://raw.githubusercontent.com/searica/TerrainTools/main/Media/HardnessDemo.png"></img>
+<img src="https://raw.githubusercontent.com/searica/TerrainTools/main/Media/SharpnessDemo.png"></img>
 
 ### New Terrain Tool
 - Adds a craftable shovel that lets you lower terrain.
@@ -143,7 +143,7 @@ Changes made to the configuration settings will be reflected in-game immediately
 
 
 <div class="header">
-	<h3>Hardness Section</h3>
+	<h3>Sharpness Section</h3>
     These settings control features related to modifying the hardness of terrain tools.
 </div>
 <table>
@@ -153,10 +153,10 @@ Changes made to the configuration settings will be reflected in-game immediately
             <th align="center">Server Sync</th>
 			<th align="center">Description</th>
 		</tr>
-			<td align="center"><b>HardnessModifier</b></td>
+			<td align="center"><b>SharpnessModifier</b></td>
             <td align="center">Yes</td>
 			<td align="left">
-                Set to true/enabled to allow modifying the hardness of terrain tools using the scroll wheel. Note: Hardness cannot be changed on square terraforming tools and tools that do not alter ground height do not have a hardness.
+                Set to true/enabled to allow modifying the hardness of terrain tools using the scroll wheel. Note: Sharpness cannot be changed on square terraforming tools and tools that do not alter ground height do not have a hardness.
 				<ul>
 					<li>Acceptable values: False, True</li>
 					<li>Default value: true</li>
@@ -164,7 +164,7 @@ Changes made to the configuration settings will be reflected in-game immediately
 			</td>
 		</tr>
         </tr>
-			<td align="center"><b>HardnessModKey</b></td>
+			<td align="center"><b>SharpnessModKey</b></td>
             <td align="center">No</td>
 			<td align="left">
                 Modifier key that must be held down when using scroll wheel to change the hardness of terrain tools.
@@ -175,7 +175,7 @@ Changes made to the configuration settings will be reflected in-game immediately
 			</td>
 		</tr>
         </tr>
-			<td align="center"><b>HardnessScrollScale</b></td>
+			<td align="center"><b>SharpnessScrollScale</b></td>
             <td align="center">No</td>
 			<td align="left">
                 Scroll wheel change scale, larger magnitude means the hardness will change faster and negative sign will reverse the direction you need to scroll to increase the hardness.
