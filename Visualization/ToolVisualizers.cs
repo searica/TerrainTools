@@ -98,7 +98,7 @@ public class SeedGrassOverlayVisualizer : HoverInfoEnabled
         Freeze(secondary);
         VisualizeRecoloringBounds(secondary);
         // Might be able to remove these lines?
-        primary.StartSize = 4.0f;
+        primary.StartSize = 3.0f;
         primary.LocalPosition = new Vector3(0.0f, 2.5f, 0.0f);
     }
 
