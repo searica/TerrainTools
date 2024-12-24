@@ -22,7 +22,7 @@ public static class PreciseTerrainModifier
     {
         if (TerrainCompExtensions.IsPrecisionModifier(radius))
         {
-            radius = TerrainCompExtensions.FixedRadius;
+            radius = TerrainCompExtensions.FixedRadius - 0.25f;
         }
     }
 
@@ -106,7 +106,7 @@ public static class PreciseTerrainModifier
     {
         if (__instance.IsPrecisionModifier())
         {
-            __instance.m_lastOpRadius = __instance.GetScaledFixedRadius();
+            __instance.m_lastOpRadius = __instance.GetFixedRadius();
         }
     }
 
