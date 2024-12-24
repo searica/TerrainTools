@@ -72,14 +72,14 @@ public abstract class OverlayVisualizer : MonoBehaviour
 
     protected void VisualizeRecoloringBounds(Overlay overlay)
     {
-        overlay.StartSize = 4.0f;
+        overlay.StartSize = 3.0f;
         overlay.psr.material.mainTexture = IconCache.Box;
         overlay.LocalPosition = VerticalOffset;
     }
 
     protected void VisualizeIconInsideRecoloringBounds(Overlay overlay, Texture iconTexture)
     {
-        overlay.StartSize = 3.0f;
+        overlay.StartSize = 2.5f;
         overlay.psr.material.mainTexture = iconTexture;
         overlay.Position = transform.position + VerticalOffset;
     }
