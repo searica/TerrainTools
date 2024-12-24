@@ -1,10 +1,13 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace TerrainTools.Extensions;
 
 internal static class TerrainCompExtensions
 {
     public const int FixedRadius = 1;
+    public const float LerpVal = 0.35f;
+    public const float RoundOff = 0.05f;
     internal struct SquareBounds
     {
         public int min;
@@ -17,13 +20,14 @@ internal static class TerrainCompExtensions
     }
 
     /// <summary>
-    ///     Get fixed radius scaled by comp.m_h_map.m_scale
+    ///     Get fixed radius. Do not scale because this is already in
+    ///     units of vertex numbering.
     /// </summary>
     /// <param name="comp"></param>
     /// <returns></returns>
-    public static int GetScaledFixedRadius(this TerrainComp comp)
+    public static int GetFixedRadius(this TerrainComp comp)
     {
-        return Mathf.CeilToInt(FixedRadius / comp.m_hmap.m_scale);
+        return FixedRadius;
     }
 
     /// <summary>
@@ -50,7 +54,7 @@ internal static class TerrainCompExtensions
     {
         Log.LogInfo("[INIT] Remove Terrain Modifications", LogLevel.Medium);
 
-        int fixedRadius = comp.GetScaledFixedRadius();
+        int fixedRadius = comp.GetFixedRadius();
         int nVertsInGrid = comp.m_width + 1;
         FindSquareBounds(comp, worldPos, fixedRadius, out SquareBounds xBounds, out SquareBounds zBounds, offset: false);
         Log.LogInfo($"worldPos: {worldPos}, Bounds (X,Z): Min=({xBounds.min}, {zBounds.min}), Max=({xBounds.max}, {zBounds.max})", LogLevel.Medium);
@@ -73,7 +77,7 @@ internal static class TerrainCompExtensions
     {
         Log.LogInfo("[INIT] Raise Terrain Modification", LogLevel.Medium);
 
-        int fixedRadius = comp.GetScaledFixedRadius();
+        int fixedRadius = comp.GetFixedRadius();
         int nVertsInGrid = comp.m_width + 1;
         FindSquareBounds(comp, worldPos, fixedRadius, out SquareBounds xBounds, out SquareBounds zBounds, offset: false);
         Log.LogInfo($"worldPos: {worldPos}, Bounds (X,Z): Min=({xBounds.min}, {zBounds.min}), Max=({xBounds.max}, {zBounds.max})", LogLevel.Medium);
@@ -121,7 +125,7 @@ internal static class TerrainCompExtensions
     {
         Log.LogInfo("PreciseSmoothTerrain", LogLevel.Medium);
 
-        int fixedRadius = comp.GetScaledFixedRadius();
+        int fixedRadius = comp.GetFixedRadius();
         int nVertsInGrid = comp.m_width + 1;
         FindSquareBounds(comp, worldPos, fixedRadius, out SquareBounds xBounds, out SquareBounds zBounds, offset: false);
         float refHeight = worldPos.y - comp.transform.position.y;
@@ -153,7 +157,8 @@ internal static class TerrainCompExtensions
         Log.LogInfo("[INIT] PreciseRecolorTerrain", LogLevel.Medium);
         int radius = Mathf.CeilToInt(FixedRadius / comp.m_hmap.m_scale);
         int nVertsInGrid = comp.m_width + 1;
-        FindSquareBounds(comp, worldPos, radius, out SquareBounds xBounds, out SquareBounds zBounds, offset: true);
+        var zoneQuad = comp.GetZoneQuadrant(worldPos);
+        FindSquareBounds(comp, worldPos, radius, out SquareBounds xBounds, out SquareBounds zBounds, offset: false);
 
         Color vtxColor = ResolveColor(paintType);
         bool resetColor = paintType == TerrainModifier.PaintType.Reset;
@@ -162,9 +167,25 @@ internal static class TerrainCompExtensions
         {
             for (int j = zBounds.min; j <= zBounds.max; j++)
             {
-                vtxColor.a = comp.m_hmap.GetPaintMask(i, j).a;  // avoids lava
                 int vertexIndex = (j * nVertsInGrid) + i;
-                comp.m_paintMask[vertexIndex] = vtxColor;
+                Color currentColor = comp.m_hmap.GetPaintMask(i, j);
+
+
+                // This is to compensate for the paint color bleeding towards the zone center in Valheim
+                if ((zoneQuad == ZoneQuadrant.TopLeft && (i == xBounds.max || j == zBounds.min))
+                    || (zoneQuad == ZoneQuadrant.TopRight && (i == xBounds.min || j == zBounds.min))
+                    || (zoneQuad == ZoneQuadrant.BottomLeft && (i == xBounds.max || j == zBounds.max))
+                    || (zoneQuad == ZoneQuadrant.BottomRight && (i == xBounds.min || j == zBounds.max)))
+                {
+                    Log.LogInfo($"ZoneQuad: {zoneQuad.ToString()}, Vertex: ({i},{j}), Bounds: Min=({xBounds.min},{zBounds.min}), Max=({xBounds.max},{zBounds.max})");
+                    comp.m_paintMask[vertexIndex] = BlendColor(currentColor, vtxColor, LerpVal);
+                    Log.LogInfo($"Paint: {comp.m_paintMask[vertexIndex]}");
+                }
+                else
+                {
+                    vtxColor.a = currentColor.a; // avoid spawning lava
+                    comp.m_paintMask[vertexIndex] = vtxColor;
+                }
                 comp.m_modifiedPaint[vertexIndex] = !resetColor;
                 Log.LogInfo($"Vertex: ({i}, {j}), Index: {vertexIndex}, Color: {vtxColor}", LogLevel.Medium);
             }
@@ -189,7 +210,6 @@ internal static class TerrainCompExtensions
         }
         return Heightmap.m_paintMaskNothing;
     }
-
 
 
     /// <summary>
@@ -228,5 +248,111 @@ internal static class TerrainCompExtensions
             Mathf.Max(0, vertIdY - radius),
             Mathf.Min(vertIdY + radius, comp.m_width)
         );
+    }
+
+
+    internal enum ZoneQuadrant
+    {
+        /// <summary>
+        ///     Center of the zone.
+        /// </summary>
+        Center,
+
+        /// <summary>
+        ///     Outer edge is x.min && z.max
+        ///     Towards center is x.max && z.min
+        /// </summary>
+        TopLeft,
+
+        /// <summary>
+        ///     Outer edge is x.max && z.max
+        ///     Towards center is x.min && z.min
+        /// </summary>
+        TopRight,
+
+        /// <summary>
+        ///     Outer edge is x.min && z.min
+        ///     Towards center is x.max && z.max
+        /// </summary>
+        BottomLeft,
+
+        /// <summary>
+        ///     Outer edge is x.max && z.min.
+        ///     Towards center is x.min && z.max
+        /// </summary>
+        BottomRight, 
+    }
+
+
+    /// <summary>
+    ///     Get the quadrant of the zone that a world position is in.
+    /// </summary>
+    /// <param name="comp"></param>
+    /// <param name="worldPos"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    private static ZoneQuadrant GetZoneQuadrant(this TerrainComp comp, Vector3 worldPos)
+    {
+        Vector3 relativePos = worldPos - comp.m_hmap.transform.position;
+        if (Mathf.Abs(relativePos.x) <= 0.5f && Mathf.Abs(relativePos.z) <= 0.5f)
+        {
+            return ZoneQuadrant.Center;
+        }
+        else if (relativePos.x < 0 && relativePos.z > 0)
+        {
+            return ZoneQuadrant.TopLeft;
+        }
+        else if (relativePos.x > 0 && relativePos.z > 0)
+        {
+            return ZoneQuadrant.TopRight;
+        }
+        else if (relativePos.x < 0 && relativePos.z < 0)
+        {
+            return ZoneQuadrant.BottomLeft;
+        }
+        else if (relativePos.x > 0 && relativePos.z < 0)
+        {
+            return ZoneQuadrant.BottomRight;
+        }
+
+        throw new ArgumentOutOfRangeException("Could not determine location within zone!");
+    }
+
+    /// <summary>
+    ///     Interpolate color while clamping the result to prevent bleeds on repeat color changes.
+    ///     Also directly copies the alpha value without Lerp. The approach used here only works because
+    ///     each paint type in Valheim is a single primary color (R, G, B).
+    /// </summary>
+    /// <param name="currentColor"></param>
+    /// <param name="newColor"></param>
+    /// <param name="t"></param>
+    /// <returns></returns>
+    private static Color BlendColor(Color currentColor, Color newColor, float t)
+    {
+        return new(
+            LerpToUpperOrLowerRange(currentColor.r, newColor.r, t),
+            LerpToUpperOrLowerRange(currentColor.g, newColor.g, t),
+            LerpToUpperOrLowerRange(currentColor.b, newColor.b, t),
+            currentColor.a
+        );
+    }
+
+    /// <summary>
+    ///     Used to clamps Lerp changes to color for repeated changes.
+    /// </summary>
+    /// <param name="currentVal"></param>
+    /// <param name="newVal"></param>
+    /// <param name="t"></param>
+    /// <returns>Clamp new value to range (1-t, 1) if it is lower than currentVal. Clamp new value to range (0, t) if it is higher than currentVal.</returns>
+    private static float LerpToUpperOrLowerRange(float currentVal, float newVal, float t) 
+    {
+        float tmpVal = Mathf.Lerp(currentVal, newVal, t);
+        if (currentVal >= 0.5f)
+        {
+            tmpVal = Mathf.Clamp(tmpVal, 1f - t, 1f);
+            return tmpVal.Equals(1f, eps: RoundOff) ? 1f : tmpVal;
+        }
+        tmpVal = Mathf.Clamp(tmpVal, 0f, t);
+        return tmpVal.Equals(0f, eps: RoundOff) ? 0f: tmpVal;
     }
 }

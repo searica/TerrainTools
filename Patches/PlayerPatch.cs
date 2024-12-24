@@ -1,11 +1,7 @@
 ﻿using HarmonyLib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TerrainTools.Visualization;
 using UnityEngine;
+using TerrainTools.Extensions;
+using TerrainTools.Visualization;
 
 namespace TerrainTools.Patches;
 
@@ -29,32 +25,8 @@ internal class PlayerPatch
         }
 
         Vector3 position = __instance.m_placementGhost.transform.position;
-        position.x = RoundToNearest(position.x, 1.0f);
-        position.z = RoundToNearest(position.z, 1.0f);
+        position.x = position.x.RoundToNearest(1.0f);
+        position.z = position.z.RoundToNearest(1.0f);
         __instance.m_placementGhost.transform.position = position;
-    }
-
-    /// <summary>
-    ///     Round to nearest multiple of precision (midpoint rounds away from zero)
-    /// </summary>
-    /// <param name="x"></param>
-    /// <param name="precision"></param>
-    /// <returns></returns>
-    private static float RoundToNearest(float x, float precision)
-    {
-        if (precision <= 0) { return x; }
-        float sign = Mathf.Sign(x);
-
-        int val = (int)Mathf.Abs(x * 1000f);
-        int whole = val / 1000;
-        int fraction = val % 1000;
-
-        int midPoint = (int)(precision * 1000f / 2f);
-
-        if (fraction < midPoint)
-        {
-            return sign * whole;
-        }
-        return sign * (whole + precision);
     }
 }
