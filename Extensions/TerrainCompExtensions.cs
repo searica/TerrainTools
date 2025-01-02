@@ -56,7 +56,7 @@ internal static class TerrainCompExtensions
 
         int fixedRadius = comp.GetFixedRadius();
         int nVertsInGrid = comp.m_width + 1;
-        FindSquareBounds(comp, worldPos, fixedRadius, out SquareBounds xBounds, out SquareBounds zBounds, offset: false);
+        FindSquareBounds(comp, worldPos, fixedRadius, out SquareBounds xBounds, out SquareBounds zBounds, paint: false);
         Log.LogInfo($"worldPos: {worldPos}, Bounds (X,Z): Min=({xBounds.min}, {zBounds.min}), Max=({xBounds.max}, {zBounds.max})", LogLevel.Medium);
 
         for (int i = xBounds.min; i <= xBounds.max; i++)
@@ -79,7 +79,7 @@ internal static class TerrainCompExtensions
 
         int fixedRadius = comp.GetFixedRadius();
         int nVertsInGrid = comp.m_width + 1;
-        FindSquareBounds(comp, worldPos, fixedRadius, out SquareBounds xBounds, out SquareBounds zBounds, offset: false);
+        FindSquareBounds(comp, worldPos, fixedRadius, out SquareBounds xBounds, out SquareBounds zBounds, paint: false);
         Log.LogInfo($"worldPos: {worldPos}, Bounds (X,Z): Min=({xBounds.min}, {zBounds.min}), Max=({xBounds.max}, {zBounds.max})", LogLevel.Medium);
 
         float refHeight = worldPos.y - comp.transform.position.y;
@@ -127,7 +127,7 @@ internal static class TerrainCompExtensions
 
         int fixedRadius = comp.GetFixedRadius();
         int nVertsInGrid = comp.m_width + 1;
-        FindSquareBounds(comp, worldPos, fixedRadius, out SquareBounds xBounds, out SquareBounds zBounds, offset: false);
+        FindSquareBounds(comp, worldPos, fixedRadius, out SquareBounds xBounds, out SquareBounds zBounds, paint: false);
         float refHeight = worldPos.y - comp.transform.position.y;
         Log.LogInfo($"worldPos: {worldPos}, Bounds (X,Z): Min=({xBounds.min}, {zBounds.min}), Max=({xBounds.max}, {zBounds.max})", LogLevel.Medium);
 
@@ -158,7 +158,7 @@ internal static class TerrainCompExtensions
         int radius = Mathf.CeilToInt(FixedRadius / comp.m_hmap.m_scale);
         int nVertsInGrid = comp.m_width + 1;
         var zoneQuad = comp.GetZoneQuadrant(worldPos);
-        FindSquareBounds(comp, worldPos, radius, out SquareBounds xBounds, out SquareBounds zBounds, offset: false);
+        FindSquareBounds(comp, worldPos, radius, out SquareBounds xBounds, out SquareBounds zBounds, paint: true);
 
         Color vtxColor = ResolveColor(paintType);
         bool resetColor = paintType == TerrainModifier.PaintType.Reset;
@@ -228,16 +228,20 @@ internal static class TerrainCompExtensions
         int radius,
         out SquareBounds xBounds,
         out SquareBounds zBounds,
-        bool offset = false
+        bool paint = false
     )
     {
-        if (offset)
-        {
-            worldPos = new(worldPos.x - 0.5f, worldPos.y, worldPos.z - 0.5f);
-        }
-
         // Get 2D index numbering of the nearest vertex within the zone 
-        comp.m_hmap.WorldToVertexMask(worldPos, out int vertIdX, out int vertIdY);
+        int vertIdX;
+        int vertIdY;
+        if (paint)
+        {
+            comp.m_hmap.WorldToVertexMask(worldPos, out vertIdX, out vertIdY);
+        }
+        else 
+        {
+            comp.m_hmap.WorldToVertex(worldPos, out vertIdX, out vertIdY);
+        }
 
         // m_width is the number of tiles so number of vertexes is m_width + 1
         xBounds = new SquareBounds(
