@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using System.Collections.Generic;
 using System.Reflection.Emit;
-using TerrainTools.Helpers;
+using TerrainTools.Core;
 using TerrainTools.Visualization;
 
 namespace TerrainTools.Patches;

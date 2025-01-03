@@ -1,5 +1,5 @@
-﻿using TerrainTools.Helpers;
-using UnityEngine;
+﻿using UnityEngine;
+using TerrainTools.Core;
 
 namespace TerrainTools.Visualization;
 

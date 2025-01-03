@@ -1,8 +1,9 @@
 ﻿using HarmonyLib;
-using TerrainTools.Visualization;
 using UnityEngine;
+using Logging;
+using TerrainTools.Visualization;
 
-namespace TerrainTools.Helpers;
+namespace TerrainTools.Core;
 
 [HarmonyPatch]
 internal static class RadiusModifier
@@ -103,25 +104,25 @@ internal static class RadiusModifier
         if (__instance.m_settings.m_level)
         {
             __instance.m_settings.m_levelRadius = ModifyRadius(__instance.m_settings.m_levelRadius, lastTotalDelta);
-            Log.LogInfo($"Applying level radius {__instance.m_settings.m_levelRadius}", LogLevel.Medium);
+            Log.LogInfo($"Applying level radius {__instance.m_settings.m_levelRadius}", Log.InfoLevel.Medium);
         }
 
         if (__instance.m_settings.m_raise)
         {
             __instance.m_settings.m_raiseRadius = ModifyRadius(__instance.m_settings.m_raiseRadius, lastTotalDelta);
-            Log.LogInfo($"Applying raise radius {__instance.m_settings.m_raiseRadius}", LogLevel.Medium);
+            Log.LogInfo($"Applying raise radius {__instance.m_settings.m_raiseRadius}", Log.InfoLevel.Medium);
         }
 
         if (__instance.m_settings.m_smooth)
         {
             __instance.m_settings.m_smoothRadius = ModifyRadius(__instance.m_settings.m_smoothRadius, lastTotalDelta);
-            Log.LogInfo($"Applying smooth radius {__instance.m_settings.m_smoothRadius}", LogLevel.Medium);
+            Log.LogInfo($"Applying smooth radius {__instance.m_settings.m_smoothRadius}", Log.InfoLevel.Medium);
         }
 
         if (__instance.m_settings.m_paintCleared)
         {
             __instance.m_settings.m_paintRadius = ModifyRadius(__instance.m_settings.m_paintRadius, lastTotalDelta);
-            Log.LogInfo($"Applying paint radius {__instance.m_settings.m_paintRadius}", LogLevel.Medium);
+            Log.LogInfo($"Applying paint radius {__instance.m_settings.m_paintRadius}", Log.InfoLevel.Medium);
         }
     }
 
@@ -132,7 +133,7 @@ internal static class RadiusModifier
 
     private static void SetRadius(TerrainOp terrainOp, float delta)
     {
-        Log.LogInfo($"Adjusting radius by {delta}", LogLevel.High);
+        Log.LogInfo($"Adjusting radius by {delta}", Log.InfoLevel.High);
 
         if (!RadiusToolIsInUse && terrainOp)
         {
@@ -149,7 +150,7 @@ internal static class RadiusModifier
             lastModdedRadius = ModifyRadius(lastModdedRadius, delta);
             lastTotalDelta += delta;
         }
-        Log.LogInfo($"total delta {lastTotalDelta}", LogLevel.High);
+        Log.LogInfo($"total delta {lastTotalDelta}", Log.InfoLevel.High);
 
         lastGhostScale = new Vector3(
             lastModdedRadius / lastOriginalRadius,
@@ -181,7 +182,7 @@ internal static class RadiusModifier
         float diff = Vector3.Distance(particleEffect.transform.localScale, lastGhostScale);
         if (diff > Tolerance)
         {
-            Log.LogInfo($"Adjusting ghost scale to {lastGhostScale}x", LogLevel.High);
+            Log.LogInfo($"Adjusting ghost scale to {lastGhostScale}x", Log.InfoLevel.High);
             particleEffect.transform.localScale = lastGhostScale;
         }
     }

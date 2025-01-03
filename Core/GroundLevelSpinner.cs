@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace TerrainTools.Helpers;
+namespace TerrainTools.Core;
 
 public static class GroundLevelSpinner
 {

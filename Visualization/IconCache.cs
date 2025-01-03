@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Linq;
 using UnityEngine;
+using Logging;
 
 namespace TerrainTools.Visualization;
 

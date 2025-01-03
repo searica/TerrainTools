@@ -1,19 +1,20 @@
 ﻿// Ignore Spelling: TerrainTools Jotunn
 
-using BepInEx;
-using BepInEx.Configuration;
-using BepInEx.Logging;
-using HarmonyLib;
-using Jotunn.Configs;
-using Jotunn.Managers;
-using Jotunn.Utils;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using TerrainTools.Configs;
-using TerrainTools.Extensions;
-using TerrainTools.Helpers;
+using BepInEx;
+using BepInEx.Configuration;
+using HarmonyLib;
 using UnityEngine;
+using Jotunn.Configs;
+using Jotunn.Managers;
+using Jotunn.Utils;
+using Jotunn.Extensions;
+using Configs;
+using Logging;
+using TerrainTools.Core;
+using TerrainTools.Tools;
 
 namespace TerrainTools;
 
@@ -29,15 +30,16 @@ internal sealed class TerrainTools : BaseUnityPlugin
     public const string PluginVersion = "1.4.1";
 
     public static TerrainTools Instance;
+    private static ConfigFileWatcher ConfigFileWatcher;
 
     #region Section Names
 
-    private const string MainSection = "1 - Global";
-    private const string RadiusSection = "2 - Radius";
-    private const string SharpnessSection = "3 - Sharpness";
-    private const string ShovelSection = "4 - Shovel";
-    private const string HoeSection = "5 - Hoe";
-    private const string CultivatorSection = "6 - Cultivator";
+    private const string MainSection = "Global";
+    private const string RadiusSection = "Radius";
+    private const string SharpnessSection = "Sharpness";
+    private const string ShovelSection = "Shovel";
+    private const string HoeSection = "Hoe";
+    private const string CultivatorSection = "Cultivator";
 
     internal bool UpdatePlugin = false;
 
@@ -110,7 +112,8 @@ internal sealed class TerrainTools : BaseUnityPlugin
         Instance = this;
         Log.Init(Logger);
 
-        Config.Init(PluginGUID, saveOnConfigSet: false);
+    
+        Config.DisableSaveOnConfigSet();
         SetUpConfigEntries();
         Config.Save();
         Config.SaveOnConfigSet = true;
@@ -122,10 +125,10 @@ internal sealed class TerrainTools : BaseUnityPlugin
         PieceManager.OnPiecesRegistered += InitManager.InitToolPieces;
 
         _ = GUIManager.Instance; // Fix rare NRE on shutdown
-        Config.SetupWatcher();
+        ConfigFileWatcher = new(Config);
 
         // Update tools if config file reloaded
-        ConfigFileManager.OnConfigFileReloaded += () =>
+        ConfigFileWatcher.OnConfigFileReloaded += () =>
         {
             if (UpdatePlugin)
             {
@@ -164,7 +167,7 @@ internal sealed class TerrainTools : BaseUnityPlugin
         Log.Verbosity = Config.BindConfigInOrder(
             MainSection,
             "Verbosity",
-            LogLevel.Low,
+            Log.InfoLevel.Low,
             "Low will log basic information about the mod. Medium will log information that " +
             "is useful for troubleshooting. High will log a lot of information, do not set " +
             "it to this without good reason as it will slow Down your game.",
@@ -201,7 +204,7 @@ internal sealed class TerrainTools : BaseUnityPlugin
             "How much each tick of movement from the scroll wheel will change radius size."
             + " Larger magnitude means the radius will faster."
             + " Negative numbers will reverse the scroll direction to adjust the radius.",
-            new AcceptableValueRange<float>(-1f, 1f),
+            acceptableValues: new AcceptableValueRange<float>(-1f, 1f),
             synced: false
         );
 
@@ -210,7 +213,7 @@ internal sealed class TerrainTools : BaseUnityPlugin
             "Max Radius",
             10f,
             "Maximum radius of terrain tools.",
-            new AcceptableValueRange<float>(4f, 20f)
+            acceptableValues: new AcceptableValueRange<float>(4f, 20f)
         );
 
         enableSharpnessModifier = Config.BindConfigInOrder(
@@ -237,7 +240,7 @@ internal sealed class TerrainTools : BaseUnityPlugin
             "How much each tick of movement from the scroll wheel will change sharpness."
             + " Larger magnitude means the sharpness will faster."
             + " Negative numbers will reverse the scroll direction to adjust the sharpness.",
-            new AcceptableValueRange<float>(-1f, 1f),
+            acceptableValues: new AcceptableValueRange<float>(-1f, 1f),
             synced: false
         );
 
@@ -277,137 +280,3 @@ internal sealed class TerrainTools : BaseUnityPlugin
     }
 }
 
-/// <summary>
-///     Log level to control output to BepInEx log
-/// </summary>
-internal enum LogLevel
-{
-    Low = 0,
-    Medium = 1,
-    High = 2,
-}
-
-/// <summary>
-///     Helper class for properly logging from static contexts.
-/// </summary>
-internal static class Log
-{
-    #region Verbosity
-
-    internal static ConfigEntry<LogLevel> Verbosity { get; set; }
-    internal static LogLevel VerbosityLevel => Verbosity.Value;
-    internal static bool IsVerbosityLow => Verbosity.Value >= LogLevel.Low;
-    internal static bool IsVerbosityMedium => Verbosity.Value >= LogLevel.Medium;
-    internal static bool IsVerbosityHigh => Verbosity.Value >= LogLevel.High;
-
-    #endregion Verbosity
-
-    private static ManualLogSource logSource;
-
-    internal static void Init(ManualLogSource logSource)
-    {
-        Log.logSource = logSource;
-    }
-
-    internal static void LogDebug(object data) => logSource.LogDebug(data);
-
-    internal static void LogError(object data) => logSource.LogError(data);
-
-    internal static void LogFatal(object data) => logSource.LogFatal(data);
-
-    internal static void LogMessage(object data) => logSource.LogMessage(data);
-
-    internal static void LogWarning(object data) => logSource.LogWarning(data);
-
-    internal static void LogInfo(object data, LogLevel level = LogLevel.Low)
-    {
-        if (Verbosity is null || VerbosityLevel >= level)
-        {
-            logSource.LogInfo(data);
-        }
-    }
-
-    internal static void LogGameObject(GameObject prefab, bool includeChildren = false)
-    {
-        LogInfo("***** " + prefab.name + " *****");
-        foreach (Component compo in prefab.GetComponents<Component>())
-        {
-            LogComponent(compo);
-        }
-
-        if (!includeChildren) { return; }
-
-        LogInfo("***** " + prefab.name + " (children) *****");
-        foreach (Transform child in prefab.transform)
-        {
-            if (!child) { continue; }
-
-            LogInfo($" - {child.name}");
-            foreach (Component compo in child.GetComponents<Component>())
-            {
-                LogComponent(compo);
-            }
-        }
-    }
-
-    internal static void LogComponent(Component compo)
-    {
-        if (!compo) { return; }
-        try
-        {
-            LogInfo($"--- {compo.GetType().Name}: {compo.name} ---");
-        }
-        catch (Exception ex)
-        {
-            Log.LogError(ex.ToString());
-            Log.LogWarning("Could not get type name for component!");
-            return;
-        }
-
-        try
-        {
-            List<PropertyInfo> properties = AccessTools.GetDeclaredProperties(compo.GetType());
-            foreach (PropertyInfo property in properties)
-            {
-                try
-                {
-                    LogInfo($" - {property.Name} = {property.GetValue(compo)}");
-                }
-                catch (Exception ex)
-                {
-                    Log.LogError(ex.ToString());
-                    Log.LogWarning($"Could not get property: {property.Name} for component!");
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Log.LogError(ex.ToString());
-            Log.LogWarning("Could not get properties for component!");
-        }
-
-        try
-        {
-
-            List<FieldInfo> fields = AccessTools.GetDeclaredFields(compo.GetType()); ;
-            foreach (FieldInfo field in fields)
-            {
-                try
-                {
-                    LogInfo($" - {field.Name} = {field.GetValue(compo)}");
-                }
-                catch (Exception ex)
-                {
-                    Log.LogError(ex.ToString());
-                    Log.LogWarning($"Could not get field: {field.Name} for component!");
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Log.LogError(ex.ToString());
-            Log.LogWarning("Could not get fields for component!");
-        }
-
-    }
-}

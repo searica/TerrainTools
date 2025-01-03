@@ -1,12 +1,12 @@
 ﻿using Jotunn.Configs;
 using System;
 using System.Collections.Generic;
-using TerrainTools.Helpers;
+using TerrainTools.Core;
 using TerrainTools.Visualization;
 
-namespace TerrainTools.Configs;
+namespace TerrainTools.Tools;
 
-internal class ToolConfigs
+internal static class ToolConfigs
 {
     internal static Dictionary<string, ToolDB> ToolConfigsMap = new()
     {
@@ -72,7 +72,7 @@ internal class ToolConfigs
         },
 
         {
-"paved_road_v2_square",
+            "paved_road_v2_square",
             new ToolDB(
                 name: "Paved road (Square)",
                 basePrefab: "paved_road_v2",
@@ -84,7 +84,7 @@ internal class ToolConfigs
             )
         },
         {
-"paved_road_v2_path",
+            "paved_road_v2_path",
             new ToolDB(
                 name: "paved_road_v2_path",
                 basePrefab: "paved_road_v2",
@@ -96,7 +96,7 @@ internal class ToolConfigs
             )
         },
         {
-"paved_road_v2_path_square",
+            "paved_road_v2_path_square",
             new ToolDB(
                 name: "paved_road_v2_path_square",
                 basePrefab: "paved_road_v2",
@@ -109,7 +109,7 @@ internal class ToolConfigs
             )
         },
         {
-"remove_terrain_mods",
+            "remove_terrain_mods",
             new ToolDB(
                 name: "remove_terrain_mods",
                 basePrefab: "mud_road_v2",
@@ -127,7 +127,7 @@ internal class ToolConfigs
 
         // Cultivator Tools
         {
-"cultivate_v2_square",
+            "cultivate_v2_square",
             new ToolDB(
                 name: "cultivate_v2_square",
                 basePrefab: "cultivate_v2",
@@ -140,7 +140,7 @@ internal class ToolConfigs
             )
         },
         {
-"cultivate_v2_path",
+            "cultivate_v2_path",
             new ToolDB(
                 name: "cultivate_v2_path",
                 basePrefab: "cultivate_v2",
@@ -153,7 +153,7 @@ internal class ToolConfigs
             )
         },
         {
-"cultivate_v2_path_square",
+            "cultivate_v2_path_square",
             new ToolDB(
                 name: "cultivate_v2_path_square",
                 basePrefab: "cultivate_v2",
@@ -167,7 +167,7 @@ internal class ToolConfigs
             )
         },
         {
-"replant_v2_square",
+            "replant_v2_square",
             new ToolDB(
                 name: "replant_v2_square",
                 basePrefab: "replant_v2",

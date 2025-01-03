@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace TerrainTools.Configs;
+namespace TerrainTools.Tools;
 
 internal class ToolDB
 {

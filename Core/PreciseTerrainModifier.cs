@@ -3,7 +3,7 @@ using UnityEngine;
 using TerrainTools.Extensions;
 using TerrainTools.Visualization;
 
-namespace TerrainTools.Helpers;
+namespace TerrainTools.Core;
 
 [HarmonyPatch(typeof(PreciseTerrainModifier))]
 public static class PreciseTerrainModifier
@@ -155,7 +155,7 @@ public static class PreciseTerrainModifier
             return true;
         }
 
-        __instance.PreciseRecolorTerrain(worldPos, paintType, heightCheck);
+        __instance.PreciseRecolorTerrain(worldPos, paintType);
         return false;
     }
 }

@@ -4,9 +4,10 @@ using Jotunn.Entities;
 using Jotunn.Managers;
 using System.Collections.Generic;
 using UnityEngine;
+using Logging;
 using TerrainTools.Visualization;
 
-namespace TerrainTools.Helpers;
+namespace TerrainTools.Core;
 
 internal static class Shovel
 {

@@ -1,10 +1,10 @@
 ﻿using HarmonyLib;
 using System.Collections.Generic;
-using TerrainTools.Extensions;
+using Logging;
 using TerrainTools.Visualization;
 using UnityEngine;
 
-namespace TerrainTools.Helpers;
+namespace TerrainTools.Core;
 
 [HarmonyPatch]
 internal static class SharpnessModifier
@@ -97,13 +97,13 @@ internal static class SharpnessModifier
         if (__instance.m_settings.m_raise)
         {
             __instance.m_settings.m_raisePower = ModifyRaisePower(__instance.m_settings.m_raisePower, lastTotalRaiseDelta);
-            Log.LogInfo($"Applying raise Power {__instance.m_settings.m_raisePower}", LogLevel.Medium);
+            Log.LogInfo($"Applying raise Power {__instance.m_settings.m_raisePower}", Log.InfoLevel.Medium);
         }
 
         if (__instance.m_settings.m_smooth)
         {
             __instance.m_settings.m_smoothPower = ModifySmoothPower(__instance.m_settings.m_smoothPower, lastTotalSmoothDelta);
-            Log.LogInfo($"Applying smooth Power {__instance.m_settings.m_smoothPower}", LogLevel.Medium);
+            Log.LogInfo($"Applying smooth Power {__instance.m_settings.m_smoothPower}", Log.InfoLevel.Medium);
         }
     }
 
@@ -160,7 +160,7 @@ internal static class SharpnessModifier
             return;
         }
 
-        Log.LogInfo($"Adjusting Smooth Power by {delta}", LogLevel.High);
+        Log.LogInfo($"Adjusting Smooth Power by {delta}", Log.InfoLevel.High);
 
         if (!SmoothToolIsInUse) // new terrain tool
         {
@@ -172,7 +172,7 @@ internal static class SharpnessModifier
             lastModdedSmoothPwr = ModifySmoothPower(lastModdedSmoothPwr, delta);
         }
         lastTotalSmoothDelta += delta;
-        Log.LogInfo($"Total smooth power delta {lastTotalSmoothDelta}", LogLevel.High);
+        Log.LogInfo($"Total smooth power delta {lastTotalSmoothDelta}", Log.InfoLevel.High);
     }
 
     private static void SetRaisePower(TerrainOp terrainOp, float delta)
@@ -184,7 +184,7 @@ internal static class SharpnessModifier
 
         delta = ConvertSmoothDeltaToRaiseDelta(delta);
 
-        Log.LogInfo($"Adjusting Raise Power by {delta}", LogLevel.High);
+        Log.LogInfo($"Adjusting Raise Power by {delta}", Log.InfoLevel.High);
 
         if (!RaiseToolIsInUse) // new terrain tool
         {
@@ -196,7 +196,7 @@ internal static class SharpnessModifier
             lastModdedRaisePwr = ModifyRaisePower(lastModdedRaisePwr, delta);
         }
         lastTotalRaiseDelta += delta;
-        Log.LogInfo($"Total raise power delta {lastTotalRaiseDelta}", LogLevel.High);
+        Log.LogInfo($"Total raise power delta {lastTotalRaiseDelta}", Log.InfoLevel.High);
     }
 
     /// <summary>

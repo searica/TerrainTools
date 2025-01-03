@@ -4,11 +4,11 @@ using Jotunn.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TerrainTools.Configs;
+using Logging;
+using TerrainTools.Tools;
 using UnityEngine;
-using static UnityEngine.GridBrushBase;
 
-namespace TerrainTools.Helpers;
+namespace TerrainTools.Core;
 
 internal static class InitManager
 {
