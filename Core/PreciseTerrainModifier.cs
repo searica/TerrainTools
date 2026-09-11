@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using System.Collections.Generic;
 using UnityEngine;
 using TerrainTools.Extensions;
 using TerrainTools.Visualization;
@@ -8,6 +9,8 @@ namespace TerrainTools.Core;
 [HarmonyPatch(typeof(PreciseTerrainModifier))]
 public static class PreciseTerrainModifier
 {
+    private const int SettingsPayloadMagic = 0x41544D53; // ATMS
+    private const int SettingsPayloadVersion = 1;
 
     /// <summary>
     ///     Catches invalid radius from precise terrain modifications and modifies it
@@ -28,9 +31,16 @@ public static class PreciseTerrainModifier
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.ApplyOperation))]
-    private static void ApplyOperationPrefix(TerrainOp modifier)
+    private static void ApplyOperationPrefix(TerrainComp __instance, TerrainOp modifier)
     {
         if (!modifier || !modifier.gameObject) { return; }
+
+        // Valheim 1.0 resolves TerrainOp settings on the owner. Claim before
+        // serializing the operation so the patched owner receives runtime values.
+        if (__instance && __instance.m_nview && !__instance.m_nview.IsOwner())
+        {
+            __instance.m_nview.ClaimOwnership();
+        }
 
         // Set radius to -inf so I can check if custom overlay in later methods
         if (modifier.gameObject.GetComponentInChildren<OverlayVisualizer>())
@@ -51,24 +61,112 @@ public static class PreciseTerrainModifier
         }
     }
 
-    /// <summary>
-    ///     Claim ownership before sending RPC to do terrain operation to
-    ///     ensure that custom terrain ops run on a PC with the mod.
-    /// </summary>
-    /// <param name="__instance"></param>
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.RPC_ApplyOperation))]
-    private static void RPC_ApplyOperationPrefix(TerrainComp __instance)
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(TerrainOp), nameof(TerrainOp.GetRadius))]
+    private static void GetRadiusPostfix(TerrainOp __instance, ref float __result)
     {
-        if (!__instance || !__instance.m_nview)
+        if (__instance && __instance.gameObject.GetComponent<RemoveModificationsOverlayVisualizer>())
+        {
+            __result = Mathf.Max(__result, __instance.m_settings.m_levelRadius + 1f);
+        }
+    }
+
+    private static void RemoveLegacyTerrainModifiers(Vector3 position, float radius)
+    {
+        var modifiers = new List<TerrainModifier>();
+        TerrainModifier.GetModifiers(position, radius + 1f, modifiers);
+        foreach (TerrainModifier modifier in modifiers)
+        {
+            if (!modifier || !modifier.m_nview)
+            {
+                continue;
+            }
+            modifier.m_nview.ClaimOwnership();
+            ZNetScene.instance.Destroy(modifier.gameObject);
+        }
+    }
+
+    /// <summary>
+    ///     Valheim 1.0 serializes only the TerrainOp prefab hash. Append the
+    ///     runtime values changed by precision, radius, and hardness controls.
+    /// </summary>
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(TerrainOp.Settings), nameof(TerrainOp.Settings.Serialize))]
+    private static void SerializeSettingsPostfix(TerrainOp.Settings __instance, ZPackage pkg)
+    {
+        if (__instance == null || pkg == null)
         {
             return;
         }
 
-        if (!__instance.m_nview.IsOwner())
+        pkg.Write(SettingsPayloadMagic);
+        pkg.Write(SettingsPayloadVersion);
+        pkg.Write(__instance.m_levelRadius);
+        pkg.Write(__instance.m_raiseRadius);
+        pkg.Write(__instance.m_raisePower);
+        pkg.Write(__instance.m_raiseDelta);
+        pkg.Write(__instance.m_smoothRadius);
+        pkg.Write(__instance.m_smoothPower);
+        pkg.Write(__instance.m_paintRadius);
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(TerrainOp.Settings), nameof(TerrainOp.Settings.Deserialize))]
+    private static void DeserializeSettingsPostfix(ZPackage pkg, ref TerrainOp.Settings __result)
+    {
+        const int payloadSize = sizeof(int) * 2 + sizeof(float) * 7;
+        if (__result == null || pkg == null || pkg.Size() - pkg.GetPos() < payloadSize)
         {
-            __instance.m_nview.ClaimOwnership();
+            return;
         }
+
+        int payloadStart = pkg.GetPos();
+        if (pkg.ReadInt() != SettingsPayloadMagic || pkg.ReadInt() != SettingsPayloadVersion)
+        {
+            pkg.SetPos(payloadStart);
+            return;
+        }
+
+        TerrainOp.Settings settings = CopySettings(__result);
+        settings.m_levelRadius = pkg.ReadSingle();
+        settings.m_raiseRadius = pkg.ReadSingle();
+        settings.m_raisePower = pkg.ReadSingle();
+        settings.m_raiseDelta = pkg.ReadSingle();
+        settings.m_smoothRadius = pkg.ReadSingle();
+        settings.m_smoothPower = pkg.ReadSingle();
+        settings.m_paintRadius = pkg.ReadSingle();
+        __result = settings;
+    }
+
+    private static TerrainOp.Settings CopySettings(TerrainOp.Settings source)
+    {
+        return new TerrainOp.Settings
+        {
+            m_levelOffset = source.m_levelOffset,
+            m_level = source.m_level,
+            m_levelRadius = source.m_levelRadius,
+            m_square = source.m_square,
+            m_raise = source.m_raise,
+            m_raiseRadius = source.m_raiseRadius,
+            m_raisePower = source.m_raisePower,
+            m_raiseDelta = source.m_raiseDelta,
+            m_smooth = source.m_smooth,
+            m_smoothRadius = source.m_smoothRadius,
+            m_smoothPower = source.m_smoothPower,
+            m_paintCleared = source.m_paintCleared,
+            m_paintHeightCheck = source.m_paintHeightCheck,
+            m_paintType = source.m_paintType,
+            m_paintRadius = source.m_paintRadius,
+            m_paintStrength = source.m_paintStrength,
+            m_paintExp = source.m_paintExp,
+            m_paintCurve = source.m_paintCurve,
+            m_rotation = source.m_rotation,
+            m_sides = source.m_sides,
+            m_addMedianMax = source.m_addMedianMax,
+            m_centerMultiplicationFactor = source.m_centerMultiplicationFactor,
+            m_pointMultiplicationFactor = source.m_pointMultiplicationFactor,
+            m_halfOffset = source.m_halfOffset
+        };
     }
 
     /// <summary>
@@ -87,8 +185,14 @@ public static class PreciseTerrainModifier
     {
         if (!modifier.m_level && !modifier.m_raise && !modifier.m_smooth && !modifier.m_paintCleared)
         {
-            __instance.RemoveTerrainModifications(pos);
-            __instance.PreciseRecolorTerrain(pos, TerrainModifier.PaintType.Reset);
+            int radius = Mathf.Clamp(
+                Mathf.RoundToInt(modifier.m_levelRadius),
+                TerrainCompExtensions.FixedRadius,
+                Mathf.CeilToInt(TerrainTools.Instance.MaxRadius)
+            );
+            RemoveLegacyTerrainModifiers(pos, radius);
+            __instance.RemoveTerrainModifications(pos, radius);
+            __instance.PreciseRecolorTerrain(pos, TerrainModifier.PaintType.Reset, radius);
         }
     }
 

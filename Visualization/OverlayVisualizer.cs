@@ -24,7 +24,7 @@ public abstract class OverlayVisualizer : MonoBehaviour
             secondary = new Overlay(secondaryTransform);
             tertiary = new Overlay(tetriaryTransform);
             hoverInfo = new HoverInfo(secondaryTransform);
-            tertiary.StartColor = new Color(255, 255, 255);
+            tertiary.StartColor = Color.white;
 
             primary.Enabled = false;
             secondary.Enabled = false;
@@ -75,6 +75,25 @@ public abstract class OverlayVisualizer : MonoBehaviour
         overlay.StartSize = 3.0f;
         overlay.psr.material.mainTexture = IconCache.Box;
         overlay.LocalPosition = VerticalOffset;
+    }
+
+    protected void SnapToPaintGrid(Overlay overlay)
+    {
+        Heightmap heightmap = Heightmap.FindHeightmap(transform.position);
+        if (!heightmap)
+        {
+            overlay.LocalPosition = VerticalOffset;
+            return;
+        }
+
+        heightmap.WorldToVertexMask(transform.position, out int xPos, out int yPos);
+        Vector3 first = heightmap.VertexMaskToWorld(xPos, yPos);
+        Vector3 last = heightmap.VertexMaskToWorld(xPos + 2, yPos + 2);
+        overlay.Position = new Vector3(
+            (first.x + last.x) * 0.5f,
+            transform.position.y + VerticalOffset.y,
+            (first.z + last.z) * 0.5f
+        );
     }
 
     protected void VisualizeIconInsideRecoloringBounds(Overlay overlay, Texture iconTexture)

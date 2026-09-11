@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<PropertyGroup>
 		<PackageDir>$(ProjectDir)Package</PackageDir>
-		<PublishDir>$(PojectDir)Publish</PublishDir>
+		<PublishDir>$(ProjectDir)Publish</PublishDir>
 		<ProjectResourcesDir>$(ProjectDir)\Resources</ProjectResourcesDir>
 		<SolutionResourcesDir>$(SolutionDir)\Resources</SolutionResourcesDir>
 	</PropertyGroup>
@@ -10,6 +10,7 @@
 		<ProjectResources Include="$(ProjectResourcesDir)\*.png" />
 		<SolutionResources Include="$(SolutionResourcesDir)\*.png" />
 		<PackageFiles Include="$(PackageDir)\*.*" />
+		<PackageTranslations Include="$(PackageDir)\Translations\**\*.*" />
 	</ItemGroup>
 	<Target Name="CreateMdbFile" BeforeTargets="CopyDLLToPlugins" Condition="'$(Configuration)' == 'Debug'">
 		<Message Text="Creating the mdb debug file" Importance="high" Condition="Exists('$(Pdb2MdbPath)')" />
@@ -139,11 +140,16 @@
 			<OutputResources>$(PublishDir)\Nexus</OutputResources>
 		</PropertyGroup>
 		<Message Text="Creating Nexus package" Importance="high" />
+		<RemoveDir Directories="$(PublishDir)\Nexus" />
 		<MakeDir Directories="$(PublishDir)\Nexus" />
 		<MakeDir Directories="$(OutputResources)" />
 
 		<Message Text="Copying $(TargetFileName) to $(PublishDir)\Nexus" Importance="high" />
 		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(PublishDir)\Nexus" />
+		<Copy
+			SourceFiles="@(PackageTranslations)"
+			DestinationFiles="@(PackageTranslations->'$(PublishDir)\Nexus\Translations\%(RecursiveDir)%(Filename)%(Extension)')"
+			SkipUnchangedFiles="true" />
 
 		<Message Text="Copying Resources directory to $(OutputResources)" Importance="high" />
 		<Message
@@ -179,6 +185,7 @@
 		</PropertyGroup>
 
 		<Message Text="Creating ThunderStore package" Importance="high" />
+		<RemoveDir Directories="$(PublishDir)\ThunderStore" />
 		<MakeDir Directories="$(PublishDir)\ThunderStore" />
 		<MakeDir Directories="$(OutputResources)" />
 
@@ -187,6 +194,7 @@
 
 		<Message Text="Copying $(ProjectDir)README.md to $(PublishDir)\ThunderStore" Importance="high" Condition="Exists('$(ProjectDir)README.md')" />
 		<Copy SourceFiles="$(ProjectDir)README.md" DestinationFolder="$(PublishDir)\ThunderStore" Condition="Exists('$(ProjectDir)README.md')" />
+		<Copy SourceFiles="$(ProjectDir)LICENSE" DestinationFolder="$(PublishDir)\ThunderStore" Condition="Exists('$(ProjectDir)LICENSE')" />
 
 		<Message Text="Copying Package files to $(PublishDir)\ThunderStore" Importance="high" />
 		<Message
@@ -197,6 +205,10 @@
 			SourceFiles="@(PackageFiles)"
 			DestinationFolder="$(PublishDir)\ThunderStore"
 			Condition="Exists('@(PackageFiles)') "
+			SkipUnchangedFiles="true" />
+		<Copy
+			SourceFiles="@(PackageTranslations)"
+			DestinationFiles="@(PackageTranslations->'$(PublishDir)\ThunderStore\Translations\%(RecursiveDir)%(Filename)%(Extension)')"
 			SkipUnchangedFiles="true" />
 
 		<Message Text="Copying Resources directory to $(OutputResources)" Importance="high" />

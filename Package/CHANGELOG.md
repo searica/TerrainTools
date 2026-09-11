@@ -5,6 +5,20 @@
 			<th align="center">Notes</th>
 		</tr>
 		<tr>
+			<td align="center">1.4.4</td>
+			<td align="left">
+				<ul>
+					<li>Updated for Valheim 1.0, BepInEx 5.4.2350, and Jotunn 2.30.0.</li>
+					<li>Preserved runtime TerrainOp settings through RPC serialization, fixing precision height, radius, hardness, and square operations in multiplayer.</li>
+					<li>Removed Player.Update Harmony patches that conflicted with EpicLoot and moved input polling to the plugin update loop.</li>
+					<li>Restored custom TerrainOp registration after world reload and added an idempotent fallback for unpatched Jotunn versions.</li>
+					<li>Fixed terrain restoration across Heightmap borders and legacy TerrainModifier objects, with adjustable radius and synchronized preview scaling.</li>
+					<li>Fixed overlay state, scroll clamping, the shovel menu, and the paved-square prefab name.</li>
+					<li>Added English and Russian gameplay translations.</li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
 			<td align="center">1.4.1</td>
 			<td align="left">
 				<ul>

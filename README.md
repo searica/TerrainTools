@@ -3,7 +3,9 @@ Quality of life building mod that improves how terrain manipulation with the hoe
 
 **Server-Side Info**: This mod does work as a client-side only mod and only needs to be installed on the server if you wish to enforce configuration settings.
 
-**Ashlands Update**: There are some visual glitches at the moment where the change of terrain paint (dirt, cobblestone, grass, etc.) can be slightly misalgned with the precision terrain tools (square shaped tools). This issue is related to a Vanilla issue and will be adressed as soon as possible.
+Version 1.4.4 targets Valheim 1.0, BepInEx 5.4.2350, and Jotunn 2.30.0. English and Russian gameplay text is available under `Package/Translations`.
+
+**Terrain paint note**: Valheim stores terrain paint on a coarse interpolated mask. The visible texture edge can therefore extend slightly beyond a square preview. The same behavior was reproduced with another terrain-paint tool and is an engine limitation, not a larger height-operation area.
 
 ## Features
 
@@ -272,7 +274,7 @@ Changes made to the configuration settings will be reflected in-game immediately
 </table>
 
 ## Known Issues
-Reseting terrain modifications on the edge of a zone when there are significant differences in terrain height can result in the terrain appearing to tear. To fix this you can hit the tear in the fabric of reality with a pickaxe, or just walk to the other zone and reset the terrain while in that zone. This isn't something I plan to fix and it's largely a product of how terrain and zones work in Valheim.
+Terrain paint can blend slightly outside square previews because the game interpolates its low-resolution paint mask. Terrain height and restoration bounds are unaffected.
 
 ## Compatibility
 Should usually be compatible with everything except other mods that let you change the radius of terrain manipulation tools as they will likely conflict.
