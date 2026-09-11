@@ -1,6 +1,7 @@
 ﻿using Jotunn;
 using Jotunn.Entities;
 using Jotunn.Managers;
+using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +11,11 @@ using UnityEngine;
 
 namespace TerrainTools.Core;
 
+[HarmonyPatch]
 internal static class InitManager
 {
     private static bool HasInitialized = false;
+    private static bool HasLoggedTerrainOpFallback = false;
     internal static readonly Dictionary<string, GameObject> ToolRefs = new();
 
     /// <summary>
@@ -26,6 +29,7 @@ internal static class InitManager
     {
         if (HasInitialized)
         {
+            RefreshTerrainOpRegistrations();
             return;
         }
 
@@ -49,36 +53,57 @@ internal static class InitManager
         UpdateTools();
     }
 
+    internal static void RefreshTerrainOpRegistrations()
+    {
+        foreach (ToolDB toolDB in ToolConfigs.ToolConfigsMap.Values)
+        {
+            if (toolDB.prefab)
+            {
+                EnsureTerrainOpRegistered(toolDB.prefab);
+            }
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ObjectDB), "UpdateRegisters")]
+    private static void ObjectDBUpdateRegistersPostfix()
+    {
+        if (HasInitialized)
+        {
+            RefreshTerrainOpRegistrations();
+        }
+    }
+
     internal static void FixVanillaToolDescriptions()
     {
         SetDescription(
            "mud_road_v2",
-           "Levels ground based on player position. Use shift + click to level ground based on where you are pointing (this will smooth the terrain)."
+           "$atmc_vanilla_level_desc"
         );
 
         SetDescription(
             "raise_v2",
-            "Raise grounds up to a maximum of 8 m above it's original height."
+            "$atmc_vanilla_raise_desc"
         );
 
         SetDescription(
             "path_v2",
-            "Creates a dirt path without affecting ground height."
+            "$atmc_vanilla_path_desc"
         );
 
         SetDescription(
             "paved_road_v2",
-            "Creates a paved path and levels ground based on player position. Use shift+click to level ground based on where you are pointing (this will smooth the terrain)."
+            "$atmc_vanilla_paved_desc"
         );
 
         SetDescription(
             "cultivate_v2",
-            "Cultivates ground and levels ground based on player position. Use shift + click to level ground based on where you are pointing (this will smooth the terrain)."
+            "$atmc_vanilla_cultivate_desc"
         );
 
         SetDescription(
             "replant_v2",
-            "Replants terrain without affecting ground height."
+            "$atmc_vanilla_replant_desc"
         );
     }
 
@@ -276,17 +301,18 @@ internal static class InitManager
             throw new Exception($"Could not find PieceTable {pieceTable}");
         }
 
-        if (table.m_pieces.Contains(prefab))
-        {
-            Log.LogDebug($"Already added piece {prefab.name}");
-            return;
-        }
-
         string name = prefab.name;
         int hash = name.GetStableHashCode();
         if (ZNetScene.instance != null && !ZNetScene.instance.m_namedPrefabs.ContainsKey(hash))
         {
             PrefabManager.Instance.RegisterToZNetScene(prefab);
+        }
+        EnsureTerrainOpRegistered(prefab);
+
+        if (table.m_pieces.Contains(prefab))
+        {
+            Log.LogDebug($"Already added piece {prefab.name}");
+            return;
         }
 
         if (!string.IsNullOrEmpty(category))
@@ -325,6 +351,42 @@ internal static class InitManager
         }
 
         Log.LogDebug($"Added piece {prefab.name} | Token: {piece.TokenName()}");
+    }
+
+    /// <summary>
+    ///     Registers custom TerrainOp prefabs when the installed Jotunn build did
+    ///     not do it. This is idempotent and becomes a no-op with the Jotunn fix.
+    /// </summary>
+    internal static void EnsureTerrainOpRegistered(GameObject prefab)
+    {
+        ObjectDB objectDB = ObjectDB.instance;
+        TerrainOp terrainOp = prefab ? prefab.GetComponent<TerrainOp>() : null;
+        if (!objectDB || !terrainOp || objectDB.m_terrainOpsByHash == null || objectDB.m_terrainOps == null)
+        {
+            return;
+        }
+
+        int hash = objectDB.GetPrefabHash(prefab);
+        if (objectDB.m_terrainOpsByHash.TryGetValue(hash, out TerrainOp registeredTerrainOp))
+        {
+            if (registeredTerrainOp != terrainOp)
+            {
+                Log.LogWarning($"TerrainOp prefab hash collision for {prefab.name} ({hash}); keeping the registered prefab");
+            }
+            return;
+        }
+
+        if (!objectDB.m_terrainOps.Contains(terrainOp))
+        {
+            objectDB.m_terrainOps.Add(terrainOp);
+        }
+        objectDB.m_terrainOpsByHash.Add(hash, terrainOp);
+        if (!HasLoggedTerrainOpFallback)
+        {
+            HasLoggedTerrainOpFallback = true;
+            Log.LogInfo("Installed Jotunn did not register custom TerrainOps; using the AdvancedTerrainModifiers fallback");
+        }
+        Log.LogDebug($"Registered TerrainOp {prefab.name} in ObjectDB");
     }
 
 

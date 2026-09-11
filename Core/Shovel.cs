@@ -30,6 +30,10 @@ internal static class Shovel
         }
 
         GameObject shovelPrefab = CreateShovelPrefab();
+        if (!shovelPrefab)
+        {
+            return;
+        }
 
         CreatePieceTable();
 
@@ -41,8 +45,8 @@ internal static class Shovel
 
         var shovelConfig = new ItemConfig
         {
-            Name = "Shovel",
-            Description = "",
+            Name = "$atmc_shovel_name",
+            Description = "$atmc_shovel_desc",
             CraftingStation = CraftingStations.Forge,
             PieceTable = ShovelPieceTable,
             RepairStation = CraftingStations.Forge,
@@ -60,7 +64,7 @@ internal static class Shovel
         var pieceTableConfig = new PieceTableConfig()
         {
             CanRemovePieces = false,
-            UseCategories = true,
+            UseCategories = false,
             UseCustomCategories = false
         };
         var CPT = new CustomPieceTable(ShovelPieceTable, pieceTableConfig);

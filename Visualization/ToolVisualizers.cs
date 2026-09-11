@@ -60,12 +60,13 @@ public class SquarePathOverlayVisualizer : HoverInfoEnabled
     protected override void Initialize()
     {
         base.Initialize();
-        SpeedUp(secondary);
+        Freeze(secondary);
         VisualizeRecoloringBounds(secondary);
     }
 
     protected override void OnRefresh()
     {
+        SnapToPaintGrid(secondary);
         base.OnRefresh();
         primary.Enabled = false;
         secondary.Enabled = true;
@@ -77,12 +78,13 @@ public class CultivateOverlayVisualizer : HoverInfoEnabled
     protected override void Initialize()
     {
         base.Initialize();
-        SpeedUp(secondary);
+        Freeze(secondary);
         VisualizeRecoloringBounds(secondary);
     }
 
     protected override void OnRefresh()
     {
+        SnapToPaintGrid(secondary);
         base.OnRefresh();
         primary.Enabled = false;
         secondary.Enabled = true;
@@ -112,12 +114,24 @@ public class SeedGrassOverlayVisualizer : HoverInfoEnabled
 
 public class RemoveModificationsOverlayVisualizer : OverlayVisualizer
 {
+    internal void SetScale(Vector3 scale)
+    {
+        if (primary == null || scale == Vector3.zero)
+        {
+            return;
+        }
+        primary.LocalScale = scale;
+        secondary.LocalScale = scale;
+    }
+
     protected override void Initialize()
     {
         Freeze(primary);
         SpeedUp(secondary);
         VisualizeTerraformingBounds(primary);
         VisualizeIconInsideTerraformingBounds(secondary, IconCache.Cross);
+        primary.StartSize = 2.0f;
+        secondary.StartSize = 1.5f;
     }
 
     protected override void OnRefresh()

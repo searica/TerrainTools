@@ -36,10 +36,7 @@ internal static class SharpnessModifier
     private static float lastDisplayedRaiseSharpness;
 
 
-    [HarmonyPrefix]
-    [HarmonyPriority(Priority.LowerThanNormal)]
-    [HarmonyPatch(typeof(Player), nameof(Player.Update))]
-    private static void UpdatePrefix(Player __instance)
+    internal static void Tick(Player __instance)
     {
         if (!__instance || __instance != Player.m_localPlayer)
         {
@@ -131,7 +128,7 @@ internal static class SharpnessModifier
             if (Mathf.Abs(smoothSharpness - lastDisplayedSmoothSharpness) > DisplayThreshold)
             {
                 lastDisplayedSmoothSharpness = Mathf.Round(smoothSharpness);
-                updateMsg.Add($"Terrain tool smoothing hardness: {smoothSharpness:0}%");
+                updateMsg.Add($"{Localization.instance.Localize("$atmc_smoothing_hardness")} {smoothSharpness:0}%");
             }
         }
         if (RaiseToolIsInUse)
@@ -140,12 +137,13 @@ internal static class SharpnessModifier
             if (Mathf.Abs(raiseSharpness - lastDisplayedRaiseSharpness) > DisplayThreshold)
             {
                 lastDisplayedRaiseSharpness = Mathf.Round(raiseSharpness);
-                updateMsg.Add($"Terrain tool raise hardness: {raiseSharpness:0}%");
+                updateMsg.Add($"{Localization.instance.Localize("$atmc_raise_hardness")} {raiseSharpness:0}%");
             }
         }
         if (SmoothToolIsInUse || RaiseToolIsInUse)
         {
-            Sprite toolIcon = player.m_placementGhost.GetComponent<Piece>().m_icon;
+            Piece placementPiece = player.m_placementGhost ? player.m_placementGhost.GetComponent<Piece>() : null;
+            Sprite toolIcon = placementPiece ? placementPiece.m_icon : null;
             if (toolIcon != null && updateMsg.Count > 0)
             {
                 player.Message(MessageHud.MessageType.Center, string.Join("\n", updateMsg.ToArray()), icon: toolIcon);
@@ -162,16 +160,10 @@ internal static class SharpnessModifier
 
         Log.LogInfo($"Adjusting Smooth Power by {delta}", Log.InfoLevel.High);
 
-        if (!SmoothToolIsInUse) // new terrain tool
-        {
-            SmoothToolIsInUse = true;
-            lastModdedSmoothPwr = ModifySmoothPower(terrainOp.m_settings.m_smoothPower, delta);
-        }
-        else
-        {
-            lastModdedSmoothPwr = ModifySmoothPower(lastModdedSmoothPwr, delta);
-        }
-        lastTotalSmoothDelta += delta;
+        float previousPower = SmoothToolIsInUse ? lastModdedSmoothPwr : terrainOp.m_settings.m_smoothPower;
+        SmoothToolIsInUse = true;
+        lastModdedSmoothPwr = ModifySmoothPower(previousPower, delta);
+        lastTotalSmoothDelta += lastModdedSmoothPwr - previousPower;
         Log.LogInfo($"Total smooth power delta {lastTotalSmoothDelta}", Log.InfoLevel.High);
     }
 
@@ -186,16 +178,10 @@ internal static class SharpnessModifier
 
         Log.LogInfo($"Adjusting Raise Power by {delta}", Log.InfoLevel.High);
 
-        if (!RaiseToolIsInUse) // new terrain tool
-        {
-            RaiseToolIsInUse = true;
-            lastModdedRaisePwr = ModifyRaisePower(terrainOp.m_settings.m_raisePower, delta);
-        }
-        else
-        {
-            lastModdedRaisePwr = ModifyRaisePower(lastModdedRaisePwr, delta);
-        }
-        lastTotalRaiseDelta += delta;
+        float previousPower = RaiseToolIsInUse ? lastModdedRaisePwr : terrainOp.m_settings.m_raisePower;
+        RaiseToolIsInUse = true;
+        lastModdedRaisePwr = ModifyRaisePower(previousPower, delta);
+        lastTotalRaiseDelta += lastModdedRaisePwr - previousPower;
         Log.LogInfo($"Total raise power delta {lastTotalRaiseDelta}", Log.InfoLevel.High);
     }
 
