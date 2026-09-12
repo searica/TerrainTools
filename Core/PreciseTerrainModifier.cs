@@ -6,7 +6,7 @@ using TerrainTools.Visualization;
 
 namespace TerrainTools.Core;
 
-[HarmonyPatch(typeof(PreciseTerrainModifier))]
+[HarmonyPatch]
 public static class PreciseTerrainModifier
 {
     private const int SettingsPayloadMagic = 0x41544D53; // ATMS
@@ -77,7 +77,9 @@ public static class PreciseTerrainModifier
         TerrainModifier.GetModifiers(position, radius + 1f, modifiers);
         foreach (TerrainModifier modifier in modifiers)
         {
-            if (!modifier || !modifier.m_nview)
+            if (!modifier || !modifier.m_nview
+                || modifier.GetComponentInParent<Piece>()
+                || modifier.GetComponentInParent<WearNTear>())
             {
                 continue;
             }

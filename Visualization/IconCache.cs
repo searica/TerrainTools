@@ -65,7 +65,11 @@ internal static class IconCache
         using MemoryStream buffer = new();
         manifestResourceStream.CopyTo(buffer);
         Texture2D texture = new(0, 0);
-        MethodInfo loadImage = Type.GetType("UnityEngine.ImageConversion, UnityEngine.ImageConversionModule")?
+        Type imageConversion = Type.GetType("UnityEngine.ImageConversion, UnityEngine.ImageConversionModule")
+            ?? AppDomain.CurrentDomain.GetAssemblies()
+                .Select(assembly => assembly.GetType("UnityEngine.ImageConversion"))
+                .FirstOrDefault(type => type != null);
+        MethodInfo loadImage = imageConversion?
             .GetMethod("LoadImage", new[] { typeof(Texture2D), typeof(byte[]) });
         if (loadImage?.Invoke(null, new object[] { texture, buffer.ToArray() }) is not bool loaded || !loaded)
         {

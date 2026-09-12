@@ -17,17 +17,25 @@ $radius = Get-Content -LiteralPath (Join-Path $ProjectRoot "Core\RadiusModifier.
 $overlay = Get-Content -LiteralPath (Join-Path $ProjectRoot "Visualization\Overlay.cs") -Raw
 $visualizers = Get-Content -LiteralPath (Join-Path $ProjectRoot "Visualization\ToolVisualizers.cs") -Raw
 $shovel = Get-Content -LiteralPath (Join-Path $ProjectRoot "Core\Shovel.cs") -Raw
+$iconCache = Get-Content -LiteralPath (Join-Path $ProjectRoot "Visualization\IconCache.cs") -Raw
+$packageTargets = Get-Content -LiteralPath (Join-Path $ProjectRoot "ModPackageTool.targets") -Raw
+$environment = Get-Content -LiteralPath (Join-Path $ProjectRoot "environment.props") -Raw
 
 Assert-True ($source -notmatch 'HarmonyPatch\(typeof\(Player\),\s*nameof\(Player\.Update\)\)') "Player.Update Harmony conflict returned"
 Assert-True ($plugin -match 'RadiusModifier\.Tick\(Player\.m_localPlayer\)') "radius polling is not in plugin Update"
 Assert-True ($plugin -match 'SharpnessModifier\.Tick\(Player\.m_localPlayer\)') "hardness polling is not in plugin Update"
 Assert-True ($precise -match 'SerializeSettingsPostfix' -and $precise -match 'DeserializeSettingsPostfix') "runtime TerrainOp settings are not serialized"
 Assert-True ($precise -match 'GetRadiusPostfix' -and $precise -match 'RemoveLegacyTerrainModifiers') "cross-Heightmap restoration support is missing"
+Assert-True ($precise -match 'GetComponentInParent<Piece>' -and $precise -match 'GetComponentInParent<WearNTear>') "structure protection is missing"
+Assert-True ($precise -notmatch '\[HarmonyPatch\(typeof\(PreciseTerrainModifier\)\)\]') "redundant class-level Harmony target returned"
 Assert-True ($init -match 'ObjectDBUpdateRegistersPostfix' -and $init -match 'm_terrainOpsByHash\.TryGetValue') "idempotent TerrainOp fallback is missing"
 Assert-True ($radius -match 'RemoveModificationsOverlayVisualizer' -and $radius -match 'SetScale\(lastGhostScale\)') "restoration radius preview is incomplete"
 Assert-True ($overlay -match 'psm = ps\.main' -and $overlay -match 'psm\.startSpeed\.constant') "overlay particle state is invalid"
 Assert-True ($visualizers -match 'internal void SetScale') "restoration frame and marker cannot scale together"
 Assert-True ($shovel -match 'UseCategories = false') "single-action shovel still uses hammer categories"
+Assert-True ($iconCache -match 'AppDomain\.CurrentDomain\.GetAssemblies') "ImageConversion assembly fallback is missing"
+Assert-True ($packageTargets -match 'OutputResources\)\\Translations') "debug translations are not deployed"
+Assert-True ($environment -notmatch 'VALHEIM_SERVERR') "dedicated-server property typo returned"
 
 $tokens = [regex]::Matches($source, '\$atmc_[a-z0-9_]+') |
     ForEach-Object { $_.Value.TrimStart('$') } |

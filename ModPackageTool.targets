@@ -45,6 +45,12 @@
 
 		<Message Text="Copying Resources directory to $(OutputResources)" Importance="high" />
 		<MakeDir Directories="$(OutputResources)" />
+		<MakeDir Directories="$(OutputResources)\Translations" Condition="Exists('@(PackageTranslations)')" />
+		<Copy
+			SourceFiles="@(PackageTranslations)"
+			DestinationFiles="@(PackageTranslations->'$(OutputResources)\Translations\%(RecursiveDir)%(Filename)%(Extension)')"
+			Condition="Exists('@(PackageTranslations)')"
+			SkipUnchangedFiles="true" />
 
 		<Message
 			Text="Copying $(ProjectResourcesDir) to $(OutputResources)"
