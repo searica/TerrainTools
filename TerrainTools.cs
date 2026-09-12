@@ -117,6 +117,7 @@ internal sealed class TerrainTools : BaseUnityPlugin
         SetUpConfigEntries();
         Config.Save();
         Config.SaveOnConfigSet = true;
+        RegisterTranslations();
 
         Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), harmonyInstanceId: PluginGUID);
         Game.isModded = true;
@@ -155,6 +156,14 @@ internal sealed class TerrainTools : BaseUnityPlugin
                 UpdatePlugin = false;
             }
         };
+    }
+
+    private void RegisterTranslations()
+    {
+        var localization = LocalizationManager.Instance.GetLocalization();
+        Assembly assembly = Assembly.GetExecutingAssembly();
+        localization.AddJsonFile("English", AssetUtils.LoadTextFromResources("TerrainTools.Translations.English.json", assembly));
+        localization.AddJsonFile("Russian", AssetUtils.LoadTextFromResources("TerrainTools.Translations.Russian.json", assembly));
     }
 
     private void Update()

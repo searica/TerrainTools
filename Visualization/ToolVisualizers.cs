@@ -120,8 +120,8 @@ public class RemoveModificationsOverlayVisualizer : OverlayVisualizer
         {
             return;
         }
-        primary.LocalScale = scale;
-        secondary.LocalScale = scale;
+        primary.StartSize = 2.0f * scale.x;
+        secondary.StartSize = 1.5f * scale.x;
     }
 
     protected override void Initialize()
