@@ -91,6 +91,11 @@ internal static class SharpnessModifier
             return;
         }
 
+        if (lastTotalRaiseDelta != 0f || lastTotalSmoothDelta != 0f)
+        {
+            PreciseTerrainModifier.EnsureRuntimeSettings(__instance);
+        }
+
         if (__instance.m_settings.m_raise)
         {
             __instance.m_settings.m_raisePower = ModifyRaisePower(__instance.m_settings.m_raisePower, lastTotalRaiseDelta);

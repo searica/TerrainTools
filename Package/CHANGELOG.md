@@ -15,6 +15,10 @@
 					<li>Fixed terrain restoration across Heightmap borders and legacy TerrainModifier objects, with adjustable radius and synchronized preview scaling.</li>
 					<li>Fixed overlay state, scroll clamping, the shovel menu, and the paved-square prefab name.</li>
 					<li>Added English and Russian gameplay translations.</li>
+					<li>Scoped custom RPC settings and ownership claims to managed terrain operations and rejected malformed network values.</li>
+					<li>Restricted reset to its dedicated tool, protected the full brush footprint, and skipped unrelated legacy modifiers.</li>
+					<li>Removed the placement-preview update race and made the camera-scroll patch fail safely after game IL changes.</li>
+					<li>Made editable translations reliable in nested and flattened mod-manager installs.</li>
 				</ul>
 			</td>
 		</tr>

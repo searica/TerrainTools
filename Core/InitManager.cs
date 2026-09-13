@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Logging;
 using TerrainTools.Tools;
+using TerrainTools.Visualization;
 using UnityEngine;
 
 namespace TerrainTools.Core;
@@ -17,6 +18,11 @@ internal static class InitManager
     private static bool HasInitialized = false;
     private static bool HasLoggedTerrainOpFallback = false;
     internal static readonly Dictionary<string, GameObject> ToolRefs = new();
+
+    internal static bool IsCustomTool(GameObject gameObject)
+    {
+        return gameObject && ToolConfigs.ToolConfigsMap.ContainsKey(gameObject.name.Replace("(Clone)", ""));
+    }
 
     /// <summary>
     ///     Track the where pieces have been inserted into each piece table. Used
@@ -234,7 +240,12 @@ internal static class InitManager
         }
 
         // customize terrain op component
-        TerrainOp.Settings settings = toolPrefab.GetComponent<TerrainOp>().m_settings;
+        TerrainOp terrainOp = toolPrefab.GetComponent<TerrainOp>();
+        TerrainOp.Settings settings = PreciseTerrainModifier.EnsureRuntimeSettings(
+            terrainOp,
+            toolDB.overlayType == typeof(RemoveModificationsOverlayVisualizer),
+            toolDB.overlayType != null
+        );
         settings.m_level = UpdateValueIfNeeded(settings.m_level, toolDB.level);
         settings.m_levelRadius = UpdateValueIfNeeded(settings.m_levelRadius, toolDB.levelRadius);
 

@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
@@ -162,8 +163,36 @@ internal sealed class TerrainTools : BaseUnityPlugin
     {
         var localization = LocalizationManager.Instance.GetLocalization();
         Assembly assembly = Assembly.GetExecutingAssembly();
-        localization.AddJsonFile("English", AssetUtils.LoadTextFromResources("TerrainTools.Translations.English.json", assembly));
-        localization.AddJsonFile("Russian", AssetUtils.LoadTextFromResources("TerrainTools.Translations.Russian.json", assembly));
+        string pluginDirectory = Path.GetDirectoryName(Info.Location);
+
+        foreach (string language in new[] { "English", "Russian" })
+        {
+            localization.AddJsonFile(
+                language,
+                AssetUtils.LoadTextFromResources($"TerrainTools.Translations.{language}.json", assembly)
+            );
+
+            if (string.IsNullOrEmpty(pluginDirectory)) { continue; }
+
+            string externalPath = Path.Combine(
+                pluginDirectory,
+                "Translations",
+                "TerrainTools",
+                language,
+                "translations.json"
+            );
+            try
+            {
+                if (File.Exists(externalPath))
+                {
+                    localization.AddFileByPath(externalPath, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.LogWarning($"Could not load external {language} translations: {ex.Message}");
+            }
+        }
     }
 
     private void Update()

@@ -3,7 +3,9 @@ Quality of life building mod that improves how terrain manipulation with the hoe
 
 **Server-Side Info**: This mod does work as a client-side only mod and only needs to be installed on the server if you wish to enforce configuration settings.
 
-Version 1.4.4 targets Valheim 1.0, BepInEx 5.4.2350, and Jotunn 2.30.0. English and Russian gameplay text is available under `Package/Translations`.
+**Security note**: Ward checks cover the full local brush footprint, but Valheim's client-owned terrain RPCs are not server-authoritative validation. Untrusted or modified clients are outside the supported security model.
+
+Version 1.4.4 targets Valheim 1.0, BepInEx 5.4.2350, and Jotunn 2.30.0. English and Russian gameplay text is available under `Package/Translations/TerrainTools/<Language>`; installed external files override the embedded defaults.
 
 **Terrain paint note**: Valheim stores terrain paint on a coarse interpolated mask. The visible texture edge can therefore extend slightly beyond a square preview. The same behavior was reproduced with another terrain-paint tool and is an engine limitation, not a larger height-operation area.
 

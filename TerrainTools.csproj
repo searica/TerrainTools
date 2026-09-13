@@ -72,8 +72,8 @@
 		<Content Include="Package\icon.png" />
 	</ItemGroup>
 	<ItemGroup>
-		<EmbeddedResource Include="Package\Translations\English\translations.json" LogicalName="TerrainTools.Translations.English.json" />
-		<EmbeddedResource Include="Package\Translations\Russian\translations.json" LogicalName="TerrainTools.Translations.Russian.json" />
+		<EmbeddedResource Include="Package\Translations\TerrainTools\English\translations.json" LogicalName="TerrainTools.Translations.English.json" />
+		<EmbeddedResource Include="Package\Translations\TerrainTools\Russian\translations.json" LogicalName="TerrainTools.Translations.Russian.json" />
 		<EmbeddedResource Include="Resources\box.png" />
 		<EmbeddedResource Include="Resources\cross.png" />
 		<EmbeddedResource Include="Resources\cultivate_v2_path.png" />
