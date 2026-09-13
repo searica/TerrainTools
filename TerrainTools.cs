@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
@@ -27,10 +28,10 @@ internal sealed class TerrainTools : BaseUnityPlugin
     internal const string Author = "Searica";
     public const string PluginName = "AdvancedTerrainModifiers";
     public const string PluginGUID = $"{Author}.Valheim.TerrainTools";
-    public const string PluginVersion = "1.4.1";
+    public const string PluginVersion = "1.4.4";
 
     public static TerrainTools Instance;
-    private static ConfigFileWatcher ConfigFileWatcher;
+    private static Configs.ConfigFileWatcher ConfigFileWatcher;
 
     #region Section Names
 
@@ -117,6 +118,7 @@ internal sealed class TerrainTools : BaseUnityPlugin
         SetUpConfigEntries();
         Config.Save();
         Config.SaveOnConfigSet = true;
+        RegisterTranslations();
 
         Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), harmonyInstanceId: PluginGUID);
         Game.isModded = true;
@@ -155,6 +157,48 @@ internal sealed class TerrainTools : BaseUnityPlugin
                 UpdatePlugin = false;
             }
         };
+    }
+
+    private void RegisterTranslations()
+    {
+        var localization = LocalizationManager.Instance.GetLocalization();
+        Assembly assembly = Assembly.GetExecutingAssembly();
+        string pluginDirectory = Path.GetDirectoryName(Info.Location);
+
+        foreach (string language in new[] { "English", "Russian" })
+        {
+            localization.AddJsonFile(
+                language,
+                AssetUtils.LoadTextFromResources($"TerrainTools.Translations.{language}.json", assembly)
+            );
+
+            if (string.IsNullOrEmpty(pluginDirectory)) { continue; }
+
+            string externalPath = Path.Combine(
+                pluginDirectory,
+                "Translations",
+                "TerrainTools",
+                language,
+                "translations.json"
+            );
+            try
+            {
+                if (File.Exists(externalPath))
+                {
+                    localization.AddFileByPath(externalPath, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.LogWarning($"Could not load external {language} translations: {ex.Message}");
+            }
+        }
+    }
+
+    private void Update()
+    {
+        RadiusModifier.Tick(Player.m_localPlayer);
+        SharpnessModifier.Tick(Player.m_localPlayer);
     }
 
     public void OnDestroy()
@@ -236,7 +280,7 @@ internal sealed class TerrainTools : BaseUnityPlugin
         hardnessScrollScale = Config.BindConfig(
             SharpnessSection,
             "Sharpness Scroll Speed",
-            0.1f,
+            1f,
             "How much each tick of movement from the scroll wheel will change sharpness."
             + " Larger magnitude means the sharpness will faster."
             + " Negative numbers will reverse the scroll direction to adjust the sharpness.",

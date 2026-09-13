@@ -51,13 +51,12 @@ internal static class TerrainCompExtensions
         return radius == float.NegativeInfinity;
     }
 
-    public static void RemoveTerrainModifications(this TerrainComp comp, Vector3 worldPos)
+    public static void RemoveTerrainModifications(this TerrainComp comp, Vector3 worldPos, int radius = FixedRadius)
     {
         Log.LogInfo("[INIT] Remove Terrain Modifications", Log.InfoLevel.Medium);
 
-        int fixedRadius = comp.GetFixedRadius();
         int nVertsInGrid = comp.m_width + 1;
-        FindSquareBounds(comp, worldPos, fixedRadius, out SquareBounds xBounds, out SquareBounds zBounds);
+        FindSquareBounds(comp, worldPos, radius, out SquareBounds xBounds, out SquareBounds zBounds);
         Log.LogInfo($"worldPos: {worldPos}, Bounds (X,Z): Min=({xBounds.min}, {zBounds.min}), Max=({xBounds.max}, {zBounds.max})", Log.InfoLevel.Medium);
 
         for (int i = xBounds.min; i <= xBounds.max; i++)
@@ -150,7 +149,8 @@ internal static class TerrainCompExtensions
     public static void PreciseRecolorTerrain(
         this TerrainComp comp,
         Vector3 worldPos,
-        TerrainModifier.PaintType paintType
+        TerrainModifier.PaintType paintType,
+        int radius = FixedRadius
     )
     {
         // TODO: make the distance differences relative to actual worldPos
@@ -160,7 +160,7 @@ internal static class TerrainCompExtensions
 
         float pixelWidth = comp.m_hmap.GetPaintMaskScale();
         float pixelArea = pixelWidth * pixelWidth;
-        int pixelDelta = Mathf.CeilToInt((float)FixedRadius / pixelWidth);
+        int pixelDelta = Mathf.CeilToInt((float)radius / pixelWidth);
         int iMin = Math.Max(xCenterIdx - pixelDelta, 0);
         int iMax = Math.Min(xCenterIdx + pixelDelta, comp.m_width);
         int jMin = Math.Max(zCenterIdx - pixelDelta, 0);
@@ -180,8 +180,8 @@ internal static class TerrainCompExtensions
 
                 // Distance to outer edge of pixel
                 Vector3 vertexPos = comp.m_hmap.PaintMaskVertexToWorldPos(i, j);
-                float xOutside = Mathf.Max(Mathf.Abs(vertexPos.x - worldPos.x) + (0.5f * pixelWidth) - FixedRadius, 0f);
-                float zOutside = Mathf.Max(Mathf.Abs(vertexPos.z - worldPos.z) + (0.5f * pixelWidth) - FixedRadius, 0f);
+                float xOutside = Mathf.Max(Mathf.Abs(vertexPos.x - worldPos.x) + (0.5f * pixelWidth) - radius, 0f);
+                float zOutside = Mathf.Max(Mathf.Abs(vertexPos.z - worldPos.z) + (0.5f * pixelWidth) - radius, 0f);
                 //Log.LogInfo($"VertexPos: {vertexPos}");
                 //Log.LogInfo($"Distance Outside, X={xOutside}, Z={zOutside}");
 

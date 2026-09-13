@@ -16,8 +16,8 @@ internal static class ToolConfigs
             new ToolDB(
                 name: "mud_road_v2_sq",
                 basePrefab:"mud_road_v2",
-                pieceName: "Level ground(square)",
-                pieceDesc: "Levels ground according to the world grid based on player position. Use shift+click to level ground based on where you are pointing instead (this will smooth the terrain).",
+                pieceName: "$atmc_level_square_name",
+                pieceDesc: "$atmc_level_square_desc",
                 icon: IconCache.MudRoadSquare,
                 pieceTable: PieceTables.Hoe,
                 overlayType: typeof(LevelGroundOverlayVisualizer),
@@ -30,8 +30,8 @@ internal static class ToolConfigs
             new ToolDB(
                 name: "raise_v2_precise",
                 basePrefab:"raise_v2",
-                pieceName: "Raise ground (precision)",
-                pieceDesc: "Raise ground with precision accuracy by using scroll wheel to set ground height.",
+                pieceName: "$atmc_raise_precision_name",
+                pieceDesc: "$atmc_raise_precision_desc",
                 icon: IconCache.RaiseSquare,
                 pieceTable: PieceTables.Hoe,
                 overlayType: typeof(RaiseGroundOverlayVisualizer),
@@ -44,8 +44,8 @@ internal static class ToolConfigs
             new ToolDB(
                 name: "lower_v2",
                 basePrefab:"raise_v2",
-                pieceName: "Lower ground",
-                pieceDesc: "Lowers ground.",
+                pieceName: "$atmc_lower_name",
+                pieceDesc: "$atmc_lower_desc",
                 icon: IconCache.Lower,
                 pieceTable: Shovel.ShovelPieceTable,
                 overlayType: null, // should make a lower ground visualizer
@@ -62,8 +62,8 @@ internal static class ToolConfigs
             new ToolDB(
                 name: "path_v2_square",
                 basePrefab:"path_v2",
-                pieceName: "Pathen (square)",
-                pieceDesc: "Creates a dirt path according to the world grid without affecting ground height.",
+                pieceName: "$atmc_path_square_name",
+                pieceDesc: "$atmc_path_square_desc",
                 icon: IconCache.MudRoadPathSquare,
                 pieceTable: PieceTables.Hoe,
                 overlayType: typeof(SquarePathOverlayVisualizer),
@@ -74,10 +74,10 @@ internal static class ToolConfigs
         {
             "paved_road_v2_square",
             new ToolDB(
-                name: "Paved road (Square)",
+                name: "paved_road_v2_square",
                 basePrefab: "paved_road_v2",
-                pieceName: "Paved road (square)",
-                pieceDesc: "Creates a paved path according to the world grid and levels ground based on player position. Use shift+click to level ground based on where you are pointing (this will smooth the terrain).",
+                pieceName: "$atmc_paved_square_name",
+                pieceDesc: "$atmc_paved_square_desc",
                 icon: IconCache.PavedRoadSquare,
                 pieceTable: PieceTables.Hoe,
                 overlayType: typeof(SquarePathOverlayVisualizer)
@@ -88,8 +88,8 @@ internal static class ToolConfigs
             new ToolDB(
                 name: "paved_road_v2_path",
                 basePrefab: "paved_road_v2",
-                pieceName: "Paved road (path)",
-                pieceDesc: "Creates a paved path without affecting ground height",
+                pieceName: "$atmc_paved_path_name",
+                pieceDesc: "$atmc_paved_path_desc",
                 icon: IconCache.PavedRoadPath,
                 pieceTable: PieceTables.Hoe,
                 smooth: false
@@ -100,8 +100,8 @@ internal static class ToolConfigs
             new ToolDB(
                 name: "paved_road_v2_path_square",
                 basePrefab: "paved_road_v2",
-                pieceName: "Paved road (path, square)",
-                pieceDesc: "Created a paved path according to the world grid without affecting ground height",
+                pieceName: "$atmc_paved_path_square_name",
+                pieceDesc: "$atmc_paved_path_square_desc",
                 icon: IconCache.PavedRoadPathSquare,
                 pieceTable: PieceTables.Hoe,
                 overlayType: typeof(SquarePathOverlayVisualizer),
@@ -113,8 +113,8 @@ internal static class ToolConfigs
             new ToolDB(
                 name: "remove_terrain_mods",
                 basePrefab: "mud_road_v2",
-                pieceName: "Remove Terrain Modifications",
-                pieceDesc: "Resets ground height and paint",
+                pieceName: "$atmc_remove_name",
+                pieceDesc: "$atmc_remove_desc",
                 icon: IconCache.Remove,
                 pieceTable: PieceTables.Hoe,
                 overlayType: typeof(RemoveModificationsOverlayVisualizer),
@@ -131,8 +131,8 @@ internal static class ToolConfigs
             new ToolDB(
                 name: "cultivate_v2_square",
                 basePrefab: "cultivate_v2",
-                pieceName: "Cultivate (square)",
-                pieceDesc: "Cultivates ground according to the world grid and levels terrain based on player position. Use shift+click to level ground based on where you are pointing (this will smooth the terrain).",
+                pieceName: "$atmc_cultivate_square_name",
+                pieceDesc: "$atmc_cultivate_square_desc",
                 icon: IconCache.CultivateSquare,
                 pieceTable: PieceTables.Cultivator,
                 overlayType: typeof(CultivateOverlayVisualizer),
@@ -144,8 +144,8 @@ internal static class ToolConfigs
             new ToolDB(
                 name: "cultivate_v2_path",
                 basePrefab: "cultivate_v2",
-                pieceName: "Cultivate (path)",
-                pieceDesc: "Cultivates ground without affecting ground height.",
+                pieceName: "$atmc_cultivate_path_name",
+                pieceDesc: "$atmc_cultivate_path_desc",
                 icon: IconCache.CultivatePath,
                 pieceTable: PieceTables.Cultivator,
                 smooth: false,
@@ -157,8 +157,8 @@ internal static class ToolConfigs
             new ToolDB(
                 name: "cultivate_v2_path_square",
                 basePrefab: "cultivate_v2",
-                pieceName: "Cultivate (path, square)",
-                pieceDesc: "Cultivates ground according to the world grid without affecting ground height.",
+                pieceName: "$atmc_cultivate_path_square_name",
+                pieceDesc: "$atmc_cultivate_path_square_desc",
                 icon: IconCache.CultivatePathSquare,
                 pieceTable: PieceTables.Cultivator,
                 overlayType: typeof(CultivateOverlayVisualizer),
@@ -171,8 +171,8 @@ internal static class ToolConfigs
             new ToolDB(
                 name: "replant_v2_square",
                 basePrefab: "replant_v2",
-                pieceName: "Replant (square)",
-                pieceDesc: "Replants terrain according to world grid without affecting ground height.",
+                pieceName: "$atmc_replant_square_name",
+                pieceDesc: "$atmc_replant_square_desc",
                 icon: IconCache.ReplantSquare,
                 pieceTable: PieceTables.Cultivator,
                 overlayType: typeof(SeedGrassOverlayVisualizer),

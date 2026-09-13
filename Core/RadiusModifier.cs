@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using UnityEngine;
 using Logging;
+using TerrainTools.Extensions;
 using TerrainTools.Visualization;
 
 namespace TerrainTools.Core;
@@ -9,6 +10,7 @@ namespace TerrainTools.Core;
 internal static class RadiusModifier
 {
     private static bool RadiusToolIsInUse = false;
+    private static TerrainOp activeRadiusTool;
     private static float lastOriginalRadius;
     private static float lastModdedRadius;
     private static float lastTotalDelta;
@@ -18,9 +20,7 @@ internal static class RadiusModifier
     private const float Tolerance = 0.01f;
 
 
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(Player), nameof(Player.Update))]
-    private static void UpdatePrefix(Player __instance)
+    internal static void Tick(Player __instance)
     {
         if (!__instance || __instance != Player.m_localPlayer)
         {
@@ -29,22 +29,16 @@ internal static class RadiusModifier
 
         if (!__instance.InPlaceMode() || Hud.IsPieceSelectionVisible())
         {
-            if (RadiusToolIsInUse)
-            {
-                RadiusToolIsInUse = false;
-                lastOriginalRadius = 0;
-                lastModdedRadius = 0;
-                lastTotalDelta = 0;
-                lastGhostScale = Vector3.zero;
-            }
-
+            SelectRadiusTool(null);
             return;
         }
 
         if (!IsValidSelectedPiece(__instance, out TerrainOp terrainOp))
         {
+            SelectRadiusTool(null);
             return;
         }
+        SelectRadiusTool(terrainOp);
 
         if (ShouldModifyRadius())
         {
@@ -56,6 +50,17 @@ internal static class RadiusModifier
         RefreshGhostScale(__instance);
     }
 
+    private static void SelectRadiusTool(TerrainOp terrainOp)
+    {
+        if (activeRadiusTool == terrainOp) { return; }
+        activeRadiusTool = terrainOp;
+        RadiusToolIsInUse = false;
+        lastOriginalRadius = 0f;
+        lastModdedRadius = 0f;
+        lastTotalDelta = 0f;
+        lastGhostScale = Vector3.zero;
+    }
+
     /// <summary>
     ///     Checks if selected piece is a valid target for modifying radius.
     /// </summary>
@@ -65,7 +70,14 @@ internal static class RadiusModifier
     internal static bool IsValidSelectedPiece(Player player, out TerrainOp terrainOp)
     {
         Piece piece = player.GetSelectedPiece();
-        if (!piece || !piece.gameObject || piece.gameObject.GetComponent<OverlayVisualizer>())
+        if (!piece || !piece.gameObject)
+        {
+            terrainOp = null;
+            return false;
+        }
+
+        OverlayVisualizer overlay = piece.gameObject.GetComponent<OverlayVisualizer>();
+        if (overlay && overlay is not RemoveModificationsOverlayVisualizer)
         {
             terrainOp = null;
             return false;
@@ -94,11 +106,32 @@ internal static class RadiusModifier
     [HarmonyPatch(typeof(TerrainOp), nameof(TerrainOp.Awake))]
     private static void AwakePrefix(TerrainOp __instance)
     {
-        if (!__instance ||
-            !__instance.gameObject ||
-            __instance.gameObject.GetComponent<OverlayVisualizer>())
+        if (!__instance || !__instance.gameObject)
         {
             return;
+        }
+
+        OverlayVisualizer overlay = __instance.gameObject.GetComponent<OverlayVisualizer>();
+        bool isResetTool = overlay is RemoveModificationsOverlayVisualizer;
+        if (overlay && !isResetTool)
+        {
+            return;
+        }
+
+        if (lastTotalDelta != 0f)
+        {
+            if (!IsActiveToolInstance(__instance)) { return; }
+            PreciseTerrainModifier.EnsureRuntimeSettings(__instance, isResetTool, overlay != null);
+        }
+
+        if (isResetTool)
+        {
+            __instance.m_settings.m_levelRadius = ModifyRadius(
+                __instance.m_settings.m_levelRadius,
+                lastTotalDelta,
+                TerrainCompExtensions.FixedRadius
+            );
+            Log.LogInfo($"Applying reset radius {__instance.m_settings.m_levelRadius}", Log.InfoLevel.Medium);
         }
 
         if (__instance.m_settings.m_level)
@@ -126,13 +159,26 @@ internal static class RadiusModifier
         }
     }
 
-    private static float ModifyRadius(float radius, float delta)
+    private static float ModifyRadius(float radius, float delta, float minRadius = MinRadius)
     {
-        return Mathf.Clamp(radius + delta, MinRadius, TerrainTools.Instance.MaxRadius);
+        return Mathf.Clamp(radius + delta, minRadius, TerrainTools.Instance.MaxRadius);
+    }
+
+    private static bool IsActiveToolInstance(TerrainOp terrainOp)
+    {
+        if (!activeRadiusTool) { return false; }
+        return terrainOp.gameObject.name.Replace("(Clone)", "")
+            == activeRadiusTool.gameObject.name.Replace("(Clone)", "");
     }
 
     private static void SetRadius(TerrainOp terrainOp, float delta)
     {
+        bool isResetTool = terrainOp && terrainOp.gameObject.GetComponent<RemoveModificationsOverlayVisualizer>();
+        float minRadius = isResetTool ? TerrainCompExtensions.FixedRadius : MinRadius;
+        if (isResetTool)
+        {
+            delta = Mathf.Sign(delta);
+        }
         Log.LogInfo($"Adjusting radius by {delta}", Log.InfoLevel.High);
 
         if (!RadiusToolIsInUse && terrainOp)
@@ -141,14 +187,15 @@ internal static class RadiusModifier
             {
                 RadiusToolIsInUse = true;
                 lastOriginalRadius = radius;
-                lastModdedRadius = ModifyRadius(radius, delta);
-                lastTotalDelta += delta;
+                lastModdedRadius = ModifyRadius(radius, delta, minRadius);
+                lastTotalDelta += lastModdedRadius - radius;
             }
         }
         else
         {
-            lastModdedRadius = ModifyRadius(lastModdedRadius, delta);
-            lastTotalDelta += delta;
+            float previousRadius = lastModdedRadius;
+            lastModdedRadius = ModifyRadius(lastModdedRadius, delta, minRadius);
+            lastTotalDelta += lastModdedRadius - previousRadius;
         }
         Log.LogInfo($"total delta {lastTotalDelta}", Log.InfoLevel.High);
 
@@ -159,10 +206,21 @@ internal static class RadiusModifier
         );
     }
 
-    private static void RefreshGhostScale(Player player)
+    internal static void RefreshGhostScale(Player player)
     {
         if (!RadiusToolIsInUse || !player.m_placementGhost)
         {
+            return;
+        }
+
+        TerrainOp ghostTerrainOp = player.m_placementGhost.GetComponent<TerrainOp>();
+        if (!ghostTerrainOp || !IsActiveToolInstance(ghostTerrainOp)) { return; }
+
+        RemoveModificationsOverlayVisualizer resetVisualizer = player.m_placementGhost.GetComponent<RemoveModificationsOverlayVisualizer>();
+        if (resetVisualizer)
+        {
+            ghostTerrainOp.m_settings.m_levelRadius = lastModdedRadius;
+            resetVisualizer.SetScale(lastGhostScale);
             return;
         }
 
@@ -195,6 +253,10 @@ internal static class RadiusModifier
     private static bool TryGetMaximumRadius(TerrainOp terrainOp, out float maxRadius)
     {
         maxRadius = 0f;
+        if (terrainOp.gameObject.GetComponent<RemoveModificationsOverlayVisualizer>())
+        {
+            maxRadius = terrainOp.m_settings.m_levelRadius;
+        }
         if (terrainOp.m_settings.m_level && maxRadius < terrainOp.m_settings.m_levelRadius)
         {
             maxRadius = terrainOp.m_settings.m_levelRadius;

@@ -12,9 +12,12 @@ public static class GroundLevelSpinner
     public const float MinSpinner = 0.0f;
 
     public static float Value { get; private set; } = 1.0f;
+    private static int lastRefreshFrame = -1;
 
     public static void Refresh()
     {
+        if (lastRefreshFrame == Time.frameCount) { return; }
+        lastRefreshFrame = Time.frameCount;
         float scrollDelta = ScrollDelta();
         if (scrollDelta > 0)
         {

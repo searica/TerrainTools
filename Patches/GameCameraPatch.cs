@@ -1,6 +1,8 @@
 ﻿using HarmonyLib;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection.Emit;
+using Logging;
 using TerrainTools.Core;
 using TerrainTools.Visualization;
 
@@ -25,13 +27,23 @@ internal static class GameCameraPatch
 			IL_00b6: brfalse.s IL_00c9
 
          */
-        return new CodeMatcher(instructions)
-            .MatchForward(
-                useEnd: false,
-                new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(Player), nameof(Player.CanRotatePiece)))
-            )
-            .SetInstructionAndAdvance(Transpilers.EmitDelegate(UpdateCamera_BlockScroll_Delegate))
-            .InstructionEnumeration();
+        List<CodeInstruction> original = instructions.ToList();
+        var target = AccessTools.Method(typeof(Player), nameof(Player.CanRotatePiece));
+        var matches = original
+            .Select((instruction, index) => (instruction, index))
+            .Where(item => item.instruction.opcode == OpCodes.Callvirt && Equals(item.instruction.operand, target))
+            .ToList();
+        if (matches.Count != 1)
+        {
+            Log.LogWarning($"GameCamera.UpdateCamera patch skipped: expected one CanRotatePiece call, found {matches.Count}");
+            return original;
+        }
+
+        CodeInstruction replacement = Transpilers.EmitDelegate(UpdateCamera_BlockScroll_Delegate);
+        replacement.labels.AddRange(matches[0].instruction.labels);
+        replacement.blocks.AddRange(matches[0].instruction.blocks);
+        original[matches[0].index] = replacement;
+        return original;
     }
 
     private static bool UpdateCamera_BlockScroll_Delegate(Player localPlayer)
