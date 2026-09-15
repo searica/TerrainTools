@@ -11,10 +11,10 @@ using Jotunn.Configs;
 using Jotunn.Managers;
 using Jotunn.Utils;
 using Jotunn.Extensions;
-using Configs;
 using Logging;
 using TerrainTools.Core;
 using TerrainTools.Tools;
+using TerrainTools.Extensions;
 
 namespace TerrainTools;
 
@@ -27,7 +27,7 @@ internal sealed class TerrainTools : BaseUnityPlugin
     internal const string Author = "Searica";
     public const string PluginName = "AdvancedTerrainModifiers";
     public const string PluginGUID = $"{Author}.Valheim.TerrainTools";
-    public const string PluginVersion = "1.4.1";
+    public const string PluginVersion = "1.5.0";
 
     public static TerrainTools Instance;
     private static ConfigFileWatcher ConfigFileWatcher;

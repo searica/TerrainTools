@@ -1,6 +1,6 @@
 ﻿using BepInEx.Configuration;
 
-namespace Configs;
+namespace TerrainTools.Extensions;
 
 /// <summary>
 ///     Extends ConfigFile with a convenience method to bind config entries with less boilerplate code 
