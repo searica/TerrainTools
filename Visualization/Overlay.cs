@@ -59,7 +59,7 @@ public class Overlay
 
     public float StartSpeed
     {
-        get { return psm.startSize.constant; }
+        get { return psm.startSpeed.constant; }  // uses size rather than speed for a reason?
         set { ParticleSystem.MainModule psMain = ps.main; psMain.startSpeed = value; }
     }
 
@@ -88,5 +88,6 @@ public class Overlay
         GameObject = transform.gameObject;
         ps = transform.GetComponentInChildren<ParticleSystem>();
         psr = transform.GetComponentInChildren<ParticleSystemRenderer>();
+        psm = ps.main;
     }
 }

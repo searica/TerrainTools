@@ -5,6 +5,15 @@
 			<th align="center">Notes</th>
 		</tr>
 		<tr>
+			<td align="center">1.5.0</td>
+			<td align="left">
+				<ul>
+					<li>Updated for Deep North release!</li>
+					<li>Note: I haven't fixed the non-intuitive results for precise terrrain paint tools. However the source of that issue is a vanilla bug so the mod still works just like before.</li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
 			<td align="center">1.4.1</td>
 			<td align="left">
 				<ul>

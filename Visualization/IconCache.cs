@@ -1,8 +1,9 @@
-﻿using System.IO;
-using System.Reflection;
-using System.Linq;
-using UnityEngine;
+﻿using HarmonyLib;
 using Logging;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using UnityEngine;
 
 namespace TerrainTools.Visualization;
 
@@ -25,6 +26,9 @@ internal static class IconCache
     private static Texture2D _raiseSquare;
     private static Texture2D _lower;
     private static Texture2D _shovel;
+
+    private static readonly MethodInfo LoadImageMethod = AccessTools.Method(typeof(ImageConversion), nameof(ImageConversion.LoadImage), [typeof(Texture2D), typeof(byte[])]);
+
 
     internal static Sprite LoadEmbeddedTextureAsSprite(string fileName)
     {
@@ -54,7 +58,7 @@ internal static class IconCache
         byte[] array = new byte[manifestResourceStream.Length];
         manifestResourceStream.Read(array, 0, array.Length);
         Texture2D texture = new(0, 0);
-        ImageConversion.LoadImage(texture, array);
+        LoadImageMethod.Invoke(null, [texture, array]);
         return texture;
     }
 

@@ -145,17 +145,16 @@ public static class PreciseTerrainModifier
     private static bool PaintClearedPrefix(
         TerrainComp __instance,
         Vector3 worldPos,
-        float radius,
-        TerrainModifier.PaintType paintType,
-        bool heightCheck
+        Vector3 rot,
+        TerrainOp.Settings settings
     )
     {
-        if (!TerrainCompExtensions.IsPrecisionModifier(radius))
+        if (!TerrainCompExtensions.IsPrecisionModifier(settings))
         {
             return true;
         }
 
-        __instance.PreciseRecolorTerrain(worldPos, paintType);
+        __instance.PreciseRecolorTerrain(worldPos, settings.m_paintType);
         return false;
     }
 }

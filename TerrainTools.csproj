@@ -117,10 +117,4 @@
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 	</PropertyGroup>
-	<ItemGroup>
-	  <EditorConfigFiles Remove="C:\Users\TheUser\Documents\GitHub\TerrainTools\.editorconfig" />
-	</ItemGroup>
-	<ItemGroup>
-	  <None Include="C:\Users\TheUser\Documents\GitHub\TerrainTools\.editorconfig" />
-	</ItemGroup>
 </Project>

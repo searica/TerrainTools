@@ -44,6 +44,26 @@ internal static class TerrainCompExtensions
     /// <summary>
     ///     Checks if radius is set as flag for precision modifier.
     /// </summary>
+    /// <param name="settings"></param>
+    /// <returns></returns>
+    public static bool IsPrecisionModifier(this TerrainOp.Settings settings)
+    {
+        if (
+            IsPrecisionModifier(settings.m_raiseRadius) ||
+            IsPrecisionModifier(settings.m_smoothRadius) ||
+            IsPrecisionModifier(settings.m_paintRadius) ||
+            IsPrecisionModifier(settings.m_levelRadius)
+            )
+        {
+            return true;
+        }
+        return false;
+
+    }
+
+    /// <summary>
+    ///     Checks if radius is set as flag for precision modifier.
+    /// </summary>
     /// <param name="radius"></param>
     /// <returns></returns>
     public static bool IsPrecisionModifier(float radius)
@@ -190,11 +210,11 @@ internal static class TerrainCompExtensions
                     continue; // out of bounds.
                 }
                 // blend color based on how much of the pixel is within the fixed square
-                float areaOutside = pixelWidth*(xOutside + zOutside) - (xOutside * zOutside);
-                float percentageInside = (pixelArea - areaOutside) / pixelArea;
-                Log.LogInfo($"Percentage Inside: {percentageInside}");
-                comp.m_paintMask[vertexIndex] = BlendColor(currentColor, newColor, percentageInside);
-               
+                //float areaOutside = pixelWidth*(xOutside + zOutside) - (xOutside * zOutside);
+                //float percentageInside = (pixelArea - areaOutside) / pixelArea;
+                //Log.LogInfo($"Percentage Inside: {percentageInside}");
+                //comp.m_paintMask[vertexIndex] = BlendColor(currentColor, newColor, percentageInside);
+                comp.m_paintMask[vertexIndex] = newColor;
                 comp.m_modifiedPaint[vertexIndex] = !resetColor;
                 Log.LogInfo($"Vertex: ({i}, {j}), Index: {vertexIndex}, Color: {comp.m_paintMask[vertexIndex]}", Log.InfoLevel.Medium);
             }

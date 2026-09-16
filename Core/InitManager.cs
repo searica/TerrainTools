@@ -37,6 +37,7 @@ internal static class InitManager
             {
                 ToolDB toolDB = ToolConfigs.ToolConfigsMap[key];
                 toolDB.prefab = MakeToolPiece(toolDB);
+                Log.LogInfo($"Created {toolDB.name}", Log.InfoLevel.Medium);
             }
             catch
             {
@@ -85,7 +86,7 @@ internal static class InitManager
     private static void SetDescription(string prefabName, string description)
     {
         Piece prefabPiece = PrefabManager.Instance.GetPrefab(prefabName)?.GetComponent<Piece>();
-        if (prefabPiece != null)
+        if (!prefabPiece)
         {
             prefabPiece.m_description = description;
         }
@@ -240,6 +241,7 @@ internal static class InitManager
                 ghost.localPosition += new Vector3(0f, 2f, 0f);
             }
         }
+
         return toolPrefab;
     }
 
@@ -265,7 +267,7 @@ internal static class InitManager
     private static void RegisterPieceInPieceTable(GameObject prefab, string pieceTable, string category, int position = -1)
     {
         Piece piece = prefab.GetComponent<Piece>();
-        if (piece == null)
+        if (!piece)
         {
             throw new Exception($"Prefab {prefab.name} has no Piece component attached");
         }
@@ -288,6 +290,7 @@ internal static class InitManager
         {
             PrefabManager.Instance.RegisterToZNetScene(prefab);
         }
+        RegisterTerrainOpInObjectDB(prefab);
 
         if (!string.IsNullOrEmpty(category))
         {
@@ -325,6 +328,42 @@ internal static class InitManager
         }
 
         Log.LogDebug($"Added piece {prefab.name} | Token: {piece.TokenName()}");
+    }
+
+    /// <summary>
+    ///     Register custom TerrainOp prefabs to ObjectDB so that they can be deserialized correctly.
+    /// </summary>
+    internal static void RegisterTerrainOpInObjectDB(GameObject prefab)
+    {
+        if (
+            !ObjectDB.instance || !prefab.TryGetComponent(out TerrainOp terrainOp) ||
+            ObjectDB.instance.m_terrainOpsByHash == null || ObjectDB.instance.m_terrainOps == null
+        )
+        {
+            return;
+        }
+
+        int hash = prefab.name.GetStableHashCode();
+        if (ObjectDB.instance.m_terrainOpsByHash.TryGetValue(hash, out TerrainOp registeredTerrainOp))
+        {
+            if (registeredTerrainOp != terrainOp)
+            {
+                Log.LogWarning($"TerrainOp prefab hash collision for {prefab.name} ({hash}); keeping the registered prefab");
+            }
+            return;
+        }
+
+        if (!ObjectDB.instance.m_terrainOps.Contains(terrainOp))
+        {
+            ObjectDB.instance.m_terrainOps.Add(terrainOp);
+        }
+
+        if (!ObjectDB.instance.m_terrainOpsByHash.ContainsKey(hash))
+        {
+            ObjectDB.instance.m_terrainOpsByHash.Add(hash, terrainOp);
+        }
+
+        Log.LogInfo($"Registered TerrainOp {prefab.name} in ObjectDB");
     }
 
 

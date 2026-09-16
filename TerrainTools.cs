@@ -233,7 +233,7 @@ internal sealed class TerrainTools : BaseUnityPlugin
             synced: false
         );
 
-        hardnessScrollScale = Config.BindConfig(
+        hardnessScrollScale = Config.BindConfigInOrder(
             SharpnessSection,
             "Sharpness Scroll Speed",
             0.1f,
