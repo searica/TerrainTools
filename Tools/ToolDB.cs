@@ -26,6 +26,7 @@ internal class ToolDB
     public float? paintRadius;
     public Piece.Requirement[] requirements;
     public bool invertGhost;
+    public Piece.UsageTagFlags usageTagFlags;
     public GameObject prefab;
 
     public ToolDB(
@@ -49,7 +50,8 @@ internal class ToolDB
         bool? clearPaint = null,
         float? paintRadius = null,
         Piece.Requirement[] requirements = null,
-        bool invertGhost = false
+        bool invertGhost = false,
+        Piece.UsageTagFlags usageTagFlags = Piece.UsageTagFlags.Misc
     )
     {
         this.name = name;
@@ -80,5 +82,6 @@ internal class ToolDB
 
         this.requirements = requirements;
         this.invertGhost = invertGhost;
+        this.usageTagFlags = usageTagFlags;
     }
 }

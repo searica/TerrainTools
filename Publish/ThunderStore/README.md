@@ -25,7 +25,8 @@ Quality of life building mod that improves how terrain manipulation with the hoe
 - Configurable hotkey to enable changing sharpness.
 - Camera zoom is blocked while modifying tool sharpness.
 - It's refered to as "hardness" in the example image because I originally named it that after digital paintbrush tools but I got tired of my friends making jokes about getting harder and changed it to sharpness.
-<img src="https://raw.githubusercontent.com/searica/TerrainTools/main/Media/SharpnessDemo.png"></img>
+
+<img src="https://raw.githubusercontent.com/searica/TerrainTools/release/Media/HardnessDemo.png"></img>
 
 ### New Terrain Tool
 - Adds a craftable shovel that lets you lower terrain.
@@ -36,13 +37,13 @@ Quality of life building mod that improves how terrain manipulation with the hoe
 - Adds a precision raise ground tool that lets you set the exact height you want to raise the terrain by using the scroll wheel on your mouse.
 - Adds a remove terrain modifications tool that lets you reset terrain.
 
-<img src="https://raw.githubusercontent.com/searica/TerrainTools/main/Media/HoeTools.png"></img>
+<img src="https://raw.githubusercontent.com/searica/TerrainTools/release/Media/HoeTools.png"></img>
 
 ### New Cultivator Tools
 - Adds a version of the cultivate tool that doesn't affect the terrain height when used.
 - Adds square versions of each tools tool in the cultivator that modifies terrain according to the world grid (so you can enjoy clean edges).
 
-<img src="https://raw.githubusercontent.com/searica/TerrainTools/main/Media/CultivatorTools.png"></img>
+<img src="https://raw.githubusercontent.com/searica/TerrainTools/release/Media/CultivatorTools.png"></img>
 
 ## Instructions
 If you are using a mod manager for Thunderstore simply install the mod from there. If you are not using a mod manager then, you need a modded instance of Valheim (BepInEx) and the Jotunn plugin installed.
@@ -309,6 +310,7 @@ If you like this mod you might like some of my other ones.
 #### Building Mods
 - [More Vanilla Build Prefabs](https://thunderstore.io/c/valheim/p/Searica/More_Vanilla_Build_Prefabs/)
 - [Extra Snap Points Made Easy](https://thunderstore.io/c/valheim/p/Searica/Extra_Snap_Points_Made_Easy/)
+- [AdvancedTerrainModifiers](https://thunderstore.io/c/valheim/p/Searica/AdvancedTerrainModifiers/)
 - [BuildRestrictionTweaksSync](https://thunderstore.io/c/valheim/p/Searica/BuildRestrictionTweaksSync/)
 - [ToolTweaks](https://thunderstore.io/c/valheim/p/Searica/ToolTweaks/)
 - [MeasureTwice](https://thunderstore.io/c/valheim/p/Searica/MeasureTwice/)
@@ -323,6 +325,7 @@ If you like this mod you might like some of my other ones.
 - [SkilledCarryWeight](https://thunderstore.io/c/valheim/p/Searica/SkilledCarryWeight/)
 - [SafetyStatus](https://thunderstore.io/c/valheim/p/Searica/SafetyStatus/)
 - [ShowMeTheGoods](https://thunderstore.io/c/valheim/p/Searica/ShowMeTheGoods/)
+- [UnderTheSea](https://thunderstore.io/c/valheim/p/Searica/UnderTheSea/)
 - [WatchWhereYouStab](https://thunderstore.io/c/valheim/p/Searica/WatchWhereYouStab/)
 
 #### Networking Mods

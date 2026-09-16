@@ -10,37 +10,37 @@ namespace TerrainTools.Patches;
 [HarmonyPatch]
 internal static class HeightmapPatches
 {
-    [HarmonyPrefix]
-    [HarmonyPriority(Priority.Last)]
-    [HarmonyPatch(typeof(Heightmap), nameof(Heightmap.IsCleared))]
-    private static void IsClearedPrefix(Heightmap __instance, ref Vector3 worldPos)
-    {
-        CounterOffset(ref worldPos);
-    }
+    //[HarmonyPrefix]
+    //[HarmonyPriority(Priority.Last)]
+    //[HarmonyPatch(typeof(Heightmap), nameof(Heightmap.IsCleared))]
+    //private static void IsClearedPrefix(Heightmap __instance, ref Vector3 worldPos)
+    //{
+    //    CounterOffset(ref worldPos);
+    //}
 
-    [HarmonyPrefix]
-    [HarmonyPriority(Priority.Last)]
-    [HarmonyPatch(typeof(Heightmap), nameof(Heightmap.GetVegetationMask))]
-    private static void GetVegetationMaskPrefix(Heightmap __instance, ref Vector3 worldPos)
-    {
-        CounterOffset(ref worldPos);
-    }
+    //[HarmonyPrefix]
+    //[HarmonyPriority(Priority.Last)]
+    //[HarmonyPatch(typeof(Heightmap), nameof(Heightmap.GetVegetationMask))]
+    //private static void GetVegetationMaskPrefix(Heightmap __instance, ref Vector3 worldPos)
+    //{
+    //    CounterOffset(ref worldPos);
+    //}
 
-    [HarmonyPostfix]
-    [HarmonyPriority(Priority.First)]
-    [HarmonyPatch(typeof(Heightmap), nameof(Heightmap.IsCleared))]
-    private static void IsClearedPostfix(Heightmap __instance, ref Vector3 worldPos)
-    {
-        UndoCounterOffset(ref worldPos);
-    }
+    //[HarmonyPostfix]
+    //[HarmonyPriority(Priority.First)]
+    //[HarmonyPatch(typeof(Heightmap), nameof(Heightmap.IsCleared))]
+    //private static void IsClearedPostfix(Heightmap __instance, ref Vector3 worldPos)
+    //{
+    //    UndoCounterOffset(ref worldPos);
+    //}
 
-    [HarmonyPostfix]
-    [HarmonyPriority(Priority.First)]
-    [HarmonyPatch(typeof(Heightmap), nameof(Heightmap.GetVegetationMask))]
-    private static void GetVegetationMaskPostfix(Heightmap __instance, ref Vector3 worldPos)
-    {
-        UndoCounterOffset(ref worldPos);
-    }
+    //[HarmonyPostfix]
+    //[HarmonyPriority(Priority.First)]
+    //[HarmonyPatch(typeof(Heightmap), nameof(Heightmap.GetVegetationMask))]
+    //private static void GetVegetationMaskPostfix(Heightmap __instance, ref Vector3 worldPos)
+    //{
+    //    UndoCounterOffset(ref worldPos);
+    //}
 
 
     /// <summary>
@@ -63,33 +63,33 @@ internal static class HeightmapPatches
         worldPos.z -= 0.5f;
     }
 
-    /// <summary>
-    ///     Swap out m_scale to reflect actual positioning of paint mask pixel centers
-    /// </summary>
-    /// <param name="__instance"></param>
-    /// <param name="__state"></param>
-    [HarmonyPrefix]
-    [HarmonyPriority(Priority.Last)]
-    [HarmonyPatch(typeof(Heightmap), nameof(Heightmap.WorldToVertexMask))] 
-    public static void WorldPosToPaintMaskVertexPrefix(Heightmap __instance, out float __state)
-    {
-        __state = __instance.m_scale;
-        __instance.m_scale = __instance.GetPaintMaskScale();
-    }
+    ///// <summary>
+    /////     Swap out m_scale to reflect actual positioning of paint mask pixel centers
+    ///// </summary>
+    ///// <param name="__instance"></param>
+    ///// <param name="__state"></param>
+    //[HarmonyPrefix]
+    //[HarmonyPriority(Priority.Last)]
+    //[HarmonyPatch(typeof(Heightmap), nameof(Heightmap.WorldToVertexMask))] 
+    //public static void WorldPosToPaintMaskVertexPrefix(Heightmap __instance, out float __state)
+    //{
+    //    __state = __instance.m_scale;
+    //    __instance.m_scale = __instance.GetPaintMaskScale();
+    //}
 
 
-    /// <summary>
-    ///     Swap m_scale back to original value
-    /// </summary>
-    /// <param name="__instance"></param>
-    /// <param name="__state"></param>
-    [HarmonyPostfix]
-    [HarmonyPriority(Priority.First)]
-    [HarmonyPatch(typeof(Heightmap), nameof(Heightmap.WorldToVertexMask))]
-    public static void WorldPosToPaintMaskVertexPostfix(Heightmap __instance, ref float __state)
-    {
-        __instance.m_scale = __state;
-    }
+    ///// <summary>
+    /////     Swap m_scale back to original value
+    ///// </summary>
+    ///// <param name="__instance"></param>
+    ///// <param name="__state"></param>
+    //[HarmonyPostfix]
+    //[HarmonyPriority(Priority.First)]
+    //[HarmonyPatch(typeof(Heightmap), nameof(Heightmap.WorldToVertexMask))]
+    //public static void WorldPosToPaintMaskVertexPostfix(Heightmap __instance, ref float __state)
+    //{
+    //    __instance.m_scale = __state;
+    //}
 
 
     /// <summary>

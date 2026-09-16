@@ -16,7 +16,7 @@ internal static class ToolConfigs
             new ToolDB(
                 name: "mud_road_v2_sq",
                 basePrefab:"mud_road_v2",
-                pieceName: "Level ground(square)",
+                pieceName: "Level ground (square)",
                 pieceDesc: "Levels ground according to the world grid based on player position. Use shift+click to level ground based on where you are pointing instead (this will smooth the terrain).",
                 icon: IconCache.MudRoadSquare,
                 pieceTable: PieceTables.Hoe,
@@ -74,13 +74,14 @@ internal static class ToolConfigs
         {
             "paved_road_v2_square",
             new ToolDB(
-                name: "Paved road (Square)",
+                name: "paved_road_v2_square",
                 basePrefab: "paved_road_v2",
                 pieceName: "Paved road (square)",
                 pieceDesc: "Creates a paved path according to the world grid and levels ground based on player position. Use shift+click to level ground based on where you are pointing (this will smooth the terrain).",
                 icon: IconCache.PavedRoadSquare,
                 pieceTable: PieceTables.Hoe,
-                overlayType: typeof(SquarePathOverlayVisualizer)
+                overlayType: typeof(SquarePathOverlayVisualizer),
+                insertIndex: 4
             )
         },
         {
@@ -92,7 +93,8 @@ internal static class ToolConfigs
                 pieceDesc: "Creates a paved path without affecting ground height",
                 icon: IconCache.PavedRoadPath,
                 pieceTable: PieceTables.Hoe,
-                smooth: false
+                smooth: false,
+                insertIndex: 4
             )
         },
         {
@@ -105,7 +107,8 @@ internal static class ToolConfigs
                 icon: IconCache.PavedRoadPathSquare,
                 pieceTable: PieceTables.Hoe,
                 overlayType: typeof(SquarePathOverlayVisualizer),
-                smooth: false
+                smooth: false,
+                insertIndex: 4
             )
         },
         {
@@ -121,7 +124,8 @@ internal static class ToolConfigs
                 smooth: false,
                 level: false,
                 raise: false,
-                clearPaint: false
+                clearPaint: false,
+                insertIndex: 4
             )
         },
 

@@ -5,6 +5,24 @@
 			<th align="center">Notes</th>
 		</tr>
 		<tr>
+			<td align="center">1.5.2</td>
+			<td align="left">
+				<ul>
+					<li>Added usage tags to new terrain tools to improve sorting and filtering in build menus.</li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td align="center">1.5.1</td>
+			<td align="left">
+				<ul>
+					<li>Bugfix: restored intended functionality for radius and sharpness modifications.</li>
+					<li>Adjusted the placement of terrain tools in the hoe build menu.</li>
+					<li>Improved display of terrain tool sharpness to reflect whether a tool raises or lowers (dig) terrain.</li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
 			<td align="center">1.5.0</td>
 			<td align="left">
 				<ul>
