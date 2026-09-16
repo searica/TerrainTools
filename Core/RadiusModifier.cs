@@ -3,7 +3,6 @@ using Logging;
 using TerrainTools.Extensions;
 using TerrainTools.Visualization;
 using UnityEngine;
-using static InventoryGrid;
 
 namespace TerrainTools.Core;
 
@@ -205,7 +204,7 @@ internal static class RadiusModifier
             lastModdedRadius = ModifyRadius(lastModdedRadius, delta);
             lastTotalDelta += delta;
         }
-        Log.LogInfo($"total delta {lastTotalDelta}", Log.InfoLevel.High);
+        Log.LogInfo($"Total delta {lastTotalDelta}", Log.InfoLevel.High);
 
         lastGhostScale = new Vector3(
             lastModdedRadius / lastOriginalRadius,
