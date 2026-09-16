@@ -26,7 +26,7 @@ Quality of life building mod that improves how terrain manipulation with the hoe
 - Camera zoom is blocked while modifying tool sharpness.
 - It's refered to as "hardness" in the example image because I originally named it that after digital paintbrush tools but I got tired of my friends making jokes about getting harder and changed it to sharpness.
 
-<img src="https://raw.githubusercontent.com/searica/TerrainTools/release/Media/SharpnessDemo.png"></img>
+<img src="https://raw.githubusercontent.com/searica/TerrainTools/release/Media/HardnessDemo.png"></img>
 
 ### New Terrain Tool
 - Adds a craftable shovel that lets you lower terrain.
