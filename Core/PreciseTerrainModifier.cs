@@ -28,9 +28,15 @@ public static class PreciseTerrainModifier
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.ApplyOperation))]
-    private static void ApplyOperationPrefix(TerrainOp modifier)
+    private static void ApplyOperationPrefix(TerrainComp __instance, TerrainOp modifier)
     {
         if (!modifier || !modifier.gameObject) { return; }
+
+        if (__instance && __instance.m_nview && !__instance.m_nview.IsOwner())
+        {
+            // claim ownership before sending RPC out? Should just ping self and grab ownership in RPC though.
+            __instance.m_nview.ClaimOwnership();
+        }
 
         // Set radius to -inf so I can check if custom overlay in later methods
         if (modifier.gameObject.GetComponentInChildren<OverlayVisualizer>())
@@ -48,6 +54,29 @@ public static class PreciseTerrainModifier
             {
                 modifier.m_settings.m_paintRadius = float.NegativeInfinity;
             }
+        }
+    }
+
+    /// <summary>
+    ///     Modify the operation radius to accurately reflect the fixed radius of precise terrain modifications. This ensures that
+    ///     the m_lastOpRadius is not set to an invalid radius when a precision modifier is the last operation applied and avoids issues
+    ///     caused by saving an invalid radius.
+    /// </summary>
+    /// <param name="__instance"></param>
+    /// <param name="__result"></param>
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(TerrainOp), nameof(TerrainOp.GetRadius))]
+    private static void GetRadiusPostfix(TerrainOp __instance, ref float __result)
+    {
+        if (!__instance)
+        {
+            return;
+        }
+
+        // return correct radius for precision tools
+        if (__instance.m_settings.IsPrecisionModifier())
+        {
+            __result = Mathf.Max(__result, __instance.GetFixedRadius());
         }
     }
 
@@ -78,6 +107,7 @@ public static class PreciseTerrainModifier
     /// <param name="pos"></param>
     /// <param name="modifier"></param>
     [HarmonyPrefix]
+    [HarmonyPriority(Priority.VeryHigh)]
     [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.InternalDoOperation))]
     private static void InternalDoOperationPrefix(
         TerrainComp __instance,
@@ -92,23 +122,23 @@ public static class PreciseTerrainModifier
         }
     }
 
-    /// <summary>
-    ///     Correct m_lastOpRadius to be FixedRadius instead of -Infinity
-    ///     if a Precision Modifier was the last operation applied. This
-    ///     avoids issues caused by saving an invalid radius.
-    /// </summary>
-    /// <param name="__instance"></param>
-    /// <param name="pos"></param>
-    /// <param name="modifier"></param>
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.InternalDoOperation))]
-    private static void InternalDoOperationPostfix(TerrainComp __instance)
-    {
-        if (__instance.IsPrecisionModifier())
-        {
-            __instance.m_lastOpRadius = __instance.GetFixedRadius();
-        }
-    }
+    ///// <summary>
+    /////     Correct m_lastOpRadius to be FixedRadius instead of -Infinity
+    /////     if a Precision Modifier was the last operation applied. This
+    /////     avoids issues caused by saving an invalid radius.
+    ///// </summary>
+    ///// <param name="__instance"></param>
+    ///// <param name="pos"></param>
+    ///// <param name="modifier"></param>
+    //[HarmonyPostfix]
+    //[HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.InternalDoOperation))]
+    //private static void InternalDoOperationPostfix(TerrainComp __instance)
+    //{
+    //    if (__instance.IsPrecisionModifier())
+    //    {
+    //        __instance.m_lastOpRadius = __instance.GetFixedRadius();
+    //    }
+    //}
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.SmoothTerrain))]
@@ -118,26 +148,24 @@ public static class PreciseTerrainModifier
         float radius
     )
     {
-        if (!TerrainCompExtensions.IsPrecisionModifier(radius))
+        if (TerrainCompExtensions.IsPrecisionModifier(radius))
         {
-            return true;
+            __instance.PreciseSmoothTerrain(worldPos);
+            return false;
         }
-
-        __instance.PreciseSmoothTerrain(worldPos);
-        return false;
+        return true;
     }
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.RaiseTerrain))]
     private static bool RaiseTerrainPrefix(TerrainComp __instance, Vector3 worldPos, float radius, float delta)
     {
-        if (!TerrainCompExtensions.IsPrecisionModifier(radius))
+        if (TerrainCompExtensions.IsPrecisionModifier(radius))
         {
-            return true;
+            __instance.PreciseRaiseTerrain(worldPos, delta);
+            return false;
         }
-
-        __instance.PreciseRaiseTerrain(worldPos, delta);
-        return false;
+        return true;
     }
 
     [HarmonyPrefix]
@@ -149,12 +177,12 @@ public static class PreciseTerrainModifier
         TerrainOp.Settings settings
     )
     {
-        if (!TerrainCompExtensions.IsPrecisionModifier(settings))
+        if (TerrainCompExtensions.IsPrecisionModifier(settings.m_paintRadius))
         {
-            return true;
+            __instance.PreciseRecolorTerrain(worldPos, settings.m_paintType);
+            return false;
         }
-
-        __instance.PreciseRecolorTerrain(worldPos, settings.m_paintType);
-        return false;
+        return true;
+        
     }
 }

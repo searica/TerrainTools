@@ -1,7 +1,9 @@
 ﻿using HarmonyLib;
-using UnityEngine;
 using Logging;
+using TerrainTools.Extensions;
 using TerrainTools.Visualization;
+using UnityEngine;
+using static InventoryGrid;
 
 namespace TerrainTools.Core;
 
@@ -12,6 +14,12 @@ internal static class RadiusModifier
     private static float lastOriginalRadius;
     private static float lastModdedRadius;
     private static float lastTotalDelta;
+
+    private static float lastRaiseRadius;
+    private static float lastSmoothRadius;
+    private static float lastPaintRadius;
+    private static float lastLevelRadius;
+
     private static Vector3 lastGhostScale = Vector3.zero;
     private const float MinRadius = 0.5f;
 
@@ -89,40 +97,87 @@ internal static class RadiusModifier
         return TerrainTools.Instance.IsEnableRadiusModifier && Input.GetKey(TerrainTools.Instance.RadiusKey) && Input.mouseScrollDelta.y != 0;
     }
 
+    /// <summary>
+    ///     Apply changes to radius just before performing the actual operation.
+    /// </summary>
+    /// <param name="__instance"></param>
+    /// <param name="modifier"></param>
     [HarmonyPrefix]
-    [HarmonyPriority(Priority.VeryHigh)]
-    [HarmonyPatch(typeof(TerrainOp), nameof(TerrainOp.Awake))]
-    private static void AwakePrefix(TerrainOp __instance)
+    [HarmonyPriority(Priority.VeryLow)]
+    [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.InternalDoOperation))]
+    private static void InternalDoOperationPrefix(TerrainComp __instance, TerrainOp.Settings modifier)
     {
-        if (!__instance ||
-            !__instance.gameObject ||
-            __instance.gameObject.GetComponent<OverlayVisualizer>())
+        if (!__instance || modifier == null || modifier.IsPrecisionModifier())
         {
             return;
         }
 
-        if (__instance.m_settings.m_level)
+        if (modifier.m_level)
         {
-            __instance.m_settings.m_levelRadius = ModifyRadius(__instance.m_settings.m_levelRadius, lastTotalDelta);
-            Log.LogInfo($"Applying level radius {__instance.m_settings.m_levelRadius}", Log.InfoLevel.Medium);
+            lastLevelRadius = modifier.m_levelRadius;
+            modifier.m_levelRadius = ModifyRadius(modifier.m_levelRadius, lastTotalDelta);
+            Log.LogInfo($"Applying level radius {modifier.m_levelRadius}", Log.InfoLevel.Medium);
         }
 
-        if (__instance.m_settings.m_raise)
+        if (modifier.m_raise)
         {
-            __instance.m_settings.m_raiseRadius = ModifyRadius(__instance.m_settings.m_raiseRadius, lastTotalDelta);
-            Log.LogInfo($"Applying raise radius {__instance.m_settings.m_raiseRadius}", Log.InfoLevel.Medium);
+            lastRaiseRadius = modifier.m_raiseRadius;
+            modifier.m_raiseRadius = ModifyRadius(modifier.m_raiseRadius, lastTotalDelta);
+            Log.LogInfo($"Applying raise radius {modifier.m_raiseRadius}", Log.InfoLevel.Medium);
         }
 
-        if (__instance.m_settings.m_smooth)
+        if (modifier.m_smooth)
         {
-            __instance.m_settings.m_smoothRadius = ModifyRadius(__instance.m_settings.m_smoothRadius, lastTotalDelta);
-            Log.LogInfo($"Applying smooth radius {__instance.m_settings.m_smoothRadius}", Log.InfoLevel.Medium);
+            lastSmoothRadius = modifier.m_smoothRadius;
+            modifier.m_smoothRadius = ModifyRadius(modifier.m_smoothRadius, lastTotalDelta);
+            Log.LogInfo($"Applying smooth radius {modifier.m_smoothRadius}", Log.InfoLevel.Medium);
         }
 
-        if (__instance.m_settings.m_paintCleared)
+        if (modifier.m_paintCleared)
         {
-            __instance.m_settings.m_paintRadius = ModifyRadius(__instance.m_settings.m_paintRadius, lastTotalDelta);
-            Log.LogInfo($"Applying paint radius {__instance.m_settings.m_paintRadius}", Log.InfoLevel.Medium);
+            lastPaintRadius = modifier.m_paintRadius;
+            modifier.m_paintRadius = ModifyRadius(modifier.m_paintRadius, lastTotalDelta);
+            Log.LogInfo($"Applying paint radius {modifier.m_paintRadius}", Log.InfoLevel.Medium);
+        }
+    }
+
+    /// <summary>
+    ///     Revert changes to radius just after performing operation to avoid cumulatively stacking delta.
+    /// </summary>
+    /// <param name="__instance"></param>
+    /// <param name="modifier"></param>
+    [HarmonyPostfix]
+    [HarmonyPriority(Priority.VeryHigh)]
+    [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.InternalDoOperation))]
+    private static void InternalDoOperationPostfix(TerrainComp __instance, TerrainOp.Settings modifier)
+    {
+        if (!__instance || modifier == null || modifier.IsPrecisionModifier())
+        {
+            return;
+        }
+
+        if (modifier.m_level)
+        {
+            modifier.m_levelRadius = lastLevelRadius;
+            Log.LogInfo($"Resoted level radius {modifier.m_levelRadius}", Log.InfoLevel.Medium);
+        }
+
+        if (modifier.m_raise)
+        {
+            modifier.m_raiseRadius = lastRaiseRadius;
+            Log.LogInfo($"Restored raise radius {modifier.m_raiseRadius}", Log.InfoLevel.Medium);
+        }
+
+        if (modifier.m_smooth)
+        {
+            modifier.m_smoothRadius = lastSmoothRadius;
+            Log.LogInfo($"Restored smooth radius {modifier.m_smoothRadius}", Log.InfoLevel.Medium);
+        }
+
+        if (modifier.m_paintCleared)
+        {
+            modifier.m_paintRadius = lastPaintRadius;
+            Log.LogInfo($"Restored paint radius {modifier.m_paintRadius}", Log.InfoLevel.Medium);
         }
     }
 

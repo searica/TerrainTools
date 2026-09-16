@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
-using System.Collections.Generic;
 using Logging;
+using System.Collections.Generic;
+using TerrainTools.Extensions;
 using TerrainTools.Visualization;
 using UnityEngine;
 
@@ -15,9 +16,9 @@ internal static class SharpnessModifier
      * For Smooth Power the effect over the tool radius is calculated as:
      * y = 1 - (x/radius)^p
      *
-     * So for smoothing, increasing the power increases the "hardness" or evenness of the effect over the area.
+     * So for smoothing, increasing the power increases the "sharpness" or evenness of the effect over the area.
      *
-     * But for raising, increasing the power decreases the "hardness" or evenness of the effect over the area.
+     * But for raising, increasing the power decreases the "sharpness" or evenness of the effect over the area.
      */
     private static bool SmoothToolIsInUse = false;
     private static float lastModdedSmoothPwr;
@@ -30,6 +31,9 @@ internal static class SharpnessModifier
     private static float lastTotalRaiseDelta;
     private const float MinRaisePwr = 0.05f;
     private const float MaxRaisePwr = 1f;
+
+    private static float lastRaisePower;
+    private static float lastSmoothPower;
 
     private const float DisplayThreshold = 0.9f; // percentage
     private static float lastDisplayedSmoothSharpness;
@@ -81,29 +85,62 @@ internal static class SharpnessModifier
         return TerrainTools.Instance.IsEnableSharpnessModifier && Input.GetKey(TerrainTools.Instance.SharpnessKey) && Input.mouseScrollDelta.y != 0;
     }
 
-
+    /// <summary>
+    ///     Apply changes to sharpness just before the operation executes.
+    /// </summary>
+    /// <param name="__instance"></param>
+    /// <param name="modifier"></param>
     [HarmonyPrefix]
-    [HarmonyPriority(Priority.High)]
-    [HarmonyPatch(typeof(TerrainOp), nameof(TerrainOp.Awake))]
-    private static void AwakePrefix(TerrainOp __instance)
+    [HarmonyPriority(101)]
+    [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.InternalDoOperation))]
+    private static void InternalDoOperationPrefix(TerrainComp __instance, TerrainOp.Settings modifier)
     {
-        if (!__instance ||
-            !__instance.gameObject ||
-            __instance.gameObject.GetComponent<OverlayVisualizer>())
+        if (!__instance || modifier == null || modifier.IsPrecisionModifier())
         {
             return;
         }
 
-        if (__instance.m_settings.m_raise)
+        if (modifier.m_raise)
         {
-            __instance.m_settings.m_raisePower = ModifyRaisePower(__instance.m_settings.m_raisePower, lastTotalRaiseDelta);
-            Log.LogInfo($"Applying raise Power {__instance.m_settings.m_raisePower}", Log.InfoLevel.Medium);
+            lastRaisePower = modifier.m_raisePower;
+            modifier.m_raisePower = ModifyRaisePower(modifier.m_raisePower, lastTotalRaiseDelta);
+            Log.LogInfo($"Applying raise power {modifier.m_raisePower}", Log.InfoLevel.Medium);
         }
 
-        if (__instance.m_settings.m_smooth)
+        if (modifier.m_smooth)
         {
-            __instance.m_settings.m_smoothPower = ModifySmoothPower(__instance.m_settings.m_smoothPower, lastTotalSmoothDelta);
-            Log.LogInfo($"Applying smooth Power {__instance.m_settings.m_smoothPower}", Log.InfoLevel.Medium);
+            lastSmoothPower = modifier.m_smoothPower;
+            modifier.m_smoothPower = ModifySmoothPower(modifier.m_smoothPower, lastTotalSmoothDelta);
+            Log.LogInfo($"Applying smooth power {modifier.m_smoothPower}", Log.InfoLevel.Medium);
+        }
+    }
+
+
+    /// <summary>
+    ///     Revert changes to sharpness just after the operation executes.
+    /// </summary>
+    /// <param name="__instance"></param>
+    /// <param name="modifier"></param>
+    [HarmonyPostfix]
+    [HarmonyPriority(Priority.VeryHigh)]
+    [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.InternalDoOperation))]
+    private static void InternalDoOperationPostfix(TerrainComp __instance, TerrainOp.Settings modifier)
+    {
+        if (!__instance || modifier == null || modifier.IsPrecisionModifier())
+        {
+            return;
+        }
+
+        if (modifier.m_raise)
+        {
+            modifier.m_raisePower = lastRaisePower;
+            Log.LogInfo($"Restored raise power {modifier.m_raisePower}", Log.InfoLevel.Medium);
+        }
+
+        if (modifier.m_smooth)
+        {
+            modifier.m_smoothPower = lastSmoothPower;
+            Log.LogInfo($"Restored smooth power {modifier.m_smoothPower}", Log.InfoLevel.Medium);
         }
     }
 
@@ -131,16 +168,20 @@ internal static class SharpnessModifier
             if (Mathf.Abs(smoothSharpness - lastDisplayedSmoothSharpness) > DisplayThreshold)
             {
                 lastDisplayedSmoothSharpness = Mathf.Round(smoothSharpness);
-                updateMsg.Add($"Terrain tool smoothing hardness: {smoothSharpness:0}%");
+                updateMsg.Add($"Terrain tool smoothing sharpness: {smoothSharpness:0}%");
             }
         }
         if (RaiseToolIsInUse)
         {
+            
+
             float raiseSharpness = GetRaisePowerDisplayValue(lastModdedRaisePwr);
             if (Mathf.Abs(raiseSharpness - lastDisplayedRaiseSharpness) > DisplayThreshold)
             {
                 lastDisplayedRaiseSharpness = Mathf.Round(raiseSharpness);
-                updateMsg.Add($"Terrain tool raise hardness: {raiseSharpness:0}%");
+
+                string raiseType = terrainOp.m_settings.m_raiseDelta < 0 ? "dig" : "raise";
+                updateMsg.Add($"Terrain tool {raiseType} sharpness: {raiseSharpness:0}%");
             }
         }
         if (SmoothToolIsInUse || RaiseToolIsInUse)
@@ -212,7 +253,7 @@ internal static class SharpnessModifier
     }
 
     /// <summary>
-    ///     Get Smooth Power as a percentage of maximum hardness
+    ///     Get Smooth Power as a percentage of maximum sharpness
     /// </summary>
     /// <param name="power"></param>
     /// <returns></returns>
@@ -222,11 +263,11 @@ internal static class SharpnessModifier
     }
 
     /// <summary>
-    ///     Get Raise Power as a percentage of maximum hardness
+    ///     Get Raise Power as a percentage of maximum sharpness
     /// </summary>
     /// <param name="power"></param>
     /// <returns></returns>
-    private static float GetRaisePowerDisplayValue(float power)
+    private static float GetRaisePowerDisplayValue(float power, bool dig = false)
     {
         return ((MaxRaisePwr - power) / (MaxRaisePwr - MinRaisePwr)) * 100;
     }

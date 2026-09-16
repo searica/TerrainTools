@@ -304,7 +304,7 @@ internal static class InitManager
 
         // Shift position to account for how many pieces have been added before it and check if OOB
         int index = 0;
-        if (position >= 0) // only adjust position if not given position of -1 as -1 should always go at the front.
+        if (position >= 0) // only adjust position if not given position of -1 as -1 should always go at the end.
         {
             index = position + InsertionIndexes[pieceTable].Where(x => x <= position).Count();
         }

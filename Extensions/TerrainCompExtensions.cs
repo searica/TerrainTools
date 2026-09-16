@@ -2,6 +2,7 @@
 using UnityEngine;
 using Logging;
 using TerrainTools.Patches;
+using System.Runtime.Remoting.Messaging;
 
 namespace TerrainTools.Extensions;
 
@@ -32,6 +33,17 @@ internal static class TerrainCompExtensions
     }
 
     /// <summary>
+    ///     Get fixed radius. Do not scale because this is already in
+    ///     units of vertex numbering.
+    /// </summary>
+    /// <param name="terrainOp"></param>
+    /// <returns></returns>
+    public static int GetFixedRadius(this TerrainOp terrainOp)
+    {
+        return FixedRadius;
+    }
+
+    /// <summary>
     ///     Checks if radius is set as flag for precision modifier.
     /// </summary>
     /// <param name="radius"></param>
@@ -48,17 +60,27 @@ internal static class TerrainCompExtensions
     /// <returns></returns>
     public static bool IsPrecisionModifier(this TerrainOp.Settings settings)
     {
-        if (
-            IsPrecisionModifier(settings.m_raiseRadius) ||
-            IsPrecisionModifier(settings.m_smoothRadius) ||
-            IsPrecisionModifier(settings.m_paintRadius) ||
-            IsPrecisionModifier(settings.m_levelRadius)
-            )
+        if (settings.m_raise && IsPrecisionModifier(settings.m_raiseRadius)) 
         {
-            return true;
+            return true; // precise raise tool
+        }
+        else if (settings.m_smooth && IsPrecisionModifier(settings.m_smoothRadius)) 
+        {
+            return true; // precise smooth tool
+        }
+        else if (settings.m_paintCleared && IsPrecisionModifier(settings.m_paintRadius)) 
+        {
+            return true; // precise paint tool
+        }
+        else if (settings.m_level && IsPrecisionModifier(settings.m_levelRadius))
+        {
+            return true; // precise level tool
+        }
+        else if (!settings.m_raise && !settings.m_smooth && !settings.m_paintCleared && !settings.m_level) 
+        {
+            return true; // precise remove modifications tool
         }
         return false;
-
     }
 
     /// <summary>
