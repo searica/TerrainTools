@@ -5,6 +5,8 @@ Quality of life building mod that improves how terrain manipulation with the hoe
 
 **Deep North Update**: There are some visual glitches at the moment where the change of terrain paint (dirt, cobblestone, grass, etc.) can be slightly misalgned with the precision terrain tools (square shaped tools). This issue is related to a Vanilla issue and will be adressed in a future update.
 
+**Compatibility Notice**: This mod is fully compatible with EpicLoot as far as I and the authors of EpicLoot are aware, not sure why one of the forks of it thinks otherwise. If you run into any issues please report them to myself and/or the modders who maintain EpicLoot.
+
 ## Features
 
 ### Multiplayer Support
