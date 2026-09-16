@@ -27,7 +27,7 @@ internal sealed class TerrainTools : BaseUnityPlugin
     internal const string Author = "Searica";
     public const string PluginName = "AdvancedTerrainModifiers";
     public const string PluginGUID = $"{Author}.Valheim.TerrainTools";
-    public const string PluginVersion = "1.5.1";
+    public const string PluginVersion = "1.5.2";
 
     public static TerrainTools Instance;
     private static ConfigFileWatcher ConfigFileWatcher;
