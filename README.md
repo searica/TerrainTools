@@ -3,7 +3,7 @@ Quality of life building mod that improves how terrain manipulation with the hoe
 
 **Server-Side Info**: This mod does work as a client-side only mod and only needs to be installed on the server if you wish to enforce configuration settings.
 
-**Ashlands Update**: There are some visual glitches at the moment where the change of terrain paint (dirt, cobblestone, grass, etc.) can be slightly misalgned with the precision terrain tools (square shaped tools). This issue is related to a Vanilla issue and will be adressed as soon as possible.
+**Deep North Update**: There are some visual glitches at the moment where the change of terrain paint (dirt, cobblestone, grass, etc.) can be slightly misalgned with the precision terrain tools (square shaped tools). This issue is related to a Vanilla issue and will be adressed in a future update.
 
 ## Features
 
@@ -21,9 +21,10 @@ Quality of life building mod that improves how terrain manipulation with the hoe
 - Camera zoom is blocked while modifying tool radius.
 
 ### Modifiable Tool Sharpness
-- Lets you change the "hardness" of terrain tools using the scroll wheel. "Sharpness" refers to how uniformly the effect is applied over the radius of the tool, so increasing the hardness will apply the effect more uniformly (see image for example of changing hardness for the Raise Ground tool).
-- Configurable hotkey to enable changing hardness.
-- Camera zoom is blocked while modifying tool hardness.
+- Lets you change the "sharpness" of terrain tools using the scroll wheel. "Sharpness" refers to how uniformly the effect is applied over the radius of the tool, so increasing the hardness will apply the effect more uniformly (see image for example of changing hardness for the Raise Ground tool).
+- Configurable hotkey to enable changing sharpness.
+- Camera zoom is blocked while modifying tool sharpness.
+- It's refered to as "hardness" in the example image because I originally named it that after digital paintbrush tools but I got tired of my friends making jokes about getting harder and changed it to sharpness.
 <img src="https://raw.githubusercontent.com/searica/TerrainTools/main/Media/SharpnessDemo.png"></img>
 
 ### New Terrain Tool
@@ -35,13 +36,13 @@ Quality of life building mod that improves how terrain manipulation with the hoe
 - Adds a precision raise ground tool that lets you set the exact height you want to raise the terrain by using the scroll wheel on your mouse.
 - Adds a remove terrain modifications tool that lets you reset terrain.
 
-<img src="https://raw.githubusercontent.com/searica/TerrainTools/main/Media/HoeTools.png"></img>
+<img src="https://raw.githubusercontent.com/searica/TerrainTools/release/Media/HoeTools.png"></img>
 
 ### New Cultivator Tools
 - Adds a version of the cultivate tool that doesn't affect the terrain height when used.
 - Adds square versions of each tools tool in the cultivator that modifies terrain according to the world grid (so you can enjoy clean edges).
 
-<img src="https://raw.githubusercontent.com/searica/TerrainTools/main/Media/CultivatorTools.png"></img>
+<img src="https://raw.githubusercontent.com/searica/TerrainTools/release/Media/CultivatorTools.png"></img>
 
 ## Instructions
 If you are using a mod manager for Thunderstore simply install the mod from there. If you are not using a mod manager then, you need a modded instance of Valheim (BepInEx) and the Jotunn plugin installed.
@@ -310,12 +311,20 @@ If you like this mod you might like some of my other ones.
 - [Extra Snap Points Made Easy](https://thunderstore.io/c/valheim/p/Searica/Extra_Snap_Points_Made_Easy/)
 - [BuildRestrictionTweaksSync](https://thunderstore.io/c/valheim/p/Searica/BuildRestrictionTweaksSync/)
 - [ToolTweaks](https://thunderstore.io/c/valheim/p/Searica/ToolTweaks/)
+- [MeasureTwice](https://thunderstore.io/c/valheim/p/Searica/MeasureTwice/)
 
 #### Gameplay Mods
 - [CameraTweaks](https://thunderstore.io/c/valheim/p/Searica/CameraTweaks/)
 - [DodgeShortcut](https://thunderstore.io/c/valheim/p/Searica/DodgeShortcut/)
+- [DiscoveryPins](https://thunderstore.io/c/valheim/p/Searica/DiscoveryPins/)
+- [ExplorersVision](https://thunderstore.io/c/valheim/p/Searica/ExplorersVision/)
 - [FortifySkillsRedux](https://thunderstore.io/c/valheim/p/Searica/FortifySkillsRedux/)
 - [ProjectileTweaks](https://thunderstore.io/c/valheim/p/Searica/ProjectileTweaks/)
 - [SkilledCarryWeight](https://thunderstore.io/c/valheim/p/Searica/SkilledCarryWeight/)
 - [SafetyStatus](https://thunderstore.io/c/valheim/p/Searica/SafetyStatus/)
+- [ShowMeTheGoods](https://thunderstore.io/c/valheim/p/Searica/ShowMeTheGoods/)
+- [WatchWhereYouStab](https://thunderstore.io/c/valheim/p/Searica/WatchWhereYouStab/)
 
+#### Networking Mods
+- [NetworkTweaks](https://thunderstore.io/c/valheim/p/Searica/NetworkTweaks/)
+- [OpenSesame](https://thunderstore.io/c/valheim/p/Searica/OpenSesame/)

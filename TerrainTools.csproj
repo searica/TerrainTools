@@ -1,20 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<NuGetPackages>$(UserProfile)\.nuget\packages</NuGetPackages>
-		<JotunnProps>$(NuGetPackages)\jotunnlib\2.20.0\build\JotunnLib.props</JotunnProps>
+		<JotunnProps>$(NuGetPackages)\jotunnlib\2.30.0\build\JotunnLib.props</JotunnProps>
 	</PropertyGroup>
-
-	<!--<Import Project="environment.props" Condition="Exists('environment.props')" />-->
-	<!--<Import Project="$(JotunnProps)" Condition="Exists('$(JotunnProps)')" />-->
+	
 	<Import Project="ModPackageTool.targets" Condition="Exists('ModPackageTool.targets')" />
 
 	<PropertyGroup>
-		<TargetFramework>net48</TargetFramework>
+		<TargetFramework>net481</TargetFramework>
 		<OutputType>Library</OutputType>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<!--<LangVersion>latest</LangVersion>-->
 		<!--<LangVersion>preview</LangVersion>-->
-		<LangVersion>10.0</LangVersion>
+		<LangVersion>12.0</LangVersion>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 		<DebugSymbols>true</DebugSymbols>
@@ -97,8 +95,7 @@
 		<EmbeddedResource Include="Resources\undo.png" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="JotunnLib" Version="2.22.0" />
-		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+		<PackageReference Include="JotunnLib" Version="2.30.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Update="Properties\Resources.Designer.cs">
@@ -120,10 +117,4 @@
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 	</PropertyGroup>
-	<Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-		<PropertyGroup>
-			<ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-		</PropertyGroup>
-		<Error Condition="!Exists('$(JotunnProps)')" Text="$([System.String]::Format('$(ErrorText)', '$(JotunnProps)'))" />
-	</Target>
 </Project>

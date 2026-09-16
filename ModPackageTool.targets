@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<PropertyGroup>
 		<PackageDir>$(ProjectDir)Package</PackageDir>
-		<PublishDir>$(PojectDir)Publish</PublishDir>
+		<PublishDir>$(ProjectDir)Publish</PublishDir>
 		<ProjectResourcesDir>$(ProjectDir)\Resources</ProjectResourcesDir>
 		<SolutionResourcesDir>$(SolutionDir)\Resources</SolutionResourcesDir>
 	</PropertyGroup>
