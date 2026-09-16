@@ -9,6 +9,7 @@
 			<td align="left">
 				<ul>
 					<li>Added usage tags to new terrain tools to improve sorting and filtering in build menus.</li>
+					<li>Updated readme with notice about forks of the mod claiming incompability with EpicLoot.</li>
 				</ul>
 			</td>
 		</tr>
