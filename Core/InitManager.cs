@@ -7,9 +7,12 @@ using System.Linq;
 using Logging;
 using TerrainTools.Tools;
 using UnityEngine;
+using HarmonyLib;
 
 namespace TerrainTools.Core;
 
+
+[HarmonyPatch]
 internal static class InitManager
 {
     private static bool HasInitialized = false;
@@ -133,22 +136,22 @@ internal static class InitManager
         }
     }
 
-    internal static void UpdatePieceTables()
-    {
-        foreach (string key in ToolConfigs.ToolConfigsMap.Keys)
-        {
-            try
-            {
-                ToolDB toolDB = ToolConfigs.ToolConfigsMap[key];
-                toolDB.prefab = MakeToolPiece(toolDB);
-                RegisterPieceInPieceTable(toolDB.prefab, toolDB.pieceTable, null, toolDB.insertIndex);
-            }
-            catch
-            {
-                Log.LogWarning($"Failed to create: {key}");
-            }
-        }
-    }
+    //internal static void UpdatePieceTables()
+    //{
+    //    foreach (string key in ToolConfigs.ToolConfigsMap.Keys)
+    //    {
+    //        try
+    //        {
+    //            ToolDB toolDB = ToolConfigs.ToolConfigsMap[key];
+    //            toolDB.prefab = MakeToolPiece(toolDB);
+    //            RegisterPieceInPieceTable(toolDB.prefab, toolDB.pieceTable, null, toolDB.insertIndex);
+    //        }
+    //        catch
+    //        {
+    //            Log.LogWarning($"Failed to create: {key}");
+    //        }
+    //    }
+    //}
 
     /// <summary>
     ///     Updates the shovel recipe to be enabled/disabled based on corresponding config entry.
@@ -277,20 +280,15 @@ internal static class InitManager
         {
             throw new Exception($"Could not find PieceTable {pieceTable}");
         }
+ 
+        // always ensure it is registered before returning, Jotunn does add it to ObjectDB
+        PrefabManager.Instance.RegisterToZNetScene(prefab);
 
         if (table.m_pieces.Contains(prefab))
         {
             Log.LogDebug($"Already added piece {prefab.name}");
             return;
         }
-
-        string name = prefab.name;
-        int hash = name.GetStableHashCode();
-        if (ZNetScene.instance != null && !ZNetScene.instance.m_namedPrefabs.ContainsKey(hash))
-        {
-            PrefabManager.Instance.RegisterToZNetScene(prefab);
-        }
-        RegisterTerrainOpInObjectDB(prefab);
 
         if (!string.IsNullOrEmpty(category))
         {
@@ -329,43 +327,6 @@ internal static class InitManager
 
         Log.LogDebug($"Added piece {prefab.name} | Token: {piece.TokenName()}");
     }
-
-    /// <summary>
-    ///     Register custom TerrainOp prefabs to ObjectDB so that they can be deserialized correctly.
-    /// </summary>
-    internal static void RegisterTerrainOpInObjectDB(GameObject prefab)
-    {
-        if (
-            !ObjectDB.instance || !prefab.TryGetComponent(out TerrainOp terrainOp) ||
-            ObjectDB.instance.m_terrainOpsByHash == null || ObjectDB.instance.m_terrainOps == null
-        )
-        {
-            return;
-        }
-
-        int hash = prefab.name.GetStableHashCode();
-        if (ObjectDB.instance.m_terrainOpsByHash.TryGetValue(hash, out TerrainOp registeredTerrainOp))
-        {
-            if (registeredTerrainOp != terrainOp)
-            {
-                Log.LogWarning($"TerrainOp prefab hash collision for {prefab.name} ({hash}); keeping the registered prefab");
-            }
-            return;
-        }
-
-        if (!ObjectDB.instance.m_terrainOps.Contains(terrainOp))
-        {
-            ObjectDB.instance.m_terrainOps.Add(terrainOp);
-        }
-
-        if (!ObjectDB.instance.m_terrainOpsByHash.ContainsKey(hash))
-        {
-            ObjectDB.instance.m_terrainOpsByHash.Add(hash, terrainOp);
-        }
-
-        Log.LogInfo($"Registered TerrainOp {prefab.name} in ObjectDB");
-    }
-
 
     /// <summary>
     ///     Removes prefab from piece table and updates insertion indexes
@@ -411,5 +372,69 @@ internal static class InitManager
                 }
             }
         }
+    }
+
+    /// <summary>
+    ///     Ensure custom TerrainOp prefabs are registered in ObjectDB so that they can be deserialized correctly. 
+    ///     Added this because they appear to get removed during gameplay sometimes. Hopefully this covers all cases
+    ///     of them being removed and restores them to prevent deserialization errors.
+    /// </summary>
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ObjectDB), nameof(ObjectDB.UpdateRegisters))]
+    private static void UpdateRegistersPostfix()
+    {
+        Log.LogInfo("Updating ObjectDB registers to ensure custom terrain operations are retained.", Log.InfoLevel.Medium);
+        foreach (string key in ToolConfigs.ToolConfigsMap.Keys)
+        {
+            if (TerrainTools.Instance.IsToolEnabled(key))
+            {
+                ToolDB toolDB = ToolConfigs.ToolConfigsMap[key];
+                RegisterTerrainOpInObjectDB(toolDB.prefab);
+            }
+        }
+    }
+
+    /// <summary>
+    ///    Add or Update ObjectDB to keep include terrain op prefab in terrain op dictionary which is
+    ///    used for deserializing terrain op settings
+    /// </summary>
+    internal static void RegisterTerrainOpInObjectDB(GameObject prefab)
+    {
+        if (!HasInitialized)
+        {
+            return;
+        }
+
+        if (!ObjectDB.instance || ObjectDB.instance.m_terrainOpsByHash == null || ObjectDB.instance.m_terrainOps == null)
+        {
+            return;
+        }
+
+        if (!prefab || !prefab.TryGetComponent(out TerrainOp terrainOp) || !terrainOp)
+        {
+            return;
+        }
+
+        int hash = prefab.name.GetStableHashCode();
+        if (ObjectDB.instance.m_terrainOpsByHash.TryGetValue(hash, out TerrainOp registeredTerrainOp))
+        {
+            if (registeredTerrainOp != terrainOp)
+            {
+                Log.LogWarning($"TerrainOp prefab hash collision for {prefab.name} ({hash}); keeping the registered prefab");
+            }
+            return;
+        }
+
+        if (!ObjectDB.instance.m_terrainOps.Contains(terrainOp))
+        {
+            ObjectDB.instance.m_terrainOps.Add(terrainOp);
+        }
+
+        if (!ObjectDB.instance.m_terrainOpsByHash.ContainsKey(hash))
+        {
+            ObjectDB.instance.m_terrainOpsByHash.Add(hash, terrainOp);
+        }
+
+        Log.LogInfo($"Registered TerrainOp {prefab.name} in ObjectDB", Log.InfoLevel.Medium);
     }
 }

@@ -1,7 +1,8 @@
 ﻿using HarmonyLib;
-using UnityEngine;
+using Logging;
 using TerrainTools.Extensions;
 using TerrainTools.Visualization;
+using UnityEngine;
 
 namespace TerrainTools.Core;
 
@@ -26,33 +27,104 @@ public static class PreciseTerrainModifier
         }
     }
 
+    /// <summary>
+    ///     Claim ownership before sending RPC to do terrain operation to
+    ///     ensure that custom terrain ops run on a PC with the mod.
+    /// </summary>
+    /// <param name="__instance"></param>
     [HarmonyPrefix]
+    [HarmonyPriority(Priority.VeryLow)]
     [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.ApplyOperation))]
     private static void ApplyOperationPrefix(TerrainComp __instance, TerrainOp modifier)
     {
-        if (!modifier || !modifier.gameObject) { return; }
-
-        if (__instance && __instance.m_nview && !__instance.m_nview.IsOwner())
+        if (!__instance || !__instance.m_nview || !modifier || !modifier.gameObject)
         {
-            // claim ownership before sending RPC out? Should just ping self and grab ownership in RPC though.
+            return;
+        }
+
+        //RegisterTerrainOpInObjectDB(modifier);
+
+        if (!__instance.m_nview.IsOwner())
+        {
             __instance.m_nview.ClaimOwnership();
         }
 
-        // Set radius to -inf so I can check if custom overlay in later methods
-        if (modifier.gameObject.GetComponentInChildren<OverlayVisualizer>())
+        
+    }
+
+    ///// <summary>
+    /////     Ensure custom TerrainOp prefabs are registered in ObjectDB so that they can be deserialized correctly. 
+    ///// </summary>
+    //internal static void RegisterTerrainOpInObjectDB(TerrainOp modifer)
+    //{
+    //    if (
+    //        !ObjectDB.instance || !modifer || !modifer.gameObject || ObjectDB.instance.m_terrainOpsByHash == null || ObjectDB.instance.m_terrainOps == null
+    //    )
+    //    {
+    //        return;
+    //    }
+
+    //    int hash = modifer.name.GetStableHashCode();
+    //    if (ObjectDB.instance.m_terrainOpsByHash.TryGetValue(hash, out TerrainOp registeredTerrainOp))
+    //    {
+    //        if (registeredTerrainOp != modifer)
+    //        {
+    //            Log.LogWarning($"TerrainOp prefab hash collision for {modifer.name} ({hash}); keeping the registered prefab");
+    //        }
+    //        return;
+    //    }
+
+    //    if (!ObjectDB.instance.m_terrainOps.Contains(modifer))
+    //    {
+    //        ObjectDB.instance.m_terrainOps.Add(modifer);
+    //    }
+
+    //    if (!ObjectDB.instance.m_terrainOpsByHash.ContainsKey(hash))
+    //    {
+    //        ObjectDB.instance.m_terrainOpsByHash.Add(hash, modifer);
+    //    }
+
+    //    Log.LogInfo($"Registered TerrainOp {modifer.name} in ObjectDB", Log.InfoLevel.Medium);
+    //}
+
+    /// <summary>
+    ///     Modify deserialized result to have setting that all me to check if it is a precision terrain operation
+    ///     and update the raise delta for the precise raise tool
+    /// </summary>
+    /// <param name="__instance"></param>
+    [HarmonyPostfix]
+    [HarmonyPriority(Priority.VeryHigh)]
+    [HarmonyPatch(typeof(TerrainOp.Settings), nameof(TerrainOp.Settings.Deserialize))]
+    private static void TerrainOpDeserializePostfix(ZPackage pkg, ref TerrainOp.Settings __result)
+    {
+        if (__result is null || pkg is null)
         {
-            if (modifier.m_settings.m_smooth)
+            return;
+        }
+
+        // read int to get hash
+        pkg.SetPos(pkg.GetPos() - 4);  
+        int hash = pkg.ReadInt();
+
+        if (ObjectDB.instance && ObjectDB.instance.TryGetTerrainOp(hash, out TerrainOp terrainOp) && terrainOp)
+        {
+            // Set radius to -inf so I can check if custom overlay in later methods
+            if (terrainOp.GetComponentInChildren<OverlayVisualizer>())
             {
-                modifier.m_settings.m_smoothRadius = float.NegativeInfinity;
-            }
-            if (modifier.m_settings.m_raise && modifier.m_settings.m_raiseDelta >= 0)
-            {
-                modifier.m_settings.m_raiseRadius = float.NegativeInfinity;
-                modifier.m_settings.m_raiseDelta = GroundLevelSpinner.Value;
-            }
-            if (modifier.m_settings.m_paintCleared)
-            {
-                modifier.m_settings.m_paintRadius = float.NegativeInfinity;
+                Log.LogInfo($"Deserializing precision tool: {terrainOp.name}", Log.InfoLevel.Medium);
+                if (__result.m_smooth)
+                {
+                    __result.m_smoothRadius = float.NegativeInfinity;
+                }
+                if (__result.m_raise && __result.m_raiseDelta >= 0)
+                {
+                    __result.m_raiseRadius = float.NegativeInfinity;
+                    __result.m_raiseDelta = GroundLevelSpinner.Value;
+                }
+                if (__result.m_paintCleared)
+                {
+                    __result.m_paintRadius = float.NegativeInfinity;
+                }
             }
         }
     }
@@ -80,25 +152,6 @@ public static class PreciseTerrainModifier
         }
     }
 
-    /// <summary>
-    ///     Claim ownership before sending RPC to do terrain operation to
-    ///     ensure that custom terrain ops run on a PC with the mod.
-    /// </summary>
-    /// <param name="__instance"></param>
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.RPC_ApplyOperation))]
-    private static void RPC_ApplyOperationPrefix(TerrainComp __instance)
-    {
-        if (!__instance || !__instance.m_nview)
-        {
-            return;
-        }
-
-        if (!__instance.m_nview.IsOwner())
-        {
-            __instance.m_nview.ClaimOwnership();
-        }
-    }
 
     /// <summary>
     ///     Apply TerrainReset operation if valid
@@ -122,23 +175,6 @@ public static class PreciseTerrainModifier
         }
     }
 
-    ///// <summary>
-    /////     Correct m_lastOpRadius to be FixedRadius instead of -Infinity
-    /////     if a Precision Modifier was the last operation applied. This
-    /////     avoids issues caused by saving an invalid radius.
-    ///// </summary>
-    ///// <param name="__instance"></param>
-    ///// <param name="pos"></param>
-    ///// <param name="modifier"></param>
-    //[HarmonyPostfix]
-    //[HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.InternalDoOperation))]
-    //private static void InternalDoOperationPostfix(TerrainComp __instance)
-    //{
-    //    if (__instance.IsPrecisionModifier())
-    //    {
-    //        __instance.m_lastOpRadius = __instance.GetFixedRadius();
-    //    }
-    //}
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.SmoothTerrain))]

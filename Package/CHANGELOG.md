@@ -5,11 +5,32 @@
 			<th align="center">Notes</th>
 		</tr>
 		<tr>
+			<td align="center">1.5.4</td>
+			<td align="left">
+				<ul>
+					<li>Fixed issue with precision raise tool not applying the correct height change.</li>
+					<li>Fixed issue with all precision tools not being applied correctly in some cases.</li>
+					<li>Patched ObjectDB updates to ensure that any custom terrain operations are restored in the hash table after ObjectDB updates.</li>
+					<li>Hopefully fixed intermitment issue with the terrain modifiers added by this mod sometimes not working in the middle of longer play sessions.</li>
+					<li>Changed default keybind for adjusting tool radius.</li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td align="center">1.5.3</td>
+			<td align="left">
+				<ul>
+					<li>Fixed intermitment bug with precision tools not working multiplayer.</li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
 			<td align="center">1.5.2</td>
 			<td align="left">
 				<ul>
 					<li>Added usage tags to new terrain tools to improve sorting and filtering in build menus.</li>
 					<li>Updated readme with notice about forks of the mod claiming incompability with EpicLoot.</li>
+					<li>Updated Jotunn and performed multiplayer testing.</li>
 				</ul>
 			</td>
 		</tr>

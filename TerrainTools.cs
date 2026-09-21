@@ -27,7 +27,7 @@ internal sealed class TerrainTools : BaseUnityPlugin
     internal const string Author = "Searica";
     public const string PluginName = "AdvancedTerrainModifiers";
     public const string PluginGUID = $"{Author}.Valheim.TerrainTools";
-    public const string PluginVersion = "1.5.2";
+    public const string PluginVersion = "1.5.4";
 
     public static TerrainTools Instance;
     private static ConfigFileWatcher ConfigFileWatcher;
@@ -192,7 +192,7 @@ internal sealed class TerrainTools : BaseUnityPlugin
         radiusModKey = Config.BindConfigInOrder(
             RadiusSection,
             "Adjust Radius Key",
-            KeyCode.LeftAlt,
+            KeyCode.LeftShift,
             "Modifier key that must be held down when using scroll wheel to change the radius of terrain tools.",
             synced: false
         );

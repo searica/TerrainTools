@@ -91,7 +91,7 @@ internal static class SharpnessModifier
     /// <param name="__instance"></param>
     /// <param name="modifier"></param>
     [HarmonyPrefix]
-    [HarmonyPriority(101)]
+    [HarmonyPriority(101)] // Priority.VeryLow + 1, to run just before RadiusModifier patches
     [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.InternalDoOperation))]
     private static void InternalDoOperationPrefix(TerrainComp __instance, TerrainOp.Settings modifier)
     {
@@ -122,7 +122,7 @@ internal static class SharpnessModifier
     /// <param name="__instance"></param>
     /// <param name="modifier"></param>
     [HarmonyPostfix]
-    [HarmonyPriority(Priority.VeryHigh)]
+    [HarmonyPriority(701)] // Priority.VeryHigh + 1, to run just before RadiusModifier patches
     [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.InternalDoOperation))]
     private static void InternalDoOperationPostfix(TerrainComp __instance, TerrainOp.Settings modifier)
     {
