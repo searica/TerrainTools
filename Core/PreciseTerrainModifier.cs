@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using Logging;
-using TerrainTools.Extensions;
 using TerrainTools.Visualization;
 using UnityEngine;
 
@@ -9,6 +8,28 @@ namespace TerrainTools.Core;
 [HarmonyPatch(typeof(PreciseTerrainModifier))]
 public static class PreciseTerrainModifier
 {
+
+    public class HeightIndex
+    {
+        public int Index;
+        public Vector3 Position;
+        public float DistanceWidth;
+        public float DistanceDepth;
+        public float Distance;
+    }
+
+    public class PaintIndex
+    {
+        public int Index;
+        public Vector3 Position;
+    }
+
+    public class Indices
+    {
+        public HeightIndex[] HeightIndices = new HeightIndex[0];
+        public PaintIndex[] PaintIndices = new PaintIndex[0];
+    }
+
 
     /// <summary>
     ///     Catches invalid radius from precise terrain modifications and modifies it
@@ -21,9 +42,9 @@ public static class PreciseTerrainModifier
     [HarmonyPatch(typeof(ClutterSystem), nameof(ClutterSystem.ResetGrass))]
     private static void ResetGrassPrefix(ClutterSystem __instance, Vector3 center, ref float radius)
     {
-        if (TerrainCompExtensions.IsPrecisionModifier(radius))
+        if (TerrainOperations.IsPrecisionModifier(radius))
         {
-            radius = TerrainCompExtensions.FixedRadius - 0.25f;
+            radius = TerrainOperations.FixedRadius;
         }
     }
 
@@ -51,41 +72,6 @@ public static class PreciseTerrainModifier
 
         
     }
-
-    ///// <summary>
-    /////     Ensure custom TerrainOp prefabs are registered in ObjectDB so that they can be deserialized correctly. 
-    ///// </summary>
-    //internal static void RegisterTerrainOpInObjectDB(TerrainOp modifer)
-    //{
-    //    if (
-    //        !ObjectDB.instance || !modifer || !modifer.gameObject || ObjectDB.instance.m_terrainOpsByHash == null || ObjectDB.instance.m_terrainOps == null
-    //    )
-    //    {
-    //        return;
-    //    }
-
-    //    int hash = modifer.name.GetStableHashCode();
-    //    if (ObjectDB.instance.m_terrainOpsByHash.TryGetValue(hash, out TerrainOp registeredTerrainOp))
-    //    {
-    //        if (registeredTerrainOp != modifer)
-    //        {
-    //            Log.LogWarning($"TerrainOp prefab hash collision for {modifer.name} ({hash}); keeping the registered prefab");
-    //        }
-    //        return;
-    //    }
-
-    //    if (!ObjectDB.instance.m_terrainOps.Contains(modifer))
-    //    {
-    //        ObjectDB.instance.m_terrainOps.Add(modifer);
-    //    }
-
-    //    if (!ObjectDB.instance.m_terrainOpsByHash.ContainsKey(hash))
-    //    {
-    //        ObjectDB.instance.m_terrainOpsByHash.Add(hash, modifer);
-    //    }
-
-    //    Log.LogInfo($"Registered TerrainOp {modifer.name} in ObjectDB", Log.InfoLevel.Medium);
-    //}
 
     /// <summary>
     ///     Modify deserialized result to have setting that all me to check if it is a precision terrain operation
@@ -184,7 +170,7 @@ public static class PreciseTerrainModifier
         float radius
     )
     {
-        if (TerrainCompExtensions.IsPrecisionModifier(radius))
+        if (TerrainOperations.IsPrecisionModifier(radius))
         {
             __instance.PreciseSmoothTerrain(worldPos);
             return false;
@@ -196,7 +182,7 @@ public static class PreciseTerrainModifier
     [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.RaiseTerrain))]
     private static bool RaiseTerrainPrefix(TerrainComp __instance, Vector3 worldPos, float radius, float delta)
     {
-        if (TerrainCompExtensions.IsPrecisionModifier(radius))
+        if (TerrainOperations.IsPrecisionModifier(radius))
         {
             __instance.PreciseRaiseTerrain(worldPos, delta);
             return false;
@@ -213,7 +199,7 @@ public static class PreciseTerrainModifier
         TerrainOp.Settings settings
     )
     {
-        if (TerrainCompExtensions.IsPrecisionModifier(settings.m_paintRadius))
+        if (TerrainOperations.IsPrecisionModifier(settings.m_paintRadius))
         {
             __instance.PreciseRecolorTerrain(worldPos, settings.m_paintType);
             return false;

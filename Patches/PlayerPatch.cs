@@ -1,7 +1,8 @@
 ﻿using HarmonyLib;
-using UnityEngine;
 using TerrainTools.Extensions;
 using TerrainTools.Visualization;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace TerrainTools.Patches;
 
@@ -9,7 +10,14 @@ namespace TerrainTools.Patches;
 [HarmonyPatch]
 internal class PlayerPatch
 {
+    private static int m_width = 64;
+    private static float m_scale = 1.0f;
+    private static float PaintStepSize = 64f / 65f;
 
+    /// <summary>
+    ///  Snap precision tools to the existing paint grid
+    /// </summary>
+    /// <param name="__instance"></param>
     [HarmonyFinalizer]
     [HarmonyPatch(typeof(Player), nameof(Player.UpdatePlacementGhost))]
     private static void UpdatePlacementGhostPostfix(Player __instance)

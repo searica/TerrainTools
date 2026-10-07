@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using Logging;
 using System.Collections.Generic;
-using TerrainTools.Extensions;
 using TerrainTools.Visualization;
 using UnityEngine;
 

@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using Logging;
-using TerrainTools.Extensions;
 using TerrainTools.Visualization;
 using UnityEngine;
 

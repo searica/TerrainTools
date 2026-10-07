@@ -5,6 +5,15 @@
 			<th align="center">Notes</th>
 		</tr>
 		<tr>
+			<td align="center">1.5.5</td>
+			<td align="left">
+				<ul>
+					<li>Fixed issue lava being created in the ashlands when using precise terrain tools.</li>
+					<li>Reduced vanilla issue the paint changes caused by precise terrain tools having the incorrect offset and appearing to bleed outside of the square bounds. There is still minor bleeding for cobblestone but it is much reduced.</li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
 			<td align="center">1.5.4</td>
 			<td align="left">
 				<ul>
