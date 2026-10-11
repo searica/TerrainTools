@@ -156,7 +156,8 @@ internal static class TerrainOperations
             comp.m_smoothDelta[heightIndex.Index] = 0f;
             comp.m_levelDelta[heightIndex.Index] += deltaH;
             comp.m_levelDelta[heightIndex.Index] = Mathf.Clamp(comp.m_levelDelta[heightIndex.Index], -8f, 8f);
-            comp.m_modifiedHeight[heightIndex.Index] = comp.m_levelDelta[heightIndex.Index] != 0f; 
+            //comp.m_modifiedHeight[heightIndex.Index] = comp.m_levelDelta[heightIndex.Index] != 0f;
+            comp.m_modifiedHeight[heightIndex.Index] = true;
         }
     }
 
@@ -177,7 +178,8 @@ internal static class TerrainOperations
             deltaH = refHeight - tileHeight;
             prevSmoothDelta = comp.m_smoothDelta[heightIndex.Index];
             comp.m_smoothDelta[heightIndex.Index] = Mathf.Clamp(prevSmoothDelta + deltaH, -1f, 1f);
-            comp.m_modifiedHeight[heightIndex.Index] = comp.m_levelDelta[heightIndex.Index] != 0f;
+            //comp.m_modifiedHeight[heightIndex.Index] = comp.m_levelDelta[heightIndex.Index] != 0f;
+            comp.m_modifiedHeight[heightIndex.Index] = true;
         }
     }
 

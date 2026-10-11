@@ -161,7 +161,6 @@ public static class PreciseTerrainModifier
         }
     }
 
-
     [HarmonyPrefix]
     [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.SmoothTerrain))]
     private static bool SmoothTerrainPrefix(

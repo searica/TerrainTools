@@ -5,6 +5,14 @@
 			<th align="center">Notes</th>
 		</tr>
 		<tr>
+			<td align="center">1.5.6</td>
+			<td align="left">
+				<ul>
+					<li>Fixed bug with terrain changes caused by precision tools not being saved.</li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
 			<td align="center">1.5.5</td>
 			<td align="left">
 				<ul>
