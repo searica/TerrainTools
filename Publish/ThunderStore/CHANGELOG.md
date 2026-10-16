@@ -15,6 +15,7 @@
 					<li>Fixed bug with terrain operations that had an increased radius not always properly affecting adjacent terrain chunks.</li>
 					<li>Added localization support. Currently all supported languages default to the English localization but users can edit the json files in the config folder and their changes will persist even when the mod updates.</li>
 					<li>Switched default keybind for adjusting sharpness back to left alt to avoid conflict with default keybinds in fly mode.</li>
+					<li>Added spoiler text information to the readme on how to unlock the shovel.</li>
 				</ul>
 			</td>
 		</tr>

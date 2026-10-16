@@ -33,6 +33,13 @@ Quality of life building mod that improves how terrain manipulation with the hoe
 ### New Terrain Tool
 - Adds a craftable shovel that lets you lower terrain.
 
+<details>
+  <summary>Shovel Recipe Information</summary>
+  
+  You need to discover iron and have access to a forge to craft the shovel.
+
+</details>
+
 ### New Hoe Tools
 - Adds a version of each terrain tool that doesn't affect the terrain height when used.
 - Adds square versions of all terrain tools that modify terrain according to the world grid (so you can enjoy clean edges).
