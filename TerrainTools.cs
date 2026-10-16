@@ -1,20 +1,22 @@
 ﻿// Ignore Spelling: TerrainTools Jotunn
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
-using UnityEngine;
 using Jotunn.Configs;
+using Jotunn.Entities;
+using Jotunn.Extensions;
 using Jotunn.Managers;
 using Jotunn.Utils;
-using Jotunn.Extensions;
 using Logging;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using TerrainTools.Core;
-using TerrainTools.Tools;
 using TerrainTools.Extensions;
+using LocalizationLoader;
+using TerrainTools.Tools;
+using UnityEngine;
 
 namespace TerrainTools;
 
@@ -27,7 +29,7 @@ internal sealed class TerrainTools : BaseUnityPlugin
     internal const string Author = "Searica";
     public const string PluginName = "AdvancedTerrainModifiers";
     public const string PluginGUID = $"{Author}.Valheim.TerrainTools";
-    public const string PluginVersion = "1.5.6";
+    public const string PluginVersion = "1.5.7";
 
     public static TerrainTools Instance;
     private static ConfigFileWatcher ConfigFileWatcher;
@@ -107,11 +109,15 @@ internal sealed class TerrainTools : BaseUnityPlugin
     private ConfigEntry<bool> enableShovel;
     internal bool IsShovelEnabled => enableShovel.Value;
 
+    private static CustomLocalization Localization;
     public void Awake()
     {
         Instance = this;
         Log.Init(Logger);
 
+        Localization = LocalizationManager.Instance.GetLocalization();
+        //EmbeddedResourceBundle = AssetUtils.LoadAssetBundleFromResources("ImpactfulSkills.AssetsEmbedded.impactfulskills", typeof(ImpactfulSkills).Assembly);
+        LocalizationLoader.LocalizationLoader.AddLocalizations(Instance, TerrainTools.PluginName, Localization);
     
         Config.DisableSaveOnConfigSet();
         SetUpConfigEntries();
@@ -228,7 +234,7 @@ internal sealed class TerrainTools : BaseUnityPlugin
         hardnessModKey = Config.BindConfigInOrder(
             SharpnessSection,
             "Adjust Sharpness Key",
-            KeyCode.LeftControl,
+            KeyCode.LeftAlt,
             "Modifier key that must be held down when using scroll wheel to change the hardness of terrain tools.",
             synced: false
         );
@@ -236,7 +242,7 @@ internal sealed class TerrainTools : BaseUnityPlugin
         hardnessScrollScale = Config.BindConfigInOrder(
             SharpnessSection,
             "Sharpness Scroll Speed",
-            0.1f,
+            0.3f,
             "How much each tick of movement from the scroll wheel will change sharpness."
             + " Larger magnitude means the sharpness will faster."
             + " Negative numbers will reverse the scroll direction to adjust the sharpness.",

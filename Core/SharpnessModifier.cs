@@ -167,20 +167,18 @@ internal static class SharpnessModifier
             if (Mathf.Abs(smoothSharpness - lastDisplayedSmoothSharpness) > DisplayThreshold)
             {
                 lastDisplayedSmoothSharpness = Mathf.Round(smoothSharpness);
-                updateMsg.Add($"Terrain tool smoothing sharpness: {smoothSharpness:0}%");
+                updateMsg.Add($"$terrain_tool_hud_name $smooth_op_name $sharpness_hud_name: {smoothSharpness:0}%");
             }
         }
         if (RaiseToolIsInUse)
         {
-            
-
             float raiseSharpness = GetRaisePowerDisplayValue(lastModdedRaisePwr);
             if (Mathf.Abs(raiseSharpness - lastDisplayedRaiseSharpness) > DisplayThreshold)
             {
                 lastDisplayedRaiseSharpness = Mathf.Round(raiseSharpness);
 
-                string raiseType = terrainOp.m_settings.m_raiseDelta < 0 ? "dig" : "raise";
-                updateMsg.Add($"Terrain tool {raiseType} sharpness: {raiseSharpness:0}%");
+                string raiseType = terrainOp.m_settings.m_raiseDelta < 0 ? "$dig_op_name" : "$raise_op_name";
+                updateMsg.Add($"$terrain_tool_hud_name {raiseType} $sharpness_hud_name: {raiseSharpness:0}%");
             }
         }
         if (SmoothToolIsInUse || RaiseToolIsInUse)

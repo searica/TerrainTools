@@ -72,7 +72,7 @@ internal static class InitManager
 
         SetDescription(
             "paved_road_v2",
-            "Creates a paved path and levels ground based on player position. Use shift+click to level ground based on where you are pointing (this will smooth the terrain)."
+            "Creates a paved path and levels ground based on player position. Use shift + click to level ground based on where you are pointing (this will smooth the terrain)."
         );
 
         SetDescription(
@@ -88,8 +88,8 @@ internal static class InitManager
 
     private static void SetDescription(string prefabName, string description)
     {
-        Piece prefabPiece = PrefabManager.Instance.GetPrefab(prefabName)?.GetComponent<Piece>();
-        if (!prefabPiece)
+        Piece prefabPiece = PrefabManager.Instance.GetPrefab(prefabName).GetComponent<Piece>();
+        if (prefabPiece)
         {
             prefabPiece.m_description = description;
         }
@@ -211,6 +211,7 @@ internal static class InitManager
         {
             toolPiece.m_resources = toolDB.requirements;
         }
+        toolPiece.m_allowedInDeepSnow = UpdateValueIfNeeded(toolPiece.m_allowedInDeepSnow, toolDB.allowedInDeepSnow);
 
         // customize terrain op component
         TerrainOp.Settings settings = toolPrefab.GetComponent<TerrainOp>().m_settings;

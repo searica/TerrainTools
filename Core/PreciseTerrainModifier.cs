@@ -63,14 +63,10 @@ public static class PreciseTerrainModifier
             return;
         }
 
-        //RegisterTerrainOpInObjectDB(modifier);
-
         if (!__instance.m_nview.IsOwner())
         {
             __instance.m_nview.ClaimOwnership();
-        }
-
-        
+        }        
     }
 
     /// <summary>
@@ -118,7 +114,7 @@ public static class PreciseTerrainModifier
     /// <summary>
     ///     Modify the operation radius to accurately reflect the fixed radius of precise terrain modifications. This ensures that
     ///     the m_lastOpRadius is not set to an invalid radius when a precision modifier is the last operation applied and avoids issues
-    ///     caused by saving an invalid radius.
+    ///     caused by saving an invalid radius. Also ensures that it finds the correct terrain comp instances in TerrainOp.Awake
     /// </summary>
     /// <param name="__instance"></param>
     /// <param name="__result"></param>

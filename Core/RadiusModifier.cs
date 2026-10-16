@@ -2,6 +2,8 @@
 using Logging;
 using TerrainTools.Visualization;
 using UnityEngine;
+using System.Collections.Generic;
+using static Player;
 
 namespace TerrainTools.Core;
 
@@ -95,6 +97,27 @@ internal static class RadiusModifier
         return TerrainTools.Instance.IsEnableRadiusModifier && Input.GetKey(TerrainTools.Instance.RadiusKey) && Input.mouseScrollDelta.y != 0;
     }
 
+
+    /// <summary>
+    ///     Apply changes to radius when it is actually placed. This is to ensure that it has the correct radius
+    ///     for finding all of the terrain compilers that it should affect when placed. Still need to modify the
+    ///     radius again in TerrainComp.InternalDoOperation since the radius information is not serialized across 
+    ///     the network. The awake method does run for the placement ghost as well.
+    /// </summary>
+    /// <param name="__instance"></param>
+    /// <param name="modifier"></param>
+    [HarmonyPrefix]
+    [HarmonyPriority(Priority.VeryLow)]
+    [HarmonyPatch(typeof(TerrainOp), nameof(TerrainOp.Awake))]
+    private static void TerrainOpAwakeModifyRadius(TerrainOp __instance)
+    {
+        if (!__instance)
+        {
+            return;
+        }
+        ApplyModifiedRadius(__instance.m_settings);
+    }
+
     /// <summary>
     ///     Apply changes to radius just before performing the actual operation.
     /// </summary>
@@ -105,7 +128,16 @@ internal static class RadiusModifier
     [HarmonyPatch(typeof(TerrainComp), nameof(TerrainComp.InternalDoOperation))]
     private static void InternalDoOperationPrefix(TerrainComp __instance, TerrainOp.Settings modifier)
     {
-        if (!__instance || modifier == null || modifier.IsPrecisionModifier())
+        if (!__instance)
+        {
+            return;
+        }
+        ApplyModifiedRadius(modifier);
+    }
+
+    private static void ApplyModifiedRadius(TerrainOp.Settings modifier)
+    {
+        if( modifier == null || modifier.IsPrecisionModifier())
         {
             return;
         }
@@ -157,7 +189,7 @@ internal static class RadiusModifier
         if (modifier.m_level)
         {
             modifier.m_levelRadius = lastLevelRadius;
-            Log.LogInfo($"Resoted level radius {modifier.m_levelRadius}", Log.InfoLevel.Medium);
+            Log.LogInfo($"Restored level radius {modifier.m_levelRadius}", Log.InfoLevel.Medium);
         }
 
         if (modifier.m_raise)
@@ -265,5 +297,72 @@ internal static class RadiusModifier
             maxRadius = terrainOp.m_settings.m_paintRadius;
         }
         return maxRadius != 0f;
+    }
+
+    /// <summary>
+    ///     Points at the edge of the actual radius of effect for the terrain op (assuming radius = 1)
+    /// </summary>
+    private static readonly List<Vector3> GridPoints = [
+        new(1.0f, 0.0f, 0.0f),
+        new(-1.0f, 0.0f, 0.0f),
+        new(0.0f, 0.0f, 1.0f),
+        new(0.0f, 0.0f, -1.0f),
+        new(0.707f, 0.0f, 0.707f),
+        new(-0.707f, 0.0f, 0.707f),
+        new(0.707f, 0.0f, -0.707f),
+        new(-0.707f, 0.0f, -0.707f),
+    ];
+
+
+    /// <summary>
+    ///     Check if the boundaries of the affected area are valid to place a terrain op at.
+    /// </summary>
+    /// <param name="__instance"></param>
+    [HarmonyPostfix]
+    [HarmonyBefore("Searica.Valheim.BuildRestrictionTweaksSync")]
+    [HarmonyPatch(typeof(Player), nameof(Player.UpdatePlacementGhost))]
+    private static void CheckValidTerrainOpPlacement(Player __instance)
+    {
+        if (!__instance || __instance.m_placementGhost == null || !__instance.m_placementGhost.TryGetComponent(out TerrainOp terrainOp))
+        {
+            return;
+        }
+
+        if (!TryGetMaximumRadius(terrainOp, out float radius))
+        {
+            return;
+        }
+
+        if (!__instance.m_placementGhost.TryGetComponent(out Piece piece))
+        {
+            return;
+        }
+
+        Vector3 position;
+        Heightmap heightmap;
+        foreach (Vector3 offset in GridPoints)
+        {
+            position = terrainOp.gameObject.transform.position + radius*offset;
+            if (Location.IsInsideNoBuildLocation(position))
+            {
+                __instance.m_placementStatus = PlacementStatus.NoBuildZone;
+                break;
+            }
+
+            heightmap = Heightmap.FindHeightmap(position);
+            if (heightmap == null)
+            {
+                __instance.m_placementStatus = PlacementStatus.Invalid;
+                break;
+            }
+
+            if (!piece.m_allowedInDeepSnow && __instance.m_currentBiome == Heightmap.Biome.DeepNorth && heightmap.GetCultivationMask(position) > __instance.m_deepSnowBuildHeight)
+            {
+                __instance.m_placementStatus = PlacementStatus.DeepSnow;
+                break;
+            }
+        }
+
+        __instance.SetPlacementGhostValid(__instance.m_placementStatus == PlacementStatus.Valid);
     }
 }

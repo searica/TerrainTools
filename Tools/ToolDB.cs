@@ -24,6 +24,7 @@ internal class ToolDB
     public float? smoothPower;
     public bool? clearPaint;
     public float? paintRadius;
+    public bool? allowedInDeepSnow;
     public Piece.Requirement[] requirements;
     public bool invertGhost;
     public Piece.UsageTagFlags usageTagFlags;
@@ -49,6 +50,7 @@ internal class ToolDB
         float? smoothPower = null,
         bool? clearPaint = null,
         float? paintRadius = null,
+        bool? allowedInDeepSnow = null,
         Piece.Requirement[] requirements = null,
         bool invertGhost = false,
         Piece.UsageTagFlags usageTagFlags = Piece.UsageTagFlags.Misc
@@ -79,6 +81,8 @@ internal class ToolDB
 
         this.clearPaint = clearPaint;
         this.paintRadius = paintRadius;
+
+        this.allowedInDeepSnow = allowedInDeepSnow;
 
         this.requirements = requirements;
         this.invertGhost = invertGhost;

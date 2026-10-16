@@ -71,6 +71,26 @@ namespace TerrainTools.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Bulgarian {
+            get {
+                object obj = ResourceManager.GetObject("Bulgarian", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Chinese {
+            get {
+                object obj = ResourceManager.GetObject("Chinese", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap cross {
@@ -107,6 +127,16 @@ namespace TerrainTools.Properties {
             get {
                 object obj = ResourceManager.GetObject("cultivate_v2_square", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] English {
+            get {
+                object obj = ResourceManager.GetObject("English", resourceCulture);
+                return ((byte[])(obj));
             }
         }
         

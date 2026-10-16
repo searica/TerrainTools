@@ -41,8 +41,8 @@ internal static class Shovel
 
         var shovelConfig = new ItemConfig
         {
-            Name = "Shovel",
-            Description = "",
+            Name = "$shovel_item_name",
+            Description = "$shovel_item_desc",
             CraftingStation = CraftingStations.Forge,
             PieceTable = ShovelPieceTable,
             RepairStation = CraftingStations.Forge,
@@ -59,9 +59,7 @@ internal static class Shovel
     {
         var pieceTableConfig = new PieceTableConfig()
         {
-            CanRemovePieces = false,
-            UseCategories = true,
-            UseCustomCategories = false
+            CanRemovePieces = false
         };
         var CPT = new CustomPieceTable(ShovelPieceTable, pieceTableConfig);
         PieceManager.Instance.AddPieceTable(CPT);

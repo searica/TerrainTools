@@ -109,7 +109,7 @@ internal static class TerrainOperations
     {
         Log.LogInfo("Remove Terrain Modifications", Log.InfoLevel.Medium);
 
-        int fixedRadius = comp.GetFixedRadius();
+        int fixedRadius = 2 * comp.GetFixedRadius();
         IEnumerable<HeightIndex> indices = GetHeightIndicesWithRect(comp, worldPos, fixedRadius, fixedRadius, 0);
         foreach (HeightIndex heightIndex in indices)
         {
