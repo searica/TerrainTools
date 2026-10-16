@@ -8,13 +8,21 @@
 			<td align="center">1.6.0</td>
 			<td align="left">
 				<ul>
-					<li>Allow the reset terrain tool to be placed in deep snow to avoid frustration when reseting terrain in the Deep North.</li>
+					<li>Allow the reset terrain tool to be placed in deep snow to avoid frustration when resetting terrain in the Deep North.</li>
 					<li>Fixed reset terrain tool having a smaller area of effect than intended since update 1.5.5.</li>
 					<li>Fixed custom piece descriptions for vanilla terrain operations.</li>
-					<li>Added check to see if placing a terrain op is valid throughout the entire modified radius. This prevents using a scaled up radius to clear snow in the deep north and prevents altering terrain in no build zones. (Compatible with NoBuildRestrictionTweaskSync, so you can still override placement restrictions with that mod.)</li>
+					<li>Added check to see if placing a terrain op is valid throughout the entire modified radius. This prevents using a scaled up radius to clear snow in the deep north and prevents altering terrain in no build zones. (Compatible with BuildRestrictionTweaksSync, so you can still override placement restrictions with that mod.)</li>
 					<li>Fixed bug with terrain operations that had an increased radius not always properly affecting adjacent terrain chunks.</li>
 					<li>Added localization support. Currently all supported languages default to the English localization but users can edit the json files in the config folder and their changes will persist even when the mod updates.</li>
-					<li>Switched default keybind for adjusting sharpness back to left alt to avoid conflict with defauly keybinds in fly mode.</li>
+					<li>Switched default keybind for adjusting sharpness back to left alt to avoid conflict with default keybinds in fly mode.</li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td align="center">1.5.7</td>
+			<td align="left">
+				<ul>
+					<li>Uploaded v1.6.0 with the wrong version string in the thunderstore manifest.</li>
 				</ul>
 			</td>
 		</tr>

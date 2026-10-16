@@ -298,7 +298,6 @@ Source code is available on Github.
 | Github Repository: | <img height="18" src="https://github.githubassets.com/favicons/favicon-dark.svg"></img> [TerrainTools](https://github.com/searica/TerrainTools)  |
 |-----------|---------------|
 
-
 ### Credits
 This mod was inspired by and is based on OCDHeim by javadevils as well as HoeRadius by aedenthorn.
 

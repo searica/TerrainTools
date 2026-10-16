@@ -19,6 +19,14 @@
 			</td>
 		</tr>
 		<tr>
+			<td align="center">1.5.7</td>
+			<td align="left">
+				<ul>
+					<li>Uploaded v1.6.0 with the wrong version string in the thunderstore manifest.</li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
 			<td align="center">1.5.6</td>
 			<td align="left">
 				<ul>
